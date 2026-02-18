@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 // ============================================================================
 
 // 1. FORMSPREE: Go to formspree.io → Create form → Copy the ID (e.g., 'xyzabc123')
-const FORMSPREE_ID = 'YOUR_FORMSPREE_ID';
+const FORMSPREE_ID = 'xlgwlovd';
 
 // 2. YOUTUBE: Upload your demo video → Copy video ID from URL (youtube.com/watch?v=THIS_PART)
 const YOUTUBE_VIDEO_ID = 'YOUR_YOUTUBE_VIDEO_ID';
