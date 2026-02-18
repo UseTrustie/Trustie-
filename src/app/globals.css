@@ -1,108 +1,236 @@
-/**
- * Global Styles
- * 
- * Gold Standard: Minimal custom CSS, leverage Tailwind.
- * Only write custom CSS for things Tailwind cannot do.
- */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Base layer - applies to all elements */
-@layer base {
-  /* Smooth scrolling */
-  html {
-    scroll-behavior: smooth;
-  }
-  
-  /* Better focus outline */
-  *:focus-visible {
-    outline: 2px solid rgb(59 130 246);
-    outline-offset: 2px;
-  }
-  
-  /* Selection color */
-  ::selection {
-    background-color: rgb(59 130 246 / 0.3);
-  }
+/* ============================================================================
+   CSS VARIABLES - THEME COLORS
+   ============================================================================ */
+
+:root {
+  /* Light Mode Colors */
+  --bg-primary: #f1f5f9;
+  --bg-secondary: #e2e8f0;
+  --bg-card: #ffffff;
+  --bg-input: #ffffff;
+  --border-color: #cbd5e1;
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --accent-blue: #2563eb;
+  --accent-blue-hover: #1d4ed8;
 }
 
-/* Components layer - reusable component styles */
-@layer components {
-  /* Custom scrollbar */
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: rgb(75 85 99) transparent;
-  }
-  
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: rgb(75 85 99);
-    border-radius: 3px;
-  }
-  
-  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background-color: rgb(107 114 128);
-  }
+[data-theme="dark"] {
+  /* Dark Mode Colors */
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --bg-card: #1f2937;
+  --bg-input: #111827;
+  --border-color: #374151;
+  --text-primary: #f3f4f6;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
+  --accent-blue: #3b82f6;
+  --accent-blue-hover: #2563eb;
 }
 
-/* Utilities layer - single-purpose classes */
-@layer utilities {
-  /* Hide scrollbar but keep functionality */
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-  
-  /* Truncate multiple lines */
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
+/* ============================================================================
+   BASE STYLES
+   ============================================================================ */
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
-/* Animations */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+/* ============================================================================
+   LIGHT MODE OVERRIDES
+   ============================================================================ */
+
+/* Base light mode background */
+.bg-gray-50 {
+  background-color: #f1f5f9 !important;
 }
+
+/* Cards and containers in light mode */
+.bg-gray-50 .bg-gray-800,
+.bg-gray-50 .bg-gray-800\/50 {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Input fields in light mode */
+.bg-gray-50 .bg-gray-900 {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
+}
+
+/* Text colors in light mode */
+.bg-gray-50 .text-gray-100 {
+  color: #1e293b !important;
+}
+
+.bg-gray-50 .text-gray-200 {
+  color: #334155 !important;
+}
+
+.bg-gray-50 .text-gray-300 {
+  color: #475569 !important;
+}
+
+.bg-gray-50 .text-gray-400 {
+  color: #64748b !important;
+}
+
+.bg-gray-50 .text-gray-500 {
+  color: #64748b !important;
+}
+
+/* Header in light mode */
+.bg-gray-50 .bg-gray-800\/50 {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(8px);
+}
+
+.bg-gray-50 .border-gray-700 {
+  border-color: #cbd5e1 !important;
+}
+
+/* Sidebar and cards in light mode */
+.bg-gray-50 .bg-gray-800 {
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Tab buttons in light mode - inactive */
+.bg-gray-50 .text-gray-400.hover\:text-blue-400 {
+  color: #64748b !important;
+}
+
+.bg-gray-50 .text-gray-400.hover\:text-blue-400:hover {
+  color: #2563eb !important;
+}
+
+/* Placeholder text in light mode */
+.bg-gray-50 .placeholder\:text-gray-500::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Example question buttons in light mode */
+.bg-gray-50 .bg-blue-500\/10 {
+  background-color: rgba(37, 99, 235, 0.1) !important;
+}
+
+.bg-gray-50 .text-blue-400 {
+  color: #2563eb !important;
+}
+
+/* Footer in light mode */
+.bg-gray-50 .text-gray-500.text-sm {
+  color: #64748b !important;
+}
+
+.bg-gray-50 .text-gray-600 {
+  color: #475569 !important;
+}
+
+/* Quick Info section text */
+.bg-gray-50 .text-gray-400.text-xs {
+  color: #475569 !important;
+}
+
+.bg-gray-50 .text-gray-300.text-sm {
+  color: #334155 !important;
+}
+
+/* ============================================================================
+   DARK MODE STYLES (Keep existing)
+   ============================================================================ */
+
+.bg-gray-900 {
+  background-color: #111827;
+}
+
+/* ============================================================================
+   COMPONENT STYLES
+   ============================================================================ */
+
+/* Smooth transitions for theme switching */
+body,
+.bg-gray-900,
+.bg-gray-50,
+.bg-gray-800,
+.text-gray-100,
+.text-gray-300,
+.text-gray-400 {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Custom scrollbar - Dark mode */
+.bg-gray-900 ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.bg-gray-900 ::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+.bg-gray-900 ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+.bg-gray-900 ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Custom scrollbar - Light mode */
+.bg-gray-50 ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.bg-gray-50 ::-webkit-scrollbar-track {
+  background: #e2e8f0;
+}
+
+.bg-gray-50 ::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 4px;
+}
+
+.bg-gray-50 ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* ============================================================================
+   FOCUS STATES
+   ============================================================================ */
+
+/* Better focus ring for accessibility */
+*:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   ANIMATIONS
+   ============================================================================ */
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -110,14 +238,75 @@
   }
 }
 
-.animate-spin {
-  animation: spin 1s linear infinite;
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.3s ease-out forwards;
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+/* Loading shimmer effect */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Text selection colors */
+::selection {
+  background-color: rgba(59, 130, 246, 0.3);
+  color: inherit;
+}
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
