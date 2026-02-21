@@ -13,7 +13,7 @@ const FORMSPREE_ID = 'xlgwlovd';
 const YOUTUBE_VIDEO_ID = 'YOUR_YOUTUBE_VIDEO_ID';
 
 // 3. CALENDLY: Go to calendly.com → Create event → Copy your full link
-const CALENDLY_LINK = 'https://calendly.com/YOUR_USERNAME/trustie-demo';
+const CALENDLY_LINK = 'https://calendly.com/trustietechnologies/trustie-demo';
 
 // ============================================================================
 // MAIN APP COMPONENT
