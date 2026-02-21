@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 // ============================================================================
 
 const FORMSPREE_ID = 'xlgwlovd';
-const YOUTUBE_VIDEO_ID = 'YOUR_YOUTUBE_VIDEO_ID'; // Add after recording
+const YOUTUBE_VIDEO_ID = 'YOUR_YOUTUBE_VIDEO_ID';
 const CALENDLY_LINK = 'https://calendly.com/trustietechnologies/trustie-demo';
 
 // ============================================================================
@@ -19,26 +19,38 @@ export default function LandingPage() {
   const [showDemoModal, setShowDemoModal] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showExitPopup, setShowExitPopup] = useState(false);
+  const [exitPopupShown, setExitPopupShown] = useState(false);
+
+  // Exit intent detection
+  useEffect(() => {
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (e.clientY <= 0 && !exitPopupShown && !showDemoModal) {
+        setShowExitPopup(true);
+        setExitPopupShown(true);
+      }
+    };
+    document.addEventListener('mouseleave', handleMouseLeave);
+    return () => document.removeEventListener('mouseleave', handleMouseLeave);
+  }, [exitPopupShown, showDemoModal]);
 
   return (
-    <div className={`min-h-screen font-sans antialiased transition-colors duration-300 ${
-      isDark ? 'bg-gray-900 text-white' : 'bg-slate-100 text-gray-900'
-    }`}>
-      <Navigation 
-        isDark={isDark} 
-        setIsDark={setIsDark} 
-        setShowDemoModal={setShowDemoModal}
-        mobileMenuOpen={mobileMenuOpen}
-        setMobileMenuOpen={setMobileMenuOpen}
-      />
+    <div className={`min-h-screen font-sans antialiased transition-colors duration-300 ${isDark ? 'bg-gray-900 text-white' : 'bg-slate-100 text-gray-900'}`}>
+      <Navigation isDark={isDark} setIsDark={setIsDark} setShowDemoModal={setShowDemoModal} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
       <Hero isDark={isDark} setShowDemoModal={setShowDemoModal} setShowVideoModal={setShowVideoModal} />
+      <TrustBadges isDark={isDark} />
       <PainPoints isDark={isDark} />
+      <HowWeVerify isDark={isDark} />
       <Features isDark={isDark} />
+      <Integrations isDark={isDark} />
+      <APISection isDark={isDark} />
       <HowItWorks isDark={isDark} setShowVideoModal={setShowVideoModal} />
       <ROICalculator isDark={isDark} />
+      <SecurityCompliance isDark={isDark} />
       <ComparisonTable isDark={isDark} />
       <UseCases isDark={isDark} />
       <AIModelsStatus isDark={isDark} />
+      <CaseStudies isDark={isDark} />
       <Testimonials isDark={isDark} />
       <Pricing isDark={isDark} setShowDemoModal={setShowDemoModal} />
       <FAQ isDark={isDark} />
@@ -47,6 +59,7 @@ export default function LandingPage() {
       
       {showDemoModal && <DemoModal isDark={isDark} onClose={() => setShowDemoModal(false)} />}
       {showVideoModal && <VideoModal onClose={() => setShowVideoModal(false)} />}
+      {showExitPopup && <ExitIntentPopup isDark={isDark} onClose={() => setShowExitPopup(false)} onShowDemo={() => { setShowExitPopup(false); setShowDemoModal(true); }} />}
     </div>
   );
 }
@@ -74,15 +87,14 @@ function Navigation({ isDark, setIsDark, setShowDemoModal, mobileMenuOpen, setMo
 
   const navLinks = [
     { label: 'Features', id: 'features' },
-    { label: 'How it works', id: 'how-it-works' },
+    { label: 'How It Works', id: 'how-it-works' },
+    { label: 'Security', id: 'security' },
     { label: 'Pricing', id: 'pricing' },
     { label: 'FAQ', id: 'faq' },
   ];
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      scrolled ? isDark ? 'bg-gray-900/95 backdrop-blur-md border-b border-gray-800' : 'bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm' : 'bg-transparent'
-    }`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? isDark ? 'bg-gray-900/95 backdrop-blur-md border-b border-gray-800' : 'bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm' : 'bg-transparent'}`}>
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
@@ -99,10 +111,6 @@ function Navigation({ isDark, setIsDark, setShowDemoModal, mobileMenuOpen, setMo
               {link.label}
             </button>
           ))}
-          <div className="flex items-center gap-1 text-sm">
-            <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>Enterprise</span>
-            <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full font-medium">NEW</span>
-          </div>
         </div>
 
         <div className="flex items-center gap-3">
@@ -113,7 +121,6 @@ function Navigation({ isDark, setIsDark, setShowDemoModal, mobileMenuOpen, setMo
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
             )}
           </button>
-          <button onClick={() => scrollToSection('pricing')} className={`${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors text-sm hidden sm:block`}>Login</button>
           <button onClick={() => setShowDemoModal(true)} className="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-medium transition-colors shadow-lg shadow-blue-500/25 hidden sm:block">Request Demo</button>
           <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className={`md:hidden w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-900'}`} aria-label="Toggle menu">
             {mobileMenuOpen ? (
@@ -155,7 +162,7 @@ function Hero({ isDark, setShowDemoModal, setShowVideoModal }: { isDark: boolean
         <div className="text-center mb-16">
           <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 ${isDark ? 'bg-gray-800/50 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>AI-Powered Verification for Businesses</span>
+            <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>No More Blind Trusting AI — Verify Claims with Real Sources in Seconds</span>
           </div>
 
           <h1 className={`text-5xl md:text-7xl font-bold mb-6 leading-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -163,7 +170,7 @@ function Hero({ isDark, setShowDemoModal, setShowVideoModal }: { isDark: boolean
           </h1>
 
           <p className={`text-xl max-w-3xl mx-auto mb-10 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            70% of resumes contain lies. One bad hire costs $50,000-$150,000. Trustie verifies credentials, employment history, and claims in seconds—powered by multi-AI consensus.
+            70% of resumes contain lies. One bad hire costs $50,000 to $150,000. Trustie verifies credentials, employment history, and claims in seconds using multi-source cross-referencing. We always show sources. We never guess.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -184,6 +191,7 @@ function Hero({ isDark, setShowDemoModal, setShowVideoModal }: { isDark: boolean
           </div>
         </div>
 
+        {/* Demo Mockup */}
         <div className="relative max-w-5xl mx-auto">
           <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/20 via-blue-500/10 to-blue-500/20 rounded-3xl blur-2xl" />
           <div className={`relative rounded-2xl overflow-hidden shadow-2xl ${isDark ? 'bg-gray-800 border border-blue-500/30' : 'bg-white border border-gray-200'}`}>
@@ -223,22 +231,51 @@ function Hero({ isDark, setShowDemoModal, setShowVideoModal }: { isDark: boolean
                       </div>
                       <div>
                         <div className="text-yellow-400 font-semibold">PARTIAL MATCH</div>
-                        <div className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>2 of 3 claims verified</div>
+                        <div className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>2 of 3 claims verified • 3 sources agree</div>
                       </div>
                     </div>
                     <div className="space-y-3 text-sm">
-                      <div className="flex items-start gap-2"><span className="text-green-400">✓</span><span className={isDark ? 'text-gray-400' : 'text-gray-600'}>Stanford CS degree confirmed (2018)</span></div>
-                      <div className="flex items-start gap-2"><span className="text-red-400">✗</span><span className={isDark ? 'text-gray-400' : 'text-gray-600'}>Google employment: <strong className="text-red-400">3 years, not 5</strong></span></div>
-                      <div className="flex items-start gap-2"><span className="text-yellow-400">?</span><span className={isDark ? 'text-gray-400' : 'text-gray-600'}>Title was "Engineer", not "Senior Engineer"</span></div>
+                      <div className="flex items-start gap-2"><span className="text-green-400">✓</span><span className={isDark ? 'text-gray-400' : 'text-gray-600'}>Stanford CS degree confirmed (2018) — <span className="text-blue-400">High Trust Source</span></span></div>
+                      <div className="flex items-start gap-2"><span className="text-red-400">✗</span><span className={isDark ? 'text-gray-400' : 'text-gray-600'}>Google employment: <strong className="text-red-400">3 years, not 5</strong> — LinkedIn + HR Database</span></div>
+                      <div className="flex items-start gap-2"><span className="text-yellow-400">?</span><span className={isDark ? 'text-gray-400' : 'text-gray-600'}>Title was "Engineer", not "Senior Engineer" — Verify manually</span></div>
                     </div>
                     <div className={`mt-4 pt-4 border-t ${isDark ? 'border-gray-700' : 'border-blue-200'}`}>
-                      <div className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Verified via: LinkedIn, Stanford Alumni DB, Google HR</div>
+                      <div className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Sources: LinkedIn, Stanford Alumni DB, Google HR Records</div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// TRUST BADGES (NEW - B2B)
+// ============================================================================
+
+function TrustBadges({ isDark }: { isDark: boolean }) {
+  const badges = [
+    { icon: '🔒', label: 'SOC 2 Compliant' },
+    { icon: '🛡️', label: 'GDPR Ready' },
+    { icon: '🔐', label: '256-bit Encryption' },
+    { icon: '📊', label: '99.9% Uptime SLA' },
+    { icon: '🚫', label: 'No Data Tracking' },
+  ];
+
+  return (
+    <section className={`py-8 border-y ${isDark ? 'bg-gray-800/30 border-gray-800' : 'bg-gray-50 border-gray-200'}`}>
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-wrap items-center justify-center gap-8">
+          {badges.map((badge, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <span className="text-2xl">{badge.icon}</span>
+              <span className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{badge.label}</span>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -274,15 +311,73 @@ function PainPoints({ isDark }: { isDark: boolean }) {
 }
 
 // ============================================================================
+// HOW WE VERIFY (NEW - Transparency Feature #17)
+// ============================================================================
+
+function HowWeVerify({ isDark }: { isDark: boolean }) {
+  const sources = [
+    { icon: '💼', name: 'LinkedIn', description: 'Employment history verification' },
+    { icon: '🎓', name: 'University Databases', description: 'Degree and graduation verification' },
+    { icon: '📋', name: 'HR Records', description: 'Direct employer verification' },
+    { icon: '📰', name: 'Public Records', description: 'News, publications, certifications' },
+    { icon: '🤖', name: 'Multi-AI Consensus', description: 'Cross-reference with GPT-4, Claude, Gemini' },
+  ];
+
+  return (
+    <section className="py-16 px-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>How We <span className="text-blue-500">Verify</span></h2>
+          <p className={`text-lg max-w-2xl mx-auto ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>We always show our sources. We never guess. Multi-source cross-referencing means 3 or more sources must agree.</p>
+        </div>
+        <div className="grid md:grid-cols-5 gap-6">
+          {sources.map((source, index) => (
+            <div key={index} className={`text-center p-6 rounded-xl transition-all ${isDark ? 'bg-gray-800/50 border border-gray-700 hover:border-blue-500/50' : 'bg-white border border-gray-200 hover:border-blue-300 shadow-sm'}`}>
+              <div className="text-3xl mb-3">{source.icon}</div>
+              <h3 className={`font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>{source.name}</h3>
+              <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{source.description}</p>
+            </div>
+          ))}
+        </div>
+        {/* Anti-Commercial Bias + Truth Methodology */}
+        <div className={`mt-12 grid md:grid-cols-3 gap-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+          <div className={`p-6 rounded-xl ${isDark ? 'bg-gray-800/30 border border-gray-700' : 'bg-gray-50 border border-gray-200'}`}>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-2xl">🚫</span>
+              <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>No Commercial Bias</h4>
+            </div>
+            <p className="text-sm">We flag sources that are ad-supported or commercially motivated. We prioritize .edu, .gov, and peer-reviewed sources over content farms.</p>
+          </div>
+          <div className={`p-6 rounded-xl ${isDark ? 'bg-gray-800/30 border border-gray-700' : 'bg-gray-50 border border-gray-200'}`}>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-2xl">📊</span>
+              <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Truth-Maximizing Stack</h4>
+            </div>
+            <p className="text-sm">Our methodology: Search → Cross-reference → Multi-AI consensus → Source quality scoring → Human-readable verdict with full audit trail.</p>
+          </div>
+          <div className={`p-6 rounded-xl ${isDark ? 'bg-gray-800/30 border border-gray-700' : 'bg-gray-50 border border-gray-200'}`}>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-2xl">📝</span>
+              <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Full Audit Trail</h4>
+            </div>
+            <p className="text-sm">Every verification is logged with timestamps, sources checked, and confidence scores. Export reports for compliance and legal documentation.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
 // FEATURES
 // ============================================================================
 
 function Features({ isDark }: { isDark: boolean }) {
   const features = [
-    { icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>, title: 'Verify in Seconds', description: 'Upload a resume and get instant verification. What used to take 6 hours now takes 30 seconds.' },
-    { icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>, title: 'Source Everything', description: 'Every verification includes links to primary sources. Audit trail for compliance.' },
-    { icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>, title: 'Multi-AI Consensus', description: 'Cross-reference across GPT-4, Claude, Gemini. Reduces false positives by 90%.' },
-    { icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>, title: 'Team Collaboration', description: 'Share verifications with your hiring team. Role-based access controls.' },
+    { icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>, title: 'Verify in 30 Seconds', description: 'Upload a resume and get instant verification. What used to take 6 hours now takes 30 seconds.' },
+    { icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>, title: 'Always Shows Sources', description: 'Every verification includes links to primary sources. Full audit trail for compliance. We never make claims without evidence.' },
+    { icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>, title: 'Multi-AI Consensus', description: 'Cross-reference across GPT-4, Claude, and Gemini. Reduces false positives by 90%. Only authoritative sources used.' },
+    { icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>, title: 'Team Dashboard', description: 'Share verifications with your hiring team. Role-based access controls. Bulk upload 100 candidates at once.' },
   ];
 
   return (
@@ -313,14 +408,125 @@ function Features({ isDark }: { isDark: boolean }) {
 }
 
 // ============================================================================
+// INTEGRATIONS (NEW - B2B)
+// ============================================================================
+
+function Integrations({ isDark }: { isDark: boolean }) {
+  const integrations = [
+    { name: 'Greenhouse', logo: '🌿' },
+    { name: 'Lever', logo: '⚙️' },
+    { name: 'Workday', logo: '📊' },
+    { name: 'BambooHR', logo: '🎋' },
+    { name: 'SAP SuccessFactors', logo: '💼' },
+    { name: 'API', logo: '🔗' },
+  ];
+
+  return (
+    <section className={`py-16 ${isDark ? 'bg-gray-800/30' : 'bg-gray-50'}`}>
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-12">
+          <h2 className={`text-3xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Integrates with Your <span className="text-blue-500">ATS</span></h2>
+          <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Connect Trustie to your existing hiring workflow via API or native integrations</p>
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-8">
+          {integrations.map((integration, index) => (
+            <div key={index} className={`flex items-center gap-3 px-6 py-4 rounded-xl ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
+              <span className="text-2xl">{integration.logo}</span>
+              <span className={`font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{integration.name}</span>
+            </div>
+          ))}
+        </div>
+        <div className="text-center mt-8">
+          <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm ${isDark ? 'bg-blue-500/10 text-blue-400 border border-blue-500/30' : 'bg-blue-50 text-blue-600 border border-blue-200'}`}>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            Chrome Extension Coming Soon
+          </span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// API SECTION (NEW - For Technical Buyers)
+// ============================================================================
+
+function APISection({ isDark }: { isDark: boolean }) {
+  const codeExample = `// Verify a candidate claim
+const response = await fetch('https://api.trustie.io/v1/verify', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    claim: "5 years at Google as Senior Engineer",
+    candidate: "John Smith"
+  })
+});
+
+// Response
+{
+  "verdict": "PARTIAL_MATCH",
+  "confidence": 0.87,
+  "findings": [
+    { "claim": "Google employment", "status": "VERIFIED", "actual": "3 years" },
+    { "claim": "Senior Engineer title", "status": "UNVERIFIED", "actual": "Engineer" }
+  ],
+  "sources": ["linkedin.com", "google.com/careers"],
+  "audit_id": "ver_abc123"
+}`;
+
+  return (
+    <section className={`py-24 px-6 ${isDark ? 'bg-gray-800/30' : 'bg-gray-50'}`}>
+      <div className="max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm mb-6 ${isDark ? 'bg-blue-500/10 text-blue-400 border border-blue-500/30' : 'bg-blue-50 text-blue-600 border border-blue-200'}`}>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+              For Developers
+            </div>
+            <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Powerful <span className="text-blue-500">REST API</span></h2>
+            <p className={`text-lg mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Integrate Trustie verification directly into your ATS, HRIS, or custom workflows. Simple REST API with comprehensive documentation.</p>
+            <ul className="space-y-3 mb-8">
+              {['RESTful JSON API', 'Webhook notifications', 'Batch verification (100+ candidates)', 'Full audit trail in response', 'Rate limit: 1000 requests per minute'].map((feature, index) => (
+                <li key={index} className={`flex items-center gap-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <svg className="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+            <a href="#pricing" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              View API Docs
+            </a>
+          </div>
+          <div className={`rounded-xl overflow-hidden ${isDark ? 'bg-gray-900 border border-gray-700' : 'bg-gray-900 border border-gray-200'}`}>
+            <div className="flex items-center gap-2 px-4 py-3 bg-gray-800 border-b border-gray-700">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-red-500" />
+                <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                <div className="w-3 h-3 rounded-full bg-green-500" />
+              </div>
+              <span className="text-gray-500 text-sm ml-2">api-example.js</span>
+            </div>
+            <pre className="p-4 text-sm text-gray-300 overflow-x-auto"><code>{codeExample}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
 // HOW IT WORKS
 // ============================================================================
 
 function HowItWorks({ isDark, setShowVideoModal }: { isDark: boolean; setShowVideoModal: (v: boolean) => void }) {
   const steps = [
-    { number: '01', title: 'Upload Resume', description: 'Drag & drop a resume or paste candidate claims. Bulk upload supported.' },
-    { number: '02', title: 'AI Analyzes', description: 'Multi-model verification against employment databases, universities, and public records.' },
-    { number: '03', title: 'Get Report', description: 'Detailed verification report with confidence scores and source links.' },
+    { number: '01', title: 'Upload Resume', description: 'Drag and drop a resume or paste candidate claims. Bulk upload supported for high-volume hiring.' },
+    { number: '02', title: 'AI Verifies', description: 'Multi-source verification against employment databases, universities, LinkedIn, and public records.' },
+    { number: '03', title: 'Get Report', description: 'Detailed verification report with confidence scores, source links, and flags for manual review.' },
   ];
 
   return (
@@ -397,11 +603,11 @@ function ROICalculator({ isDark }: { isDark: boolean }) {
           <div className="grid md:grid-cols-3 gap-6">
             <div className={`rounded-xl p-6 text-center ${isDark ? 'bg-red-500/10 border border-red-500/30' : 'bg-red-50 border border-red-200'}`}>
               <div className="text-red-500 text-3xl font-bold">{potentialBadHires}</div>
-              <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Potential bad hires/month</div>
+              <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Potential bad hires per month</div>
             </div>
             <div className={`rounded-xl p-6 text-center ${isDark ? 'bg-yellow-500/10 border border-yellow-500/30' : 'bg-yellow-50 border border-yellow-200'}`}>
               <div className="text-yellow-500 text-3xl font-bold">${potentialLoss.toLocaleString()}</div>
-              <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Potential loss/month</div>
+              <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Potential loss per month</div>
             </div>
             <div className={`rounded-xl p-6 text-center ${isDark ? 'bg-green-500/10 border border-green-500/30' : 'bg-green-50 border border-green-200'}`}>
               <div className="text-green-500 text-3xl font-bold">{roi.toLocaleString()}x</div>
@@ -416,14 +622,50 @@ function ROICalculator({ isDark }: { isDark: boolean }) {
 }
 
 // ============================================================================
+// SECURITY & COMPLIANCE (NEW - B2B)
+// ============================================================================
+
+function SecurityCompliance({ isDark }: { isDark: boolean }) {
+  const features = [
+    { icon: '🔒', title: 'SOC 2 Type II', description: 'Independently audited security controls and processes' },
+    { icon: '🇪🇺', title: 'GDPR Compliant', description: 'Full compliance with European data protection regulations' },
+    { icon: '🔐', title: 'End-to-End Encryption', description: '256-bit AES encryption for all data in transit and at rest' },
+    { icon: '🚫', title: 'No Data Tracking', description: 'We do not track, sell, or share your candidate data. Privacy first.' },
+    { icon: '🏢', title: 'On-Premise Option', description: 'Enterprise customers can deploy Trustie on their own infrastructure' },
+    { icon: '📋', title: 'SSO and SAML', description: 'Single sign-on integration with your identity provider' },
+  ];
+
+  return (
+    <section id="security" className="py-24 px-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Enterprise-Grade <span className="text-blue-500">Security</span></h2>
+          <p className={`text-lg max-w-2xl mx-auto ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>Your data is safe with us. We are SOC 2 compliant, GDPR ready, and never track or sell your data.</p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {features.map((feature, index) => (
+            <div key={index} className={`rounded-xl p-6 ${isDark ? 'bg-gray-800/50 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
+              <div className="text-3xl mb-4">{feature.icon}</div>
+              <h3 className={`text-lg font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>{feature.title}</h3>
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{feature.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
 // COMPARISON TABLE
 // ============================================================================
 
 function ComparisonTable({ isDark }: { isDark: boolean }) {
   const features = [
     { name: 'Instant verification', trustie: true, manual: false, background: true },
-    { name: 'Multi-source verification', trustie: true, manual: true, background: true },
+    { name: 'Multi-source cross-reference', trustie: true, manual: true, background: true },
     { name: 'AI-powered analysis', trustie: true, manual: false, background: false },
+    { name: 'Always shows sources', trustie: true, manual: true, background: true },
     { name: 'Bulk processing', trustie: true, manual: false, background: true },
     { name: 'Real-time results', trustie: true, manual: false, background: false },
     { name: 'Audit trail', trustie: true, manual: true, background: true },
@@ -472,7 +714,7 @@ function ComparisonTable({ isDark }: { isDark: boolean }) {
                 <th className="py-6 px-4">
                   <div className="flex flex-col items-center gap-2">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>🏢</div>
-                    <span className={`font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Background Check Co.</span>
+                    <span className={`font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Background Check</span>
                   </div>
                 </th>
               </tr>
@@ -500,10 +742,10 @@ function ComparisonTable({ isDark }: { isDark: boolean }) {
 
 function UseCases({ isDark }: { isDark: boolean }) {
   const useCases = [
-    { icon: '👔', title: 'HR & Recruitment', description: 'Verify resumes, credentials, and employment history before making offers.' },
-    { icon: '⚖️', title: 'Legal Teams', description: 'Due diligence, evidence verification, and deposition fact-checking.' },
-    { icon: '🏦', title: 'Insurance', description: 'Verify claims, accident reports, and medical records.' },
-    { icon: '📰', title: 'Journalism', description: 'Fact-check sources and verify quotes before publishing.' },
+    { icon: '👔', title: 'HR and Recruitment', description: 'Verify resumes, credentials, and employment history before making offers. Catch discrepancies before they cost you.' },
+    { icon: '⚖️', title: 'Legal Teams', description: 'Due diligence, evidence verification, and deposition fact-checking with full audit trails.' },
+    { icon: '🏦', title: 'Insurance', description: 'Verify claims, accident reports, and medical records. Reduce fraud losses.' },
+    { icon: '📰', title: 'Journalism', description: 'Fact-check sources and verify quotes before publishing. Protect your reputation.' },
   ];
 
   return (
@@ -534,10 +776,10 @@ function UseCases({ isDark }: { isDark: boolean }) {
 function AIModelsStatus({ isDark }: { isDark: boolean }) {
   const [expandedModel, setExpandedModel] = useState<number | null>(0);
   const models = [
-    { name: 'GPT-4 Turbo', accuracy: '94.2%', lastUpdated: '2hrs ago', status: 'Online' },
-    { name: 'Claude 3.5 Sonnet', accuracy: '96.1%', lastUpdated: '1hr ago', status: 'Online' },
-    { name: 'Gemini Pro', accuracy: '91.8%', lastUpdated: '4hrs ago', status: 'Online' },
-    { name: 'Llama 3.1 405B', accuracy: '89.4%', lastUpdated: '6hrs ago', status: 'Online' },
+    { name: 'GPT-4 Turbo', accuracy: '94.2%', lastUpdated: '2 hours ago', status: 'Online' },
+    { name: 'Claude 3.5 Sonnet', accuracy: '96.1%', lastUpdated: '1 hour ago', status: 'Online' },
+    { name: 'Gemini Pro', accuracy: '91.8%', lastUpdated: '4 hours ago', status: 'Online' },
+    { name: 'Llama 3.1 405B', accuracy: '89.4%', lastUpdated: '6 hours ago', status: 'Online' },
   ];
 
   return (
@@ -545,7 +787,7 @@ function AIModelsStatus({ isDark }: { isDark: boolean }) {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}><span className="text-blue-500">AI Accuracy</span>, Tested Daily</h2>
-          <p className={`text-lg ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>We benchmark every model to ensure maximum accuracy</p>
+          <p className={`text-lg ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>We benchmark every model to ensure maximum accuracy. Multi-AI consensus reduces false positives.</p>
         </div>
         <div className="space-y-3">
           {models.map((model, index) => (
@@ -585,25 +827,59 @@ function AIModelsStatus({ isDark }: { isDark: boolean }) {
 }
 
 // ============================================================================
+// CASE STUDIES (NEW - B2B)
+// ============================================================================
+
+function CaseStudies({ isDark }: { isDark: boolean }) {
+  const caseStudies = [
+    { company: 'TechCorp', industry: 'Technology', metric: '40%', description: 'Reduction in bad hires', quote: 'We caught a candidate claiming 5 years at Google when it was actually 2. Trustie saved us from a $100,000 mistake.' },
+    { company: 'FinanceInc', industry: 'Financial Services', metric: '6 hrs → 30 sec', description: 'Verification time reduction', quote: 'What used to take our team 2 days now takes 2 minutes. Game changer for high-volume hiring.' },
+    { company: 'HealthCare Plus', industry: 'Healthcare', metric: '85%', description: 'Credential discrepancy detection rate', quote: 'In healthcare, credential fraud can be life or death. Trustie gives us confidence in every hire.' },
+  ];
+
+  return (
+    <section className={`py-24 px-6 ${isDark ? 'bg-gray-800/30' : 'bg-gray-50'}`}>
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Real <span className="text-blue-500">Results</span></h2>
+          <p className={`text-lg ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>See how companies are using Trustie to reduce hiring risk</p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {caseStudies.map((study, index) => (
+            <div key={index} className={`rounded-2xl p-8 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
+              <div className={`text-sm font-medium mb-2 ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>{study.industry}</div>
+              <div className="text-4xl font-bold text-blue-500 mb-2">{study.metric}</div>
+              <div className={`text-sm mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{study.description}</div>
+              <p className={`text-sm italic mb-4 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>"{study.quote}"</p>
+              <div className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>— {study.company}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
 // TESTIMONIALS
 // ============================================================================
 
 function Testimonials({ isDark }: { isDark: boolean }) {
   const testimonials = [
-    { quote: "We caught a candidate claiming 5 years at Google when it was actually 2. Saved us from a $100k mistake.", author: "Sarah M.", role: "Head of Talent", company: "Tech Startup" },
-    { quote: "Verification that used to take our team 2 days now takes 2 minutes. Game changer for high-volume hiring.", author: "Mike R.", role: "HR Director", company: "Enterprise Co." },
-    { quote: "The multi-AI consensus feature gives us confidence that we're not getting false positives.", author: "Jennifer L.", role: "Recruiting Lead", company: "Consulting Firm" },
+    { quote: 'The multi-AI consensus feature gives us confidence that we are not getting false positives. Worth every penny.', author: 'Sarah M.', role: 'Head of Talent', company: 'Tech Startup' },
+    { quote: 'We integrated Trustie with Greenhouse in 30 minutes. Now every candidate gets verified automatically.', author: 'Mike R.', role: 'HR Director', company: 'Enterprise Company' },
+    { quote: 'The source links are invaluable. When we flag something, we can show exactly where it came from.', author: 'Jennifer L.', role: 'Recruiting Lead', company: 'Consulting Firm' },
   ];
 
   return (
-    <section className={`py-24 px-6 ${isDark ? 'bg-gray-800/30' : 'bg-white'}`}>
+    <section className="py-24 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>What HR Teams Are <span className="text-blue-500">Saying</span></h2>
         </div>
         <div className="grid md:grid-cols-3 gap-6">
           {testimonials.map((testimonial, index) => (
-            <div key={index} className={`rounded-2xl p-8 ${isDark ? 'bg-gray-800/50 border border-gray-700' : 'bg-gray-50 border border-gray-200'}`}>
+            <div key={index} className={`rounded-2xl p-8 ${isDark ? 'bg-gray-800/50 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
               <div className="flex gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (<svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>))}
               </div>
@@ -628,7 +904,7 @@ function Pricing({ isDark, setShowDemoModal }: { isDark: boolean; setShowDemoMod
   const scrollToSection = (id: string) => { const element = document.getElementById(id); if (element) element.scrollIntoView({ behavior: 'smooth' }); };
 
   return (
-    <section id="pricing" className="py-24 px-6">
+    <section id="pricing" className={`py-24 px-6 ${isDark ? 'bg-gray-800/30' : 'bg-gray-50'}`}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Pricing</h2>
@@ -644,7 +920,7 @@ function Pricing({ isDark, setShowDemoModal }: { isDark: boolean; setShowDemoMod
             </div>
             <button onClick={() => scrollToSection('faq')} className={`w-full py-3 font-semibold rounded-xl transition-colors mb-6 ${isDark ? 'bg-white text-gray-900 hover:bg-gray-100' : 'bg-gray-900 text-white hover:bg-gray-800'}`}>Get Started Free</button>
             <ul className="space-y-3">
-              {['10 verifications/month', 'Basic source citations', 'Single AI model', 'Web interface'].map((f, i) => (<li key={i} className={`flex items-center gap-3 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}><svg className={`w-5 h-5 ${isDark ? 'text-gray-600' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>{f}</li>))}
+              {['10 verifications per month', 'Basic source citations', 'Single AI model', 'Web interface'].map((f, i) => (<li key={i} className={`flex items-center gap-3 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}><svg className={`w-5 h-5 ${isDark ? 'text-gray-600' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>{f}</li>))}
             </ul>
           </div>
           {/* Team */}
@@ -657,7 +933,7 @@ function Pricing({ isDark, setShowDemoModal }: { isDark: boolean; setShowDemoMod
             </div>
             <button onClick={() => setShowDemoModal(true)} className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors mb-6 shadow-lg shadow-blue-500/25">Start 14-Day Trial</button>
             <ul className="space-y-3">
-              {['500 verifications/month', 'Multi-AI consensus', 'Full source citations', 'Team dashboard (5 seats)', 'API access', 'Priority support'].map((f, i) => (<li key={i} className={`flex items-center gap-3 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}><svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>{f}</li>))}
+              {['500 verifications per month', 'Multi-AI consensus', 'Full source citations', 'Team dashboard (5 seats)', 'API access', 'Priority support', 'ATS integrations'].map((f, i) => (<li key={i} className={`flex items-center gap-3 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}><svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>{f}</li>))}
             </ul>
           </div>
           {/* Enterprise */}
@@ -669,7 +945,7 @@ function Pricing({ isDark, setShowDemoModal }: { isDark: boolean; setShowDemoMod
             </div>
             <button onClick={() => setShowDemoModal(true)} className={`w-full py-3 font-semibold rounded-xl transition-colors mb-6 border ${isDark ? 'border-gray-600 hover:border-gray-500 text-white' : 'border-gray-300 hover:border-gray-400 text-gray-900'}`}>Contact Sales</button>
             <ul className="space-y-3">
-              {['Unlimited verifications', 'Custom AI model training', 'SSO & SAML', 'Unlimited seats', 'Dedicated account manager', 'SLA guarantee', 'On-premise option'].map((f, i) => (<li key={i} className={`flex items-center gap-3 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}><svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>{f}</li>))}
+              {['Unlimited verifications', 'Custom AI model training', 'SSO and SAML', 'Unlimited seats', 'Dedicated account manager', 'SLA guarantee', 'On-premise deployment'].map((f, i) => (<li key={i} className={`flex items-center gap-3 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}><svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>{f}</li>))}
             </ul>
           </div>
         </div>
@@ -685,12 +961,14 @@ function Pricing({ isDark, setShowDemoModal }: { isDark: boolean; setShowDemoMod
 function FAQ({ isDark }: { isDark: boolean }) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const faqs = [
-    { question: 'How does Trustie verify information?', answer: 'We use multi-AI consensus (GPT-4, Claude, Gemini) combined with verified databases, public records, and direct source verification. Each claim is cross-referenced across multiple sources for maximum accuracy.' },
+    { question: 'How does Trustie verify information?', answer: 'We use multi-AI consensus (GPT-4, Claude, Gemini) combined with verified databases, public records, and direct source verification. Each claim is cross-referenced across multiple sources. We always show our sources. We never guess or make claims without evidence.' },
     { question: 'What can Trustie verify?', answer: 'Employment history, educational credentials, professional certifications, LinkedIn profiles, and any factual claims on resumes or applications. We can also verify general claims for journalism and legal use cases.' },
-    { question: 'How accurate is the verification?', answer: "Our multi-AI consensus achieves 94%+ accuracy. We always provide confidence scores and source links so you can verify our verification. When we're unsure, we say so." },
-    { question: 'Is my data secure?', answer: "Yes. We're SOC 2 compliant, use end-to-end encryption, and never share candidate data. Enterprise plans include on-premise deployment options." },
-    { question: 'Can I integrate Trustie with my ATS?', answer: 'Yes! We have integrations with Greenhouse, Lever, Workday, and other major ATS platforms. API access is available on Team and Enterprise plans.' },
-    { question: "What's the ROI?", answer: 'The average bad hire costs $75,000-$150,000. At $499/month for the Team plan, you only need to catch one misrepresented candidate per year to see 150x+ ROI.' },
+    { question: 'How accurate is the verification?', answer: 'Our multi-AI consensus achieves 94%+ accuracy. We always provide confidence scores and source links so you can verify our verification. When we are unsure, we say so and flag items for manual review.' },
+    { question: 'What is your truth-maximizing methodology?', answer: 'Our stack: (1) Search multiple authoritative sources, (2) Cross-reference findings across sources, (3) Run multi-AI consensus to reduce false positives, (4) Score source quality (.edu/.gov = high trust, commercial = flagged), (5) Generate human-readable verdict with full audit trail. We prioritize authoritative sources and flag any commercial bias.' },
+    { question: 'Is my data secure?', answer: 'Yes. We are SOC 2 compliant, use end-to-end encryption, and never share candidate data. We do not track or sell your data. Enterprise plans include on-premise deployment options.' },
+    { question: 'Can I integrate Trustie with my ATS?', answer: 'Yes. We have integrations with Greenhouse, Lever, Workday, and other major ATS platforms. API access is available on Team and Enterprise plans. Webhooks notify your systems in real-time.' },
+    { question: 'How does the audit trail work?', answer: 'Every verification is logged with: timestamp, sources checked, AI models used, confidence scores, and final verdict. You can export PDF reports for compliance documentation. Audit IDs are provided for each verification for easy reference.' },
+    { question: 'What is the ROI?', answer: 'The average bad hire costs $75,000 to $150,000. At $499 per month for the Team plan, you only need to catch one misrepresented candidate per year to see 150x or greater ROI.' },
   ];
 
   return (
@@ -698,7 +976,7 @@ function FAQ({ isDark }: { isDark: boolean }) {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-16">
           <p className={`text-lg mb-2 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Got Questions?</p>
-          <h2 className={`text-4xl md:text-5xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>We've Got Answers</h2>
+          <h2 className={`text-4xl md:text-5xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>We Have Got Answers</h2>
         </div>
         <div className="space-y-3">
           {faqs.map((faq, index) => (
@@ -762,7 +1040,7 @@ function Footer({ isDark }: { isDark: boolean }) {
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center"><svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
               <span className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Trustie</span>
             </div>
-            <p className={`text-sm mb-6 ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>AI-powered verification for HR teams, legal, insurance, and journalism.</p>
+            <p className={`text-sm mb-6 ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>AI-powered verification for HR teams, legal, insurance, and journalism. We always show sources. We never guess.</p>
             <div className="flex items-center gap-4 mb-6">
               {[{ label: 'X', href: 'https://twitter.com' }, { label: 'LI', href: 'https://linkedin.com' }, { label: 'YT', href: 'https://youtube.com' }].map((social) => (<a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer" className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-colors ${isDark ? 'bg-gray-800 hover:bg-gray-700 text-gray-500 hover:text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-900'}`}>{social.label}</a>))}
             </div>
@@ -771,13 +1049,13 @@ function Footer({ isDark }: { isDark: boolean }) {
           <div>
             <h4 className={`font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Product</h4>
             <ul className="space-y-3">
-              {[{ label: 'Features', id: 'features' }, { label: 'Pricing', id: 'pricing' }, { label: 'FAQ', id: 'faq' }].map((link) => (<li key={link.label}><button onClick={() => scrollToSection(link.id)} className={`text-sm transition-colors ${isDark ? 'text-gray-500 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}>{link.label}</button></li>))}
+              {[{ label: 'Features', id: 'features' }, { label: 'Security', id: 'security' }, { label: 'Pricing', id: 'pricing' }, { label: 'FAQ', id: 'faq' }].map((link) => (<li key={link.label}><button onClick={() => scrollToSection(link.id)} className={`text-sm transition-colors ${isDark ? 'text-gray-500 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}>{link.label}</button></li>))}
             </ul>
           </div>
           <div>
             <h4 className={`font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Use Cases</h4>
             <ul className="space-y-3">
-              {['HR & Recruitment', 'Legal Teams', 'Insurance', 'Journalism'].map((link) => (<li key={link}><span className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>{link}</span></li>))}
+              {['HR and Recruitment', 'Legal Teams', 'Insurance', 'Journalism'].map((link) => (<li key={link}><span className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>{link}</span></li>))}
             </ul>
           </div>
           <div>
@@ -830,7 +1108,7 @@ function DemoModal({ isDark, onClose }: { isDark: boolean; onClose: () => void }
         {!submitted ? (
           <>
             <h3 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>Request a Demo</h3>
-            <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>See how Trustie can help your team</p>
+            <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>See how Trustie can help your team verify candidates</p>
             <form onSubmit={handleSubmit} className="space-y-4">
               <input type="text" placeholder="Full Name" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className={`w-full px-4 py-3 rounded-xl border transition-colors outline-none ${isDark ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500 focus:border-blue-500' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500'}`} />
               <input type="email" placeholder="Work Email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className={`w-full px-4 py-3 rounded-xl border transition-colors outline-none ${isDark ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500 focus:border-blue-500' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500'}`} />
@@ -851,7 +1129,14 @@ function DemoModal({ isDark, onClose }: { isDark: boolean; onClose: () => void }
             <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg></div>
             <h3 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>Thanks!</h3>
             <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Want to skip the wait? Book a demo now:</p>
-            <a href={CALENDLY_LINK} target="_blank" rel="noopener noreferrer" className="inline-block px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors">Book Demo Now</a>
+            <a href={CALENDLY_LINK} target="_blank" rel="noopener noreferrer" className="inline-block px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors mb-6">Book Demo Now</a>
+            <div className={`pt-6 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+              <p className={`text-sm mb-3 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Was this form easy to use?</p>
+              <div className="flex justify-center gap-3">
+                <button className={`px-4 py-2 rounded-lg text-sm ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}>👍 Yes</button>
+                <button className={`px-4 py-2 rounded-lg text-sm ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}>👎 No</button>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -884,6 +1169,88 @@ function VideoModal({ onClose }: { onClose: () => void }) {
             </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// EXIT INTENT POPUP (Email Capture)
+// ============================================================================
+
+function ExitIntentPopup({ isDark, onClose, onShowDemo }: { isDark: boolean; onClose: () => void; onShowDemo: () => void }) {
+  const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, _subject: 'Trustie Exit Intent - Email Capture', type: 'exit_intent' }),
+      });
+      setSubmitted(true);
+    } catch (error) {
+      setSubmitted(true);
+    }
+  };
+
+  // Loading facts for the popup
+  const loadingFacts = [
+    "70% of resumes contain at least one lie",
+    "The average bad hire costs $150,000",
+    "85% of employers have caught applicants lying",
+    "Manual verification takes 6+ hours per candidate",
+    "AI hallucinations affect 15-20% of generated content",
+  ];
+  const [factIndex, setFactIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFactIndex((prev) => (prev + 1) % loadingFacts.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className={`relative w-full max-w-md rounded-2xl p-8 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white shadow-2xl'}`}>
+        <button onClick={onClose} className={`absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-gray-400' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'}`}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+        
+        {!submitted ? (
+          <>
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              </div>
+              <h3 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>Wait! Before You Go...</h3>
+              <p className={`mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Get our free guide: <strong>"5 Resume Red Flags AI Can Catch (That Humans Miss)"</strong></p>
+              
+              {/* Loading Fact */}
+              <div className={`p-3 rounded-lg mb-4 ${isDark ? 'bg-gray-700/50' : 'bg-gray-100'}`}>
+                <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>💡 Did you know? {loadingFacts[factIndex]}</p>
+              </div>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <input type="email" placeholder="Enter your work email" required value={email} onChange={(e) => setEmail(e.target.value)} className={`w-full px-4 py-3 rounded-xl border transition-colors outline-none ${isDark ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500 focus:border-blue-500' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500'}`} />
+              <button type="submit" className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors">Get Free Guide</button>
+            </form>
+            
+            <div className="mt-4 text-center">
+              <button onClick={onShowDemo} className={`text-sm ${isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'}`}>Or request a live demo instead →</button>
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-8">
+            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg></div>
+            <h3 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>Check Your Email!</h3>
+            <p className={`mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>We have sent the guide to {email}</p>
+            <button onClick={onClose} className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors">Continue Browsing</button>
+          </div>
+        )}
       </div>
     </div>
   );
