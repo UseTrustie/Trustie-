@@ -1,21 +1,13 @@
-/**
- * Root Layout
- */
-
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
-
 export const metadata: Metadata = {
-  title: 'Trustie - Verify AI with Real Sources',
-  description: 'Stop blindly trusting AI. Verify AI-generated content against trusted sources in seconds.',
-  keywords: ['AI verification', 'fact checking', 'trust', 'AI hallucinations', 'source verification'],
-  authors: [{ name: 'Trustie' }],
+  title: 'Trustie - AI-Powered Resume & Credential Verification',
+  description: 'Stop resume fraud before it costs you $150,000. Verify credentials, employment history, and claims in seconds with multi-AI consensus.',
+  keywords: 'resume verification, credential verification, background check, AI verification, HR tools, recruitment',
   openGraph: {
-    title: 'Trustie - Verify AI with Real Sources',
-    description: 'Stop blindly trusting AI. Verify AI-generated content against trusted sources in seconds.',
+    title: 'Trustie - AI-Powered Resume Verification',
+    description: 'Stop resume fraud before it costs you $150,000. Verify credentials in seconds.',
     type: 'website',
   },
 }
@@ -26,14 +18,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       </head>
-      <body className={`${inter.className} antialiased`}>
-        {children}
-      </body>
+      <body className="font-sans">{children}</body>
     </html>
   )
 }
