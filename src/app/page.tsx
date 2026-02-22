@@ -85,12 +85,13 @@ function Navigation({ isDark, setIsDark, setShowDemoModal, mobileMenuOpen, setMo
     }
   };
 
-  const navLinks = [
-    { label: 'Features', id: 'features' },
-    { label: 'How It Works', id: 'how-it-works' },
-    { label: 'Security', id: 'security' },
-    { label: 'Pricing', id: 'pricing' },
-    { label: 'FAQ', id: 'faq' },
+ const navLinks = [
+    { label: 'Proof', href: '/proof' },
+    { label: 'Pricing', href: '/pricing' },
+    { label: 'Help', href: '/help' },
+    { label: 'Blog', href: '/blog' },
+    { label: 'How it works', href: '/how-it-works' },
+    { label: 'Verification Database', href: '/database', badge: 'NEW' },
   ];
 
   return (
@@ -106,10 +107,11 @@ function Navigation({ isDark, setIsDark, setShowDemoModal, mobileMenuOpen, setMo
         </button>
 
         <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <button key={link.id} onClick={() => scrollToSection(link.id)} className={`${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors text-sm`}>
+         {navLinks.map((link) => (
+            <a key={link.label} href={link.href} className={`${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors text-sm flex items-center gap-1.5`}>
               {link.label}
-            </button>
+              {link.badge && <span className="text-[10px] font-bold bg-blue-500 text-white px-1.5 py-0.5 rounded-full">{link.badge}</span>}
+            </a>
           ))}
         </div>
 
@@ -136,7 +138,7 @@ function Navigation({ isDark, setIsDark, setShowDemoModal, mobileMenuOpen, setMo
         <div className={`md:hidden border-t ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
           <div className="px-6 py-4 space-y-3">
             {navLinks.map((link) => (
-              <button key={link.id} onClick={() => scrollToSection(link.id)} className={`block w-full text-left py-2 ${isDark ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-gray-900'}`}>{link.label}</button>
+              <a key={link.label} href={link.href} className={`block w-full text-left py-2 ${isDark ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-gray-900'}`}>{link.label} {link.badge && <span className="text-[10px] font-bold bg-blue-500 text-white px-1.5 py-0.5 rounded-full ml-1">{link.badge}</span>}</a>
             ))}
             <button onClick={() => { setShowDemoModal(true); setMobileMenuOpen(false); }} className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition-colors">Request Demo</button>
           </div>
