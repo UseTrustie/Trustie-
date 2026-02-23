@@ -1,1259 +1,770 @@
 'use client';
+// @ts-nocheck
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-// ============================================================================
-// ⚠️ CONFIGURATION - YOUR VALUES ARE FILLED IN ⚠️
-// ============================================================================
+/* ============================================================
+   TRUSTIE — Complete Landing Page
+   Deploy: Replace src/app/page.tsx entirely with this file
+   ============================================================ */
 
-const FORMSPREE_ID = 'xlgwlovd';
-const YOUTUBE_VIDEO_ID = 'YOUR_YOUTUBE_VIDEO_ID';
-const CALENDLY_LINK = 'https://calendly.com/trustietechnologies/trustie-demo';
+const C = {
+  bg: "#0B1120", card: "rgba(30,41,66,0.5)", cardBorder: "rgba(59,130,246,0.12)",
+  blue: "#3b82f6", blueGlow: "rgba(59,130,246,0.25)", red: "#ef4444",
+  green: "#22c55e", amber: "#f59e0b", text: "#e2e8f0", muted: "#94a3b8",
+  dimmed: "#475569", line: "rgba(148,163,184,0.08)",
+};
 
-// ============================================================================
-// MAIN APP
-// ============================================================================
+const navLinks = [
+  { label: "Proof", href: "/proof" },
+  { label: "Pricing", href: "#pricing" },
+  { label: "Help", href: "/help" },
+  { label: "Blog", href: "/blog" },
+  { label: "How it works", href: "/how-it-works" },
+  { label: "Verification Database", href: "/database", badge: "NEW" },
+];
 
-export default function LandingPage() {
-  const [isDark, setIsDark] = useState(true);
-  const [showDemoModal, setShowDemoModal] = useState(false);
-  const [showVideoModal, setShowVideoModal] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showExitPopup, setShowExitPopup] = useState(false);
-  const [exitPopupShown, setExitPopupShown] = useState(false);
-
-  // Exit intent detection
-  useEffect(() => {
-    const handleMouseLeave = (e: MouseEvent) => {
-      if (e.clientY <= 0 && !exitPopupShown && !showDemoModal) {
-        setShowExitPopup(true);
-        setExitPopupShown(true);
-      }
-    };
-    document.addEventListener('mouseleave', handleMouseLeave);
-    return () => document.removeEventListener('mouseleave', handleMouseLeave);
-  }, [exitPopupShown, showDemoModal]);
-
-  return (
-    <div className={`min-h-screen font-sans antialiased transition-colors duration-300 ${isDark ? 'bg-gray-900 text-white' : 'bg-slate-100 text-gray-900'}`}>
-      <Navigation isDark={isDark} setIsDark={setIsDark} setShowDemoModal={setShowDemoModal} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
-      <Hero isDark={isDark} setShowDemoModal={setShowDemoModal} setShowVideoModal={setShowVideoModal} />
-      <TrustBadges isDark={isDark} />
-      <PainPoints isDark={isDark} />
-      <HowWeVerify isDark={isDark} />
-      <Features isDark={isDark} />
-      <Integrations isDark={isDark} />
-      <APISection isDark={isDark} />
-      <HowItWorks isDark={isDark} setShowVideoModal={setShowVideoModal} />
-      <ROICalculator isDark={isDark} />
-      <SecurityCompliance isDark={isDark} />
-      <ComparisonTable isDark={isDark} />
-      <UseCases isDark={isDark} />
-      <AIModelsStatus isDark={isDark} />
-      <CaseStudies isDark={isDark} />
-      <Testimonials isDark={isDark} />
-      <Pricing isDark={isDark} setShowDemoModal={setShowDemoModal} />
-      <FAQ isDark={isDark} />
-      <FinalCTA isDark={isDark} setShowDemoModal={setShowDemoModal} />
-      <Footer isDark={isDark} />
-      
-      {showDemoModal && <DemoModal isDark={isDark} onClose={() => setShowDemoModal(false)} />}
-      {showVideoModal && <VideoModal onClose={() => setShowVideoModal(false)} />}
-      {showExitPopup && <ExitIntentPopup isDark={isDark} onClose={() => setShowExitPopup(false)} onShowDemo={() => { setShowExitPopup(false); setShowDemoModal(true); }} />}
-    </div>
-  );
-}
-
-// ============================================================================
-// NAVIGATION
-// ============================================================================
-
-function Navigation({ isDark, setIsDark, setShowDemoModal, mobileMenuOpen, setMobileMenuOpen }: { isDark: boolean; setIsDark: (v: boolean) => void; setShowDemoModal: (v: boolean) => void; mobileMenuOpen: boolean; setMobileMenuOpen: (v: boolean) => void; }) {
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const h = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", h);
+    return () => window.removeEventListener("scroll", h);
   }, []);
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setMobileMenuOpen(false);
-    }
-  };
-
- const navLinks = [
-    { label: 'Proof', href: '/proof' },
-    { label: 'Pricing', href: '/pricing' },
-    { label: 'Help', href: '/help' },
-    { label: 'Blog', href: '/blog' },
-    { label: 'How it works', href: '/how-it-works' },
-    { label: 'Verification Database', href: '/database', badge: 'NEW' },
-  ];
-
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? isDark ? 'bg-gray-900/95 backdrop-blur-md border-b border-gray-800' : 'bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm' : 'bg-transparent'}`}>
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+    <nav style={{
+      position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
+      background: scrolled ? "rgba(11,17,32,0.95)" : "rgba(11,17,32,0.7)",
+      backdropFilter: "blur(20px)", borderBottom: `1px solid ${scrolled ? C.line : "transparent"}`,
+      transition: "all 0.3s ease",
+    }}>
+      <div style={{ maxWidth: "1280px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: "64px", padding: "0 24px" }}>
+        {/* Logo → Home */}
+        <a href="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
+          <div style={{ width: 32, height: 32, borderRadius: "50%", background: C.blue, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 0 16px ${C.blueGlow}` }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
-          <span className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Trustie</span>
-        </button>
+          <span style={{ color: "#fff", fontWeight: 700, fontSize: "18px", letterSpacing: "-0.01em" }}>Trustie</span>
+        </a>
 
-        <div className="hidden md:flex items-center gap-8">
-         {navLinks.map((link) => (
-            <a key={link.label} href={link.href} className={`${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors text-sm flex items-center gap-1.5`}>
-              {link.label}
-              {link.badge && <span className="text-[10px] font-bold bg-blue-500 text-white px-1.5 py-0.5 rounded-full">{link.badge}</span>}
+        {/* Desktop Nav */}
+        <div style={{ display: "flex", alignItems: "center", gap: "28px" }} className="hide-mobile">
+          {navLinks.map(l => (
+            <a key={l.label} href={l.href} style={{ color: C.muted, fontSize: "14px", textDecoration: "none", fontWeight: 400, display: "flex", alignItems: "center", gap: "6px", transition: "color 0.2s" }}
+              onMouseOver={e => (e.currentTarget.style.color = "#fff")} onMouseOut={e => (e.currentTarget.style.color = C.muted)}>
+              {l.label}
+              {l.badge && <span style={{ fontSize: "10px", fontWeight: 700, background: C.blue, color: "#fff", padding: "2px 7px", borderRadius: "9999px" }}>{l.badge}</span>}
             </a>
           ))}
         </div>
 
-        <div className="flex items-center gap-3">
-          <button onClick={() => setIsDark(!isDark)} className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${isDark ? 'bg-gray-800 hover:bg-gray-700 text-yellow-400' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}`} aria-label="Toggle theme">
-            {isDark ? (
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-            ) : (
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-            )}
-          </button>
-          <button onClick={() => setShowDemoModal(true)} className="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-medium transition-colors shadow-lg shadow-blue-500/25 hidden sm:block">Request Demo</button>
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className={`md:hidden w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-900'}`} aria-label="Toggle menu">
-            {mobileMenuOpen ? (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-            ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
-            )}
+        {/* Right side */}
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <a href="#" style={{ color: C.muted, fontSize: "14px", textDecoration: "none" }} className="hide-mobile">Login</a>
+          <a href="#" style={{
+            background: C.blue, color: "#fff", padding: "9px 20px", borderRadius: "8px",
+            fontSize: "14px", fontWeight: 600, textDecoration: "none", boxShadow: `0 0 20px ${C.blueGlow}`,
+            transition: "transform 0.2s, box-shadow 0.2s",
+          }}>Try Free</a>
+          {/* Mobile menu button */}
+          <button onClick={() => setMenuOpen(!menuOpen)} style={{ display: "none", background: "none", border: "none", color: "#fff", cursor: "pointer", padding: "4px" }} className="show-mobile">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d={menuOpen ? "M6 6l12 12M18 6L6 18" : "M4 6h16M4 12h16M4 18h16"}/></svg>
           </button>
         </div>
       </div>
 
-      {mobileMenuOpen && (
-        <div className={`md:hidden border-t ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
-          <div className="px-6 py-4 space-y-3">
-            {navLinks.map((link) => (
-              <a key={link.label} href={link.href} className={`block w-full text-left py-2 ${isDark ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-gray-900'}`}>{link.label} {link.badge && <span className="text-[10px] font-bold bg-blue-500 text-white px-1.5 py-0.5 rounded-full ml-1">{link.badge}</span>}</a>
-            ))}
-            <button onClick={() => { setShowDemoModal(true); setMobileMenuOpen(false); }} className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition-colors">Request Demo</button>
-          </div>
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div style={{ padding: "16px 24px", borderTop: `1px solid ${C.line}` }} className="show-mobile">
+          {navLinks.map(l => (
+            <a key={l.label} href={l.href} style={{ display: "block", color: C.muted, fontSize: "15px", textDecoration: "none", padding: "10px 0", borderBottom: `1px solid ${C.line}` }}>
+              {l.label} {l.badge && <span style={{ fontSize: "10px", fontWeight: 700, background: C.blue, color: "#fff", padding: "2px 7px", borderRadius: "9999px", marginLeft: "6px" }}>{l.badge}</span>}
+            </a>
+          ))}
+          <a href="#" style={{ display: "block", color: C.muted, fontSize: "15px", textDecoration: "none", padding: "10px 0" }}>Login</a>
         </div>
       )}
     </nav>
   );
 }
 
-// ============================================================================
-// HERO
-// ============================================================================
+/* ============================================================
+   ANIMATED HERO DEMO
+   ============================================================ */
+function AnimatedDemo() {
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setStep(p => (p + 1) % 4), 3000);
+    return () => clearInterval(t);
+  }, []);
 
-function Hero({ isDark, setShowDemoModal, setShowVideoModal }: { isDark: boolean; setShowDemoModal: (v: boolean) => void; setShowVideoModal: (v: boolean) => void; }) {
   return (
-    <section className="pt-32 pb-20 px-6 relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
-      </div>
+    <div style={{ position: "relative", maxWidth: "960px", margin: "0 auto" }}>
+      <div style={{ position: "absolute", inset: "-20px", background: `radial-gradient(circle at 50% 50%, ${C.blueGlow}, transparent 70%)`, borderRadius: "32px", filter: "blur(40px)", pointerEvents: "none" }} />
+      <div style={{ position: "relative", borderRadius: "16px", overflow: "hidden", border: `1px solid rgba(59,130,246,0.2)`, background: "rgba(15,23,42,0.9)", boxShadow: `0 25px 60px rgba(0,0,0,0.5), 0 0 40px ${C.blueGlow}` }}>
+        {/* Browser bar */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "12px 16px", background: "rgba(30,41,66,0.6)", borderBottom: `1px solid ${C.line}` }}>
+          <div style={{ display: "flex", gap: "6px" }}>
+            <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#ef4444" }} />
+            <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#f59e0b" }} />
+            <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#22c55e" }} />
+          </div>
+          <div style={{ flex: 1, textAlign: "center" }}>
+            <span style={{ fontSize: "12px", color: C.dimmed, background: "rgba(15,23,42,0.8)", padding: "4px 16px", borderRadius: "6px" }}>app.trustie.io/verify</span>
+          </div>
+        </div>
 
-      <div className="max-w-7xl mx-auto relative">
-        <div className="text-center mb-16">
-          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 ${isDark ? 'bg-gray-800/50 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
-            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>No More Blind Trusting AI — Verify Claims with Real Sources in Seconds</span>
+        <div style={{ padding: "32px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", minHeight: "320px" }}>
+          {/* Left: Input */}
+          <div style={{ background: "rgba(15,23,42,0.6)", borderRadius: "12px", padding: "20px", border: `1px solid ${C.line}` }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+              <div style={{ width: 36, height: 36, borderRadius: "8px", background: "rgba(59,130,246,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              </div>
+              <span style={{ color: "#fff", fontWeight: 600, fontSize: "14px" }}>Resume Verification</span>
+            </div>
+
+            <div style={{ background: "rgba(11,17,32,0.6)", borderRadius: "8px", padding: "14px", marginBottom: "12px" }}>
+              <p style={{ color: "#fff", fontSize: "13px", fontWeight: 600, marginBottom: "8px" }}>Candidate: John Smith</p>
+              <p style={{ color: C.muted, fontSize: "12px", marginBottom: "4px", opacity: step >= 0 ? 1 : 0, transition: "opacity 0.5s" }}>&quot;5 years at Google as Senior Engineer&quot;</p>
+              <p style={{ color: C.muted, fontSize: "12px", marginBottom: "4px", opacity: step >= 0 ? 1 : 0, transition: "opacity 0.5s" }}>&quot;Stanford CS, Class of 2018&quot;</p>
+              <p style={{ color: C.muted, fontSize: "12px", opacity: step >= 0 ? 1 : 0, transition: "opacity 0.5s" }}>&quot;AWS Solutions Architect Certified&quot;</p>
+            </div>
+
+            {step === 1 && (
+              <div style={{ marginBottom: "12px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
+                  <span style={{ fontSize: "11px", color: C.dimmed }}>Verifying across 5 sources...</span>
+                  <span style={{ fontSize: "11px", color: C.blue }}>3 AI models</span>
+                </div>
+                <div style={{ height: "4px", borderRadius: "2px", background: "rgba(59,130,246,0.15)", overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: "65%", background: C.blue, borderRadius: "2px", animation: "pulse 1.5s infinite" }} />
+                </div>
+              </div>
+            )}
+
+            <div style={{
+              textAlign: "center", padding: "10px", borderRadius: "8px", fontSize: "13px", fontWeight: 600,
+              background: step >= 2 ? "rgba(34,197,94,0.15)" : C.blue, color: "#fff",
+              border: step >= 2 ? `1px solid rgba(34,197,94,0.3)` : "none",
+              transition: "all 0.5s",
+            }}>
+              {step === 0 ? "Verify All Claims" : step === 1 ? "⟳ Verifying..." : "✓ Verification Complete"}
+            </div>
           </div>
 
-          <h1 className={`text-5xl md:text-7xl font-bold mb-6 leading-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            Stop <span className="text-red-500">Resume Fraud</span><br />Before It Costs You <span className="text-blue-500">$150,000</span>
+          {/* Right: Results */}
+          <div style={{
+            background: step >= 2 ? "rgba(59,130,246,0.04)" : "rgba(15,23,42,0.3)",
+            borderRadius: "12px", padding: "20px",
+            border: `1px solid ${step >= 2 ? "rgba(59,130,246,0.2)" : C.line}`,
+            transition: "all 0.5s",
+          }}>
+            {step < 2 ? (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%" }}>
+                {step === 0 && <>
+                  <div style={{ fontSize: "32px", marginBottom: "8px" }}>🔍</div>
+                  <p style={{ color: C.dimmed, fontSize: "12px" }}>Paste a resume to verify claims</p>
+                </>}
+                {step === 1 && <>
+                  <div style={{ width: 36, height: 36, border: `2px solid ${C.blue}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite", marginBottom: "12px" }} />
+                  <p style={{ color: C.text, fontSize: "13px", fontWeight: 500, marginBottom: "8px" }}>Cross-referencing sources...</p>
+                  <div style={{ textAlign: "left", width: "100%" }}>
+                    <p style={{ fontSize: "11px", color: C.dimmed, marginBottom: "4px" }}><span style={{ color: C.green }}>✓</span> LinkedIn verified</p>
+                    <p style={{ fontSize: "11px", color: C.dimmed, marginBottom: "4px" }}><span style={{ color: C.green }}>✓</span> Stanford Alumni DB checked</p>
+                    <p style={{ fontSize: "11px", color: C.dimmed }}><span style={{ color: C.blue }}>⟳</span> Querying Google HR records...</p>
+                  </div>
+                </>}
+              </div>
+            ) : (
+              <>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+                  <div style={{ width: 28, height: 28, borderRadius: "50%", background: step === 3 ? "rgba(245,158,11,0.15)" : "rgba(59,130,246,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    {step === 3 ? <span style={{ color: C.amber, fontSize: "14px" }}>⚠</span> : <div style={{ width: 14, height: 14, border: `2px solid ${C.blue}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }} />}
+                  </div>
+                  <div>
+                    <p style={{ color: step === 3 ? C.amber : C.blue, fontWeight: 700, fontSize: "13px" }}>{step === 3 ? "PARTIAL MATCH" : "ANALYZING..."}</p>
+                    <p style={{ color: C.dimmed, fontSize: "11px" }}>{step === 3 ? "2 of 3 claims verified • 5 sources" : "Processing results..."}</p>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  <div style={{ display: "flex", gap: "8px", opacity: step >= 2 ? 1 : 0, transform: `translateY(${step >= 2 ? 0 : 8}px)`, transition: "all 0.5s" }}>
+                    <span style={{ color: C.green, flexShrink: 0 }}>✓</span>
+                    <span style={{ color: C.muted, fontSize: "12px" }}>Stanford CS degree confirmed (2018) — <span style={{ color: C.blue }}>High Trust</span></span>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px", opacity: step >= 3 ? 1 : 0, transform: `translateY(${step >= 3 ? 0 : 8}px)`, transition: "all 0.7s" }}>
+                    <span style={{ color: C.red, flexShrink: 0 }}>✗</span>
+                    <span style={{ color: C.muted, fontSize: "12px" }}>Google: <strong style={{ color: C.red }}>3 years, not 5</strong> — LinkedIn + HR DB</span>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px", opacity: step >= 3 ? 1 : 0, transform: `translateY(${step >= 3 ? 0 : 8}px)`, transition: "all 1s" }}>
+                    <span style={{ color: C.amber, flexShrink: 0 }}>?</span>
+                    <span style={{ color: C.muted, fontSize: "12px" }}>Title: &quot;Engineer&quot; not &quot;Senior Engineer&quot; — Manual Check</span>
+                  </div>
+                </div>
+
+                {step === 3 && (
+                  <div style={{ marginTop: "14px", paddingTop: "12px", borderTop: `1px solid ${C.line}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: "11px", color: C.dimmed }}>4 sources • 3 AI models</span>
+                    <span style={{ fontSize: "11px", color: C.blue, fontWeight: 600 }}>87% confidence</span>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   SECTION COMPONENTS
+   ============================================================ */
+
+function SectionTitle({ watermark, title, subtitle }: { watermark?: string; title: string; subtitle?: string }) {
+  return (
+    <div style={{ textAlign: "center", position: "relative", marginBottom: "48px" }}>
+      {watermark && (
+        <span style={{
+          position: "absolute", top: "-60px", left: "50%", transform: "translateX(-50%)",
+          fontSize: "clamp(80px, 12vw, 160px)", fontWeight: 800, color: "rgba(255,255,255,0.02)",
+          whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none",
+        }}>{watermark}</span>
+      )}
+      <h2 style={{ fontSize: "36px", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: "12px", position: "relative" }}>{title}</h2>
+      {subtitle && <p style={{ color: C.muted, fontSize: "16px", maxWidth: "560px", margin: "0 auto", lineHeight: 1.6, position: "relative" }}>{subtitle}</p>}
+    </div>
+  );
+}
+
+/* ============================================================
+   MAIN PAGE
+   ============================================================ */
+export default function TrustieLandingPage() {
+  const [annual, setAnnual] = useState(true);
+
+  return (
+    <div style={{ minHeight: "100vh", color: "#fff", background: C.bg, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', overflowX: "hidden" }}>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg) } }
+        @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.5 } }
+        @keyframes float { 0%,100% { transform: translateY(0px) } 50% { transform: translateY(-10px) } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px) } to { opacity: 1; transform: translateY(0) } }
+        .hide-mobile { }
+        .show-mobile { display: none !important; }
+        @media (max-width: 768px) {
+          .hide-mobile { display: none !important; }
+          .show-mobile { display: block !important; }
+          .grid-responsive { grid-template-columns: 1fr !important; }
+          .grid-2-responsive { grid-template-columns: 1fr !important; }
+          .grid-4-responsive { grid-template-columns: 1fr 1fr !important; }
+        }
+      `}</style>
+
+      <Navbar />
+
+      {/* ============================================================
+         SECTION 1: HERO
+         ============================================================ */}
+      <section style={{ paddingTop: "120px", paddingBottom: "60px", textAlign: "center", position: "relative" }}>
+        <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "1000px", height: "600px", background: `radial-gradient(ellipse, ${C.blueGlow}, transparent 70%)`, pointerEvents: "none", opacity: 0.5 }} />
+
+        <div style={{ position: "relative", zIndex: 1, padding: "0 24px" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: "9999px", padding: "6px 16px", marginBottom: "24px" }}>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: C.green }} />
+            <span style={{ color: C.green, fontSize: "13px", fontWeight: 500 }}>No credit card required</span>
+          </div>
+
+          <h1 style={{ fontSize: "clamp(36px, 5vw, 64px)", fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.03em", marginBottom: "16px", maxWidth: "800px", margin: "0 auto 16px" }}>
+            Verify Any Claim.<br />
+            <span style={{ background: "linear-gradient(135deg, #3b82f6, #60a5fa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Trust Every Hire.</span>
           </h1>
 
-          <p className={`text-xl max-w-3xl mx-auto mb-10 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            70% of resumes contain lies. One bad hire costs $50,000 to $150,000. Trustie verifies credentials, employment history, and claims in seconds using multi-source cross-referencing. We always show sources. We never guess.
+          <p style={{ color: C.muted, fontSize: "18px", maxWidth: "560px", margin: "0 auto 32px", lineHeight: 1.6 }}>
+            AI-powered fact verification that cross-checks claims across multiple sources and AI models. Stop fraud. Build trust.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button onClick={() => setShowDemoModal(true)} className="group px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-all duration-300 flex items-center gap-3 shadow-lg shadow-blue-500/25">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-              Request a Demo
-            </button>
-            <button onClick={() => setShowVideoModal(true)} className={`px-8 py-4 font-semibold rounded-xl transition-all duration-300 flex items-center gap-3 ${isDark ? 'bg-white text-gray-900 hover:bg-gray-100' : 'bg-gray-900 text-white hover:bg-gray-800'}`}>
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              Watch 2-Min Demo
-            </button>
+          <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", marginBottom: "60px" }}>
+            <a href="#" style={{
+              background: C.blue, color: "#fff", padding: "14px 32px", borderRadius: "10px",
+              fontSize: "16px", fontWeight: 600, textDecoration: "none",
+              boxShadow: `0 0 30px ${C.blueGlow}`, transition: "transform 0.2s",
+            }}>Try Free — No Credit Card</a>
+            <a href="/how-it-works" style={{
+              background: "transparent", color: C.text, padding: "14px 32px", borderRadius: "10px",
+              fontSize: "16px", fontWeight: 500, textDecoration: "none",
+              border: `1px solid ${C.cardBorder}`, transition: "border-color 0.2s",
+            }}>See How It Works →</a>
           </div>
 
-          <div className={`mt-10 flex flex-wrap items-center justify-center gap-6 text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
-            <div className="flex items-center gap-2"><svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg><span>No credit card required</span></div>
-            <div className="flex items-center gap-2"><svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg><span>14-day free trial</span></div>
-            <div className="flex items-center gap-2"><svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg><span>SOC 2 Compliant</span></div>
-          </div>
+          <AnimatedDemo />
         </div>
+      </section>
 
-        {/* Demo Mockup */}
-        <div className="relative max-w-5xl mx-auto">
-          <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/20 via-blue-500/10 to-blue-500/20 rounded-3xl blur-2xl" />
-          <div className={`relative rounded-2xl overflow-hidden shadow-2xl ${isDark ? 'bg-gray-800 border border-blue-500/30' : 'bg-white border border-gray-200'}`}>
-            <div className={`flex items-center gap-2 px-4 py-3 border-b ${isDark ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
-              <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                <div className="w-3 h-3 rounded-full bg-green-500" />
+      {/* ============================================================
+         SECTION 2: TRUST BADGES (placeholder)
+         ============================================================ */}
+      <section style={{ padding: "48px 24px", textAlign: "center", borderTop: `1px solid ${C.line}`, borderBottom: `1px solid ${C.line}` }}>
+        <p style={{ color: C.dimmed, fontSize: "14px", marginBottom: "24px", fontWeight: 500, letterSpacing: "0.05em", textTransform: "uppercase" }}>
+          Trusted by teams verifying claims at
+        </p>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "48px", flexWrap: "wrap", opacity: 0.4 }}>
+          {["HR Teams", "Insurance Firms", "Legal Depts", "Recruiters", "Compliance"].map(name => (
+            <span key={name} style={{ color: C.muted, fontSize: "18px", fontWeight: 700, letterSpacing: "0.02em" }}>{name}</span>
+          ))}
+        </div>
+      </section>
+
+      {/* ============================================================
+         SECTION 3: 2.0 UPDATES — Feature Proof Cards
+         ============================================================ */}
+      <section style={{ padding: "100px 24px", maxWidth: "1200px", margin: "0 auto" }}>
+        <SectionTitle watermark="2.0 Updates" title="Built Different" subtitle="Every verification feature designed to catch what others miss." />
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "80px" }}>
+          {/* Card 1: Multi-AI Consensus */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", alignItems: "center" }} className="grid-2-responsive">
+            <div>
+              <div style={{ width: 52, height: 52, borderRadius: "14px", background: "rgba(59,130,246,0.1)", border: `1px solid rgba(59,130,246,0.15)`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "20px" }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="2"><path d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
               </div>
-              <div className="flex-1 flex justify-center">
-                <div className={`px-4 py-1 rounded-md text-sm ${isDark ? 'bg-gray-900 text-gray-500' : 'bg-gray-100 text-gray-500'}`}>app.trustie.io/verify</div>
-              </div>
+              <h3 style={{ fontSize: "28px", fontWeight: 700, color: "#fff", marginBottom: "12px" }}>Multi-AI Consensus Engine</h3>
+              <p style={{ color: C.muted, fontSize: "16px", lineHeight: 1.7 }}>Three AI models must agree before a claim is marked verified. GPT-4, Claude, and Gemini cross-check each other — reducing false positives by 90%.</p>
             </div>
-            <div className="p-8">
-              <div className="flex flex-col md:flex-row gap-6">
-                <div className="flex-1">
-                  <div className={`rounded-xl p-6 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                        <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                      </div>
-                      <span className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>Resume Verification</span>
-                    </div>
-                    <div className={`rounded-lg p-4 mb-4 ${isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
-                      <p className={`font-medium mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>Candidate: John Smith</p>
-                      <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Claims: "5 years at Google as Senior Engineer"</p>
-                      <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Education: "Stanford CS, 2018"</p>
-                    </div>
-                    <button className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors">Verify All Claims</button>
+            <div style={{ background: "rgba(59,130,246,0.04)", border: `1px solid rgba(59,130,246,0.12)`, borderRadius: "16px", padding: "24px" }}>
+              {[
+                { name: "GPT-4 Turbo", verdict: "VERIFIED", conf: "94%" },
+                { name: "Claude 3.5", verdict: "VERIFIED", conf: "96%" },
+                { name: "Gemini Pro", verdict: "VERIFIED", conf: "91%" },
+              ].map((m, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px", borderRadius: "10px", background: "rgba(15,23,42,0.5)", border: `1px solid ${C.line}`, marginBottom: i < 2 ? "8px" : "0" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <span style={{ fontSize: "16px" }}>🤖</span>
+                    <span style={{ color: "#fff", fontWeight: 500, fontSize: "14px" }}>{m.name}</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <span style={{ color: C.dimmed, fontSize: "13px" }}>{m.conf}</span>
+                    <span style={{ background: "rgba(34,197,94,0.1)", color: C.green, fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "9999px", border: "1px solid rgba(34,197,94,0.2)" }}>{m.verdict}</span>
                   </div>
                 </div>
-                <div className="flex-1">
-                  <div className={`rounded-xl p-6 border ${isDark ? 'bg-gray-800/50 border-blue-500/30' : 'bg-blue-50 border-blue-200'}`}>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-8 h-8 bg-yellow-500/20 rounded-full flex items-center justify-center">
-                        <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                      </div>
-                      <div>
-                        <div className="text-yellow-400 font-semibold">PARTIAL MATCH</div>
-                        <div className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>2 of 3 claims verified • 3 sources agree</div>
-                      </div>
-                    </div>
-                    <div className="space-y-3 text-sm">
-                      <div className="flex items-start gap-2"><span className="text-green-400">✓</span><span className={isDark ? 'text-gray-400' : 'text-gray-600'}>Stanford CS degree confirmed (2018) — <span className="text-blue-400">High Trust Source</span></span></div>
-                      <div className="flex items-start gap-2"><span className="text-red-400">✗</span><span className={isDark ? 'text-gray-400' : 'text-gray-600'}>Google employment: <strong className="text-red-400">3 years, not 5</strong> — LinkedIn + HR Database</span></div>
-                      <div className="flex items-start gap-2"><span className="text-yellow-400">?</span><span className={isDark ? 'text-gray-400' : 'text-gray-600'}>Title was "Engineer", not "Senior Engineer" — Verify manually</span></div>
-                    </div>
-                    <div className={`mt-4 pt-4 border-t ${isDark ? 'border-gray-700' : 'border-blue-200'}`}>
-                      <div className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Sources: LinkedIn, Stanford Alumni DB, Google HR Records</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ============================================================================
-// TRUST BADGES (NEW - B2B)
-// ============================================================================
-
-function TrustBadges({ isDark }: { isDark: boolean }) {
-  const badges = [
-    { icon: '🔒', label: 'SOC 2 Compliant' },
-    { icon: '🛡️', label: 'GDPR Ready' },
-    { icon: '🔐', label: '256-bit Encryption' },
-    { icon: '📊', label: '99.9% Uptime SLA' },
-    { icon: '🚫', label: 'No Data Tracking' },
-  ];
-
-  return (
-    <section className={`py-8 border-y ${isDark ? 'bg-gray-800/30 border-gray-800' : 'bg-gray-50 border-gray-200'}`}>
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-wrap items-center justify-center gap-8">
-          {badges.map((badge, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <span className="text-2xl">{badge.icon}</span>
-              <span className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{badge.label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ============================================================================
-// PAIN POINTS
-// ============================================================================
-
-function PainPoints({ isDark }: { isDark: boolean }) {
-  const stats = [
-    { number: '70%', label: 'of resumes contain lies', color: 'text-red-500' },
-    { number: '$150K', label: 'average cost of a bad hire', color: 'text-red-500' },
-    { number: '85%', label: 'of employers caught fake credentials', color: 'text-yellow-500' },
-    { number: '6 hrs', label: 'average manual verification time', color: 'text-blue-500' },
-  ];
-
-  return (
-    <section className={`py-16 ${isDark ? 'bg-gray-800/30' : 'bg-white'}`}>
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map((stat, index) => (
-            <div key={index} className="text-center">
-              <div className={`text-4xl md:text-5xl font-bold mb-2 ${stat.color}`}>{stat.number}</div>
-              <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ============================================================================
-// HOW WE VERIFY (NEW - Transparency Feature #17)
-// ============================================================================
-
-function HowWeVerify({ isDark }: { isDark: boolean }) {
-  const sources = [
-    { icon: '💼', name: 'LinkedIn', description: 'Employment history verification' },
-    { icon: '🎓', name: 'University Databases', description: 'Degree and graduation verification' },
-    { icon: '📋', name: 'HR Records', description: 'Direct employer verification' },
-    { icon: '📰', name: 'Public Records', description: 'News, publications, certifications' },
-    { icon: '🤖', name: 'Multi-AI Consensus', description: 'Cross-reference with GPT-4, Claude, Gemini' },
-  ];
-
-  return (
-    <section className="py-16 px-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>How We <span className="text-blue-500">Verify</span></h2>
-          <p className={`text-lg max-w-2xl mx-auto ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>We always show our sources. We never guess. Multi-source cross-referencing means 3 or more sources must agree.</p>
-        </div>
-        <div className="grid md:grid-cols-5 gap-6">
-          {sources.map((source, index) => (
-            <div key={index} className={`text-center p-6 rounded-xl transition-all ${isDark ? 'bg-gray-800/50 border border-gray-700 hover:border-blue-500/50' : 'bg-white border border-gray-200 hover:border-blue-300 shadow-sm'}`}>
-              <div className="text-3xl mb-3">{source.icon}</div>
-              <h3 className={`font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>{source.name}</h3>
-              <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{source.description}</p>
-            </div>
-          ))}
-        </div>
-        {/* Anti-Commercial Bias + Truth Methodology */}
-        <div className={`mt-12 grid md:grid-cols-3 gap-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-          <div className={`p-6 rounded-xl ${isDark ? 'bg-gray-800/30 border border-gray-700' : 'bg-gray-50 border border-gray-200'}`}>
-            <div className="flex items-center gap-3 mb-3">
-              <span className="text-2xl">🚫</span>
-              <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>No Commercial Bias</h4>
-            </div>
-            <p className="text-sm">We flag sources that are ad-supported or commercially motivated. We prioritize .edu, .gov, and peer-reviewed sources over content farms.</p>
-          </div>
-          <div className={`p-6 rounded-xl ${isDark ? 'bg-gray-800/30 border border-gray-700' : 'bg-gray-50 border border-gray-200'}`}>
-            <div className="flex items-center gap-3 mb-3">
-              <span className="text-2xl">📊</span>
-              <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Truth-Maximizing Stack</h4>
-            </div>
-            <p className="text-sm">Our methodology: Search → Cross-reference → Multi-AI consensus → Source quality scoring → Human-readable verdict with full audit trail.</p>
-          </div>
-          <div className={`p-6 rounded-xl ${isDark ? 'bg-gray-800/30 border border-gray-700' : 'bg-gray-50 border border-gray-200'}`}>
-            <div className="flex items-center gap-3 mb-3">
-              <span className="text-2xl">📝</span>
-              <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Full Audit Trail</h4>
-            </div>
-            <p className="text-sm">Every verification is logged with timestamps, sources checked, and confidence scores. Export reports for compliance and legal documentation.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ============================================================================
-// FEATURES
-// ============================================================================
-
-function Features({ isDark }: { isDark: boolean }) {
-  const features = [
-    { icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>, title: 'Verify in 30 Seconds', description: 'Upload a resume and get instant verification. What used to take 6 hours now takes 30 seconds.' },
-    { icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>, title: 'Always Shows Sources', description: 'Every verification includes links to primary sources. Full audit trail for compliance. We never make claims without evidence.' },
-    { icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>, title: 'Multi-AI Consensus', description: 'Cross-reference across GPT-4, Claude, and Gemini. Reduces false positives by 90%. Only authoritative sources used.' },
-    { icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>, title: 'Team Dashboard', description: 'Share verifications with your hiring team. Role-based access controls. Bulk upload 100 candidates at once.' },
-  ];
-
-  return (
-    <section id="features" className="py-24 px-6 relative">
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-        <span className={`text-[12rem] font-bold select-none ${isDark ? 'text-gray-800/50' : 'text-gray-200'}`}>2.0</span>
-      </div>
-      <div className="max-w-7xl mx-auto relative">
-        <div className="text-center mb-16">
-          <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}><span className={isDark ? 'text-gray-600' : 'text-gray-400'}>Trustie</span> 2.0 Features</h2>
-          <p className={`text-lg ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>Enterprise-grade verification for modern HR teams</p>
-        </div>
-        <div className="grid md:grid-cols-2 gap-8">
-          {features.map((feature, index) => (
-            <div key={index} className={`group relative rounded-2xl p-8 transition-all duration-300 ${isDark ? 'bg-gray-800/50 border border-gray-700 hover:border-blue-500/50' : 'bg-white border border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md'}`}>
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 p-0.5 mb-6">
-                <div className={`w-full h-full rounded-xl flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-white'} text-blue-500`}>{feature.icon}</div>
-              </div>
-              <h3 className={`text-2xl font-bold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>{feature.title}</h3>
-              <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>{feature.description}</p>
-              <div className={`absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 rounded-tr-lg transition-colors ${isDark ? 'border-gray-700 group-hover:border-blue-500/50' : 'border-gray-200 group-hover:border-blue-300'}`} />
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ============================================================================
-// INTEGRATIONS (NEW - B2B)
-// ============================================================================
-
-function Integrations({ isDark }: { isDark: boolean }) {
-  const integrations = [
-    { name: 'Greenhouse', logo: '🌿' },
-    { name: 'Lever', logo: '⚙️' },
-    { name: 'Workday', logo: '📊' },
-    { name: 'BambooHR', logo: '🎋' },
-    { name: 'SAP SuccessFactors', logo: '💼' },
-    { name: 'API', logo: '🔗' },
-  ];
-
-  return (
-    <section className={`py-16 ${isDark ? 'bg-gray-800/30' : 'bg-gray-50'}`}>
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-12">
-          <h2 className={`text-3xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Integrates with Your <span className="text-blue-500">ATS</span></h2>
-          <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Connect Trustie to your existing hiring workflow via API or native integrations</p>
-        </div>
-        <div className="flex flex-wrap items-center justify-center gap-8">
-          {integrations.map((integration, index) => (
-            <div key={index} className={`flex items-center gap-3 px-6 py-4 rounded-xl ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
-              <span className="text-2xl">{integration.logo}</span>
-              <span className={`font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{integration.name}</span>
-            </div>
-          ))}
-        </div>
-        <div className="text-center mt-8">
-          <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm ${isDark ? 'bg-blue-500/10 text-blue-400 border border-blue-500/30' : 'bg-blue-50 text-blue-600 border border-blue-200'}`}>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-            Chrome Extension Coming Soon
-          </span>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ============================================================================
-// API SECTION (NEW - For Technical Buyers)
-// ============================================================================
-
-function APISection({ isDark }: { isDark: boolean }) {
-  const codeExample = `// Verify a candidate claim
-const response = await fetch('https://api.trustie.io/v1/verify', {
-  method: 'POST',
-  headers: {
-    'Authorization': 'Bearer YOUR_API_KEY',
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    claim: "5 years at Google as Senior Engineer",
-    candidate: "John Smith"
-  })
-});
-
-// Response
-{
-  "verdict": "PARTIAL_MATCH",
-  "confidence": 0.87,
-  "findings": [
-    { "claim": "Google employment", "status": "VERIFIED", "actual": "3 years" },
-    { "claim": "Senior Engineer title", "status": "UNVERIFIED", "actual": "Engineer" }
-  ],
-  "sources": ["linkedin.com", "google.com/careers"],
-  "audit_id": "ver_abc123"
-}`;
-
-  return (
-    <section className={`py-24 px-6 ${isDark ? 'bg-gray-800/30' : 'bg-gray-50'}`}>
-      <div className="max-w-6xl mx-auto">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm mb-6 ${isDark ? 'bg-blue-500/10 text-blue-400 border border-blue-500/30' : 'bg-blue-50 text-blue-600 border border-blue-200'}`}>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
-              For Developers
-            </div>
-            <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Powerful <span className="text-blue-500">REST API</span></h2>
-            <p className={`text-lg mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Integrate Trustie verification directly into your ATS, HRIS, or custom workflows. Simple REST API with comprehensive documentation.</p>
-            <ul className="space-y-3 mb-8">
-              {['RESTful JSON API', 'Webhook notifications', 'Batch verification (100+ candidates)', 'Full audit trail in response', 'Rate limit: 1000 requests per minute'].map((feature, index) => (
-                <li key={index} className={`flex items-center gap-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                  <svg className="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                  {feature}
-                </li>
               ))}
-            </ul>
-            <a href="#pricing" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-              View API Docs
-            </a>
-          </div>
-          <div className={`rounded-xl overflow-hidden ${isDark ? 'bg-gray-900 border border-gray-700' : 'bg-gray-900 border border-gray-200'}`}>
-            <div className="flex items-center gap-2 px-4 py-3 bg-gray-800 border-b border-gray-700">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-500" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                <div className="w-3 h-3 rounded-full bg-green-500" />
-              </div>
-              <span className="text-gray-500 text-sm ml-2">api-example.js</span>
-            </div>
-            <pre className="p-4 text-sm text-gray-300 overflow-x-auto"><code>{codeExample}</code></pre>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ============================================================================
-// HOW IT WORKS
-// ============================================================================
-
-function HowItWorks({ isDark, setShowVideoModal }: { isDark: boolean; setShowVideoModal: (v: boolean) => void }) {
-  const steps = [
-    { number: '01', title: 'Upload Resume', description: 'Drag and drop a resume or paste candidate claims. Bulk upload supported for high-volume hiring.' },
-    { number: '02', title: 'AI Verifies', description: 'Multi-source verification against employment databases, universities, LinkedIn, and public records.' },
-    { number: '03', title: 'Get Report', description: 'Detailed verification report with confidence scores, source links, and flags for manual review.' },
-  ];
-
-  return (
-    <section id="how-it-works" className="py-24 px-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="relative mb-16">
-          <span className={`absolute -top-20 left-0 text-[10rem] font-bold select-none pointer-events-none ${isDark ? 'text-gray-800/30' : 'text-gray-200'}`}>Proof</span>
-          <div className="relative">
-            <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>How <span className="text-blue-500">Trustie</span> Works</h2>
-            <p className={`text-lg ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>Three steps to verified candidates</p>
-          </div>
-        </div>
-        <div className="grid md:grid-cols-3 gap-8">
-          {steps.map((step, index) => (
-            <div key={index} className="relative">
-              {index < steps.length - 1 && <div className="hidden md:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-blue-500/50 to-transparent -translate-x-1/2" />}
-              <div className={`rounded-2xl p-8 h-full transition-all duration-300 ${isDark ? 'bg-gray-800/50 border border-gray-700 hover:border-blue-500/50' : 'bg-white border border-gray-200 hover:border-blue-300 shadow-sm'}`}>
-                <div className="text-6xl font-bold text-blue-500/20 mb-4">{step.number}</div>
-                <h3 className={`text-2xl font-bold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>{step.title}</h3>
-                <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>{step.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-16 relative">
-          <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/10 via-transparent to-blue-500/10 rounded-3xl blur-xl" />
-          <div className={`relative rounded-2xl overflow-hidden ${isDark ? 'bg-gray-800 border border-blue-500/30' : 'bg-white border border-gray-200 shadow-lg'}`}>
-            <div className={`aspect-video flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-gray-50'}`}>
-              <div className="text-center">
-                <button onClick={() => setShowVideoModal(true)} className="w-20 h-20 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center transition-colors mb-4 mx-auto shadow-lg shadow-blue-500/25">
-                  <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-                <div className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Watch Trustie in Action</div>
-                <div className={isDark ? 'text-gray-500' : 'text-gray-500'}>See a live resume verification in 2 minutes</div>
+              <div style={{ marginTop: "12px", padding: "10px", borderRadius: "8px", background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.15)", textAlign: "center" }}>
+                <span style={{ color: C.green, fontWeight: 700, fontSize: "13px" }}>✓ CONSENSUS REACHED — 3/3 models agree</span>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
-// ============================================================================
-// ROI CALCULATOR
-// ============================================================================
-
-function ROICalculator({ isDark }: { isDark: boolean }) {
-  const [hiresPerMonth, setHiresPerMonth] = useState(10);
-  const fraudRate = 0.3;
-  const costPerBadHire = 75000;
-  const trustieCost = 500;
-  const potentialBadHires = Math.round(hiresPerMonth * fraudRate);
-  const potentialLoss = potentialBadHires * costPerBadHire;
-  const roi = Math.round(((potentialLoss - trustieCost) / trustieCost) * 100);
-
-  return (
-    <section className={`py-24 px-6 ${isDark ? 'bg-gray-800/30' : 'bg-white'}`}>
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Calculate Your <span className="text-blue-500">ROI</span></h2>
-          <p className={`text-lg ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>See how much you could save with Trustie</p>
-        </div>
-        <div className={`rounded-2xl p-8 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-gray-50 border border-gray-200'}`}>
-          <div className="mb-8">
-            <label className={`block text-lg font-medium mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>How many people do you hire per month?</label>
-            <input type="range" min="1" max="100" value={hiresPerMonth} onChange={(e) => setHiresPerMonth(Number(e.target.value))} className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500" />
-            <div className="flex justify-between mt-2">
-              <span className={isDark ? 'text-gray-500' : 'text-gray-500'}>1</span>
-              <span className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{hiresPerMonth}</span>
-              <span className={isDark ? 'text-gray-500' : 'text-gray-500'}>100</span>
+          {/* Card 2: Source Quality Tiers (reversed) */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", alignItems: "center" }} className="grid-2-responsive">
+            <div style={{ order: 2 }}>
+              <div style={{ width: 52, height: 52, borderRadius: "14px", background: "rgba(59,130,246,0.1)", border: `1px solid rgba(59,130,246,0.15)`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "20px" }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="2"><path d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
+              </div>
+              <h3 style={{ fontSize: "28px", fontWeight: 700, color: "#fff", marginBottom: "12px" }}>Source Quality Tiers</h3>
+              <p style={{ color: C.muted, fontSize: "16px", lineHeight: 1.7 }}>Not all sources are equal. We weight .gov, .edu, and peer-reviewed databases higher than blogs, forums, and commercial sites. Every source gets a trust score.</p>
+            </div>
+            <div style={{ order: 1, background: "rgba(59,130,246,0.04)", border: `1px solid rgba(59,130,246,0.12)`, borderRadius: "16px", padding: "24px" }}>
+              {[
+                { badge: "🟢 High Trust", sources: ".gov, .edu, peer-reviewed journals", weight: "3x" },
+                { badge: "🟡 Medium Trust", sources: "LinkedIn, Credly, official company sites", weight: "2x" },
+                { badge: "🔴 Low Trust", sources: "Blogs, forums, social media, Wikipedia", weight: "1x" },
+              ].map((t, i) => (
+                <div key={i} style={{ padding: "14px", borderRadius: "10px", background: "rgba(15,23,42,0.5)", border: `1px solid ${C.line}`, marginBottom: i < 2 ? "8px" : "0" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                    <span style={{ color: "#fff", fontSize: "14px", fontWeight: 600 }}>{t.badge}</span>
+                    <span style={{ fontSize: "12px", color: C.blue, fontWeight: 500, background: "rgba(59,130,246,0.1)", padding: "2px 8px", borderRadius: "4px" }}>{t.weight} weight</span>
+                  </div>
+                  <p style={{ color: C.dimmed, fontSize: "12px" }}>{t.sources}</p>
+                </div>
+              ))}
             </div>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className={`rounded-xl p-6 text-center ${isDark ? 'bg-red-500/10 border border-red-500/30' : 'bg-red-50 border border-red-200'}`}>
-              <div className="text-red-500 text-3xl font-bold">{potentialBadHires}</div>
-              <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Potential bad hires per month</div>
+
+          {/* Card 3: Anti-Commercial Bias */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", alignItems: "center" }} className="grid-2-responsive">
+            <div>
+              <div style={{ width: 52, height: 52, borderRadius: "14px", background: "rgba(59,130,246,0.1)", border: `1px solid rgba(59,130,246,0.15)`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "20px" }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="2"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+              </div>
+              <h3 style={{ fontSize: "28px", fontWeight: 700, color: "#fff", marginBottom: "12px" }}>Anti-Commercial Bias Filter</h3>
+              <p style={{ color: C.muted, fontSize: "16px", lineHeight: 1.7 }}>Sources with financial interest in the claim are automatically flagged and deprioritized. Trustie only trusts sources that have no reason to lie.</p>
             </div>
-            <div className={`rounded-xl p-6 text-center ${isDark ? 'bg-yellow-500/10 border border-yellow-500/30' : 'bg-yellow-50 border border-yellow-200'}`}>
-              <div className="text-yellow-500 text-3xl font-bold">${potentialLoss.toLocaleString()}</div>
-              <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Potential loss per month</div>
-            </div>
-            <div className={`rounded-xl p-6 text-center ${isDark ? 'bg-green-500/10 border border-green-500/30' : 'bg-green-50 border border-green-200'}`}>
-              <div className="text-green-500 text-3xl font-bold">{roi.toLocaleString()}x</div>
-              <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>ROI with Trustie</div>
+            <div style={{ background: "rgba(59,130,246,0.04)", border: `1px solid rgba(59,130,246,0.12)`, borderRadius: "16px", padding: "24px" }}>
+              {[
+                { icon: "✓", color: C.green, name: "stanford.edu/alumni", status: "TRUSTED", statusColor: C.green, desc: "No commercial interest. Official university database." },
+                { icon: "⚠", color: C.red, name: "resumebuilder.com", status: "FLAGGED", statusColor: C.red, desc: "Commercial interest: sells resume services. Deprioritized." },
+                { icon: "✓", color: C.green, name: "linkedin.com/in/jsmith", status: "TRUSTED", statusColor: C.green, desc: "Professional network. Cross-referenced with employer data." },
+              ].map((s, i) => (
+                <div key={i} style={{ padding: "14px", borderRadius: "10px", background: "rgba(15,23,42,0.5)", border: `1px solid ${s.statusColor === C.red ? "rgba(239,68,68,0.15)" : C.line}`, marginBottom: i < 2 ? "8px" : "0" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                    <span style={{ color: s.color }}>{s.icon}</span>
+                    <span style={{ color: "#fff", fontSize: "13px", fontWeight: 500 }}>{s.name}</span>
+                    <span style={{ marginLeft: "auto", fontSize: "11px", fontWeight: 700, color: s.statusColor, background: `${s.statusColor}15`, padding: "2px 8px", borderRadius: "9999px" }}>{s.status}</span>
+                  </div>
+                  <p style={{ color: C.dimmed, fontSize: "11px" }}>{s.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
-          <div className={`mt-6 text-center text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>*Based on 30% resume fraud rate and $75,000 average cost per bad hire</div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
-// ============================================================================
-// SECURITY & COMPLIANCE (NEW - B2B)
-// ============================================================================
-
-function SecurityCompliance({ isDark }: { isDark: boolean }) {
-  const features = [
-    { icon: '🔒', title: 'SOC 2 Type II', description: 'Independently audited security controls and processes' },
-    { icon: '🇪🇺', title: 'GDPR Compliant', description: 'Full compliance with European data protection regulations' },
-    { icon: '🔐', title: 'End-to-End Encryption', description: '256-bit AES encryption for all data in transit and at rest' },
-    { icon: '🚫', title: 'No Data Tracking', description: 'We do not track, sell, or share your candidate data. Privacy first.' },
-    { icon: '🏢', title: 'On-Premise Option', description: 'Enterprise customers can deploy Trustie on their own infrastructure' },
-    { icon: '📋', title: 'SSO and SAML', description: 'Single sign-on integration with your identity provider' },
-  ];
-
-  return (
-    <section id="security" className="py-24 px-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Enterprise-Grade <span className="text-blue-500">Security</span></h2>
-          <p className={`text-lg max-w-2xl mx-auto ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>Your data is safe with us. We are SOC 2 compliant, GDPR ready, and never track or sell your data.</p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
-            <div key={index} className={`rounded-xl p-6 ${isDark ? 'bg-gray-800/50 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
-              <div className="text-3xl mb-4">{feature.icon}</div>
-              <h3 className={`text-lg font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>{feature.title}</h3>
-              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{feature.description}</p>
+          {/* Card 4: Full Audit Trail (reversed) */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", alignItems: "center" }} className="grid-2-responsive">
+            <div style={{ order: 2 }}>
+              <div style={{ width: 52, height: 52, borderRadius: "14px", background: "rgba(59,130,246,0.1)", border: `1px solid rgba(59,130,246,0.15)`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "20px" }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+              </div>
+              <h3 style={{ fontSize: "28px", fontWeight: 700, color: "#fff", marginBottom: "12px" }}>Full Audit Trail</h3>
+              <p style={{ color: C.muted, fontSize: "16px", lineHeight: 1.7 }}>Every verification is logged with timestamps, sources checked, AI models used, and confidence scores. Export PDF reports for compliance and legal documentation.</p>
             </div>
-          ))}
+            <div style={{ order: 1, borderRadius: "16px", overflow: "hidden", background: "rgba(15,23,42,0.9)", border: `1px solid ${C.line}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", padding: "10px 14px", background: "rgba(30,41,66,0.6)", borderBottom: `1px solid ${C.line}` }}>
+                <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#ef4444" }} />
+                <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#f59e0b" }} />
+                <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#22c55e" }} />
+                <span style={{ color: C.dimmed, fontSize: "11px", marginLeft: "8px" }}>audit_trail_ver_abc123.json</span>
+              </div>
+              <pre style={{ padding: "16px", fontSize: "11px", color: C.muted, lineHeight: 1.6, margin: 0, overflow: "auto" }}><code>{`{
+  "audit_id": "ver_abc123",
+  "timestamp": "2025-02-22T14:30:00Z",
+  "candidate": "John Smith",
+  "claims_checked": 3,
+  "claims_verified": 2,
+  "claims_flagged": 1,
+  "confidence": 0.87,
+  "ai_models": ["gpt-4", "claude-3.5", "gemini"],
+  "sources": [
+    { "url": "stanford.edu", "tier": 1 },
+    { "url": "linkedin.com", "tier": 2 }
+  ],
+  "verdict": "PARTIAL_MATCH",
+  "export": ["pdf", "csv", "json"]
+}`}</code></pre>
+            </div>
+          </div>
         </div>
-      </div>
-    </section>
-  );
-}
+      </section>
 
-// ============================================================================
-// COMPARISON TABLE
-// ============================================================================
+      {/* ============================================================
+         SECTION 4: COMPARISON TABLE
+         ============================================================ */}
+      <section style={{ padding: "80px 24px", borderTop: `1px solid ${C.line}` }}>
+        <SectionTitle watermark="Compare" title="The Proof Is in the Comparison" subtitle="Compare side-by-side and see why Trustie catches what others miss." />
 
-function ComparisonTable({ isDark }: { isDark: boolean }) {
-  const features = [
-    { name: 'Instant verification', trustie: true, manual: false, background: true },
-    { name: 'Multi-source cross-reference', trustie: true, manual: true, background: true },
-    { name: 'AI-powered analysis', trustie: true, manual: false, background: false },
-    { name: 'Always shows sources', trustie: true, manual: true, background: true },
-    { name: 'Bulk processing', trustie: true, manual: false, background: true },
-    { name: 'Real-time results', trustie: true, manual: false, background: false },
-    { name: 'Audit trail', trustie: true, manual: true, background: true },
-    { name: 'Cost per check', trustie: '$1-5', manual: '$50-100', background: '$30-75' },
-    { name: 'Time per check', trustie: '30 sec', manual: '6 hours', background: '3-5 days' },
-  ];
-
-  const Check = ({ highlight = false }: { highlight?: boolean }) => (
-    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${highlight ? 'bg-blue-500/20 border-2 border-blue-500' : isDark ? 'bg-gray-700' : 'bg-gray-200'}`}>
-      <svg className={`w-4 h-4 ${highlight ? 'text-blue-400' : isDark ? 'text-gray-400' : 'text-gray-500'}`} fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-    </div>
-  );
-
-  const Cross = () => (
-    <div className="w-8 h-8 rounded-full flex items-center justify-center text-red-400">
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-    </div>
-  );
-
-  return (
-    <section className="py-24 px-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>The Proof Is in the <span className="text-blue-500">Comparison</span></h2>
-          <p className={`text-lg ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>See how Trustie stacks up</p>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        <div style={{ maxWidth: "1000px", margin: "0 auto", overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr className={`border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
-                <th className={`text-left py-6 px-4 font-normal ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Feature</th>
-                <th className="py-6 px-4">
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    </div>
-                    <span className="font-bold text-blue-500">Trustie</span>
-                  </div>
-                </th>
-                <th className="py-6 px-4">
-                  <div className="flex flex-col items-center gap-2">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>👤</div>
-                    <span className={`font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Manual</span>
-                  </div>
-                </th>
-                <th className="py-6 px-4">
-                  <div className="flex flex-col items-center gap-2">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>🏢</div>
-                    <span className={`font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Background Check</span>
-                  </div>
-                </th>
+              <tr>
+                <th style={{ textAlign: "left", padding: "16px 20px", color: C.muted, fontSize: "14px", fontWeight: 500, borderBottom: `1px solid ${C.line}` }}>Verification Features</th>
+                {["Trustie", "Checkr", "HireRight", "GPTZero"].map((name, i) => (
+                  <th key={name} style={{
+                    padding: "16px 20px", textAlign: "center", fontSize: "14px", fontWeight: 700,
+                    color: i === 0 ? "#fff" : C.dimmed,
+                    background: i === 0 ? "rgba(59,130,246,0.08)" : "transparent",
+                    borderBottom: `1px solid ${i === 0 ? "rgba(59,130,246,0.2)" : C.line}`,
+                    borderRadius: i === 0 ? "12px 12px 0 0" : "0",
+                  }}>{name}</th>
+                ))}
               </tr>
             </thead>
             <tbody>
-              {features.map((feature, index) => (
-                <tr key={index} className={`border-b transition-colors ${isDark ? 'border-gray-800/50 hover:bg-gray-800/30' : 'border-gray-100 hover:bg-gray-50'}`}>
-                  <td className={`py-5 px-4 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{feature.name}</td>
-                  <td className="py-5 px-4"><div className="flex justify-center">{typeof feature.trustie === 'boolean' ? (feature.trustie ? <Check highlight /> : <Cross />) : <span className="text-blue-500 font-bold">{feature.trustie}</span>}</div></td>
-                  <td className="py-5 px-4"><div className="flex justify-center">{typeof feature.manual === 'boolean' ? (feature.manual ? <Check /> : <Cross />) : <span className={`font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{feature.manual}</span>}</div></td>
-                  <td className="py-5 px-4"><div className="flex justify-center">{typeof feature.background === 'boolean' ? (feature.background ? <Check /> : <Cross />) : <span className={`font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{feature.background}</span>}</div></td>
+              {[
+                ["AI-Powered Claim Extraction", true, false, false, true],
+                ["Multi-AI Consensus (3+ models)", true, false, false, false],
+                ["Source Quality Tiering", true, false, false, false],
+                ["Anti-Commercial Bias Filter", true, false, false, false],
+                ["Real-Time Verification", true, false, false, true],
+                ["Full Audit Trail & Export", true, true, true, false],
+                ["Batch CSV Processing", true, true, true, false],
+                ["API Access", true, true, true, true],
+                ["Resume-Specific Verification", true, true, true, false],
+                ["General Claim Verification", true, false, false, true],
+                ["No Per-Check Fees", true, false, false, true],
+                ["Free Tier Available", true, false, false, true],
+              ].map(([feature, ...vals], i) => (
+                <tr key={i}>
+                  <td style={{ padding: "14px 20px", color: C.text, fontSize: "14px", borderBottom: `1px solid ${C.line}` }}>{feature as string}</td>
+                  {(vals as boolean[]).map((v, j) => (
+                    <td key={j} style={{
+                      padding: "14px 20px", textAlign: "center",
+                      background: j === 0 ? "rgba(59,130,246,0.04)" : "transparent",
+                      borderBottom: `1px solid ${C.line}`,
+                    }}>
+                      {v ? (
+                        j === 0 ? (
+                          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(59,130,246,0.15)", display: "inline-flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(59,130,246,0.3)" }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="3"><path d="M5 12l5 5L20 7"/></svg>
+                          </div>
+                        ) : (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.muted} strokeWidth="2" style={{ display: "inline" }}><path d="M5 12l5 5L20 7"/></svg>
+                        )
+                      ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.red} strokeWidth="2" style={{ display: "inline", opacity: 0.6 }}><path d="M6 6l12 12M18 6L6 18"/></svg>
+                      )}
+                    </td>
+                  ))}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </div>
-    </section>
-  );
-}
+      </section>
 
-// ============================================================================
-// USE CASES
-// ============================================================================
+      {/* ============================================================
+         SECTION 5: SOCIAL PROOF / TESTIMONIALS
+         ============================================================ */}
+      <section style={{ padding: "80px 24px", borderTop: `1px solid ${C.line}` }}>
+        <SectionTitle watermark="Proof" title="Real Results from Real Users" subtitle="See how teams are using Trustie to verify claims and build trust." />
 
-function UseCases({ isDark }: { isDark: boolean }) {
-  const useCases = [
-    { icon: '👔', title: 'HR and Recruitment', description: 'Verify resumes, credentials, and employment history before making offers. Catch discrepancies before they cost you.' },
-    { icon: '⚖️', title: 'Legal Teams', description: 'Due diligence, evidence verification, and deposition fact-checking with full audit trails.' },
-    { icon: '🏦', title: 'Insurance', description: 'Verify claims, accident reports, and medical records. Reduce fraud losses.' },
-    { icon: '📰', title: 'Journalism', description: 'Fact-check sources and verify quotes before publishing. Protect your reputation.' },
-  ];
-
-  return (
-    <section className={`py-24 px-6 ${isDark ? 'bg-gray-800/30' : 'bg-white'}`}>
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Built for <span className="text-blue-500">Every Industry</span></h2>
-          <p className={`text-lg ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>Trustie adapts to your verification needs</p>
-        </div>
-        <div className="grid md:grid-cols-4 gap-6">
-          {useCases.map((useCase, index) => (
-            <div key={index} className={`rounded-2xl p-6 text-center transition-all duration-300 ${isDark ? 'bg-gray-800/50 border border-gray-700 hover:border-blue-500/50' : 'bg-gray-50 border border-gray-200 hover:border-blue-300'}`}>
-              <div className="text-4xl mb-4">{useCase.icon}</div>
-              <h3 className={`text-lg font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>{useCase.title}</h3>
-              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{useCase.description}</p>
+        <div style={{ maxWidth: "1100px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px" }} className="grid-responsive">
+          {[
+            { name: "Sarah K.", role: "HR Director", stars: 5, text: "Caught 3 inflated titles in one batch. Trustie paid for itself in the first week.", company: "Tech Startup" },
+            { name: "Marcus R.", role: "Recruiter", stars: 5, text: "I verify every resume now. The multi-AI consensus gives me confidence no other tool does.", company: "Staffing Agency" },
+            { name: "Jennifer L.", role: "Compliance Officer", stars: 5, text: "The audit trail exports are exactly what our legal team needed. Clean, thorough, defensible.", company: "Insurance Firm" },
+            { name: "David T.", role: "Hiring Manager", stars: 5, text: "We went from 2 bad hires per quarter to zero. The ROI is insane.", company: "Series B Startup" },
+            { name: "Amy W.", role: "Legal Analyst", stars: 5, text: "Used Trustie for due diligence on a merger. Found material misrepresentations in executive bios.", company: "Law Firm" },
+            { name: "Chris P.", role: "Content Lead", stars: 5, text: "We fact-check every AI-generated article before publishing. Trustie catches things Grammarly never would.", company: "Media Company" },
+          ].map((t, i) => (
+            <div key={i} style={{
+              background: C.card, border: `1px solid ${C.cardBorder}`, borderRadius: "14px",
+              padding: "24px", backdropFilter: "blur(8px)",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
+                <div>
+                  <p style={{ color: "#fff", fontWeight: 600, fontSize: "14px" }}>{t.name}</p>
+                  <p style={{ color: C.dimmed, fontSize: "12px" }}>{t.role} • {t.company}</p>
+                </div>
+                <div style={{ display: "flex", gap: "2px" }}>
+                  {Array(t.stars).fill(0).map((_, j) => <span key={j} style={{ color: "#f59e0b", fontSize: "14px" }}>★</span>)}
+                </div>
+              </div>
+              <p style={{ color: C.muted, fontSize: "14px", lineHeight: 1.6 }}>&quot;{t.text}&quot;</p>
             </div>
           ))}
         </div>
-      </div>
-    </section>
-  );
-}
+      </section>
 
-// ============================================================================
-// AI MODELS STATUS
-// ============================================================================
+      {/* ============================================================
+         SECTION 6: PROOF — Video Placeholder
+         ============================================================ */}
+      <section style={{ padding: "80px 24px", borderTop: `1px solid ${C.line}`, position: "relative" }}>
+        <SectionTitle watermark="Proof" title="Trustie Working on Real Verifications" subtitle="Watch Trustie verify real resume claims in real-time. No scripts. No fakes." />
 
-function AIModelsStatus({ isDark }: { isDark: boolean }) {
-  const [expandedModel, setExpandedModel] = useState<number | null>(0);
-  const models = [
-    { name: 'GPT-4 Turbo', accuracy: '94.2%', lastUpdated: '2 hours ago', status: 'Online' },
-    { name: 'Claude 3.5 Sonnet', accuracy: '96.1%', lastUpdated: '1 hour ago', status: 'Online' },
-    { name: 'Gemini Pro', accuracy: '91.8%', lastUpdated: '4 hours ago', status: 'Online' },
-    { name: 'Llama 3.1 405B', accuracy: '89.4%', lastUpdated: '6 hours ago', status: 'Online' },
-  ];
-
-  return (
-    <section className="py-24 px-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}><span className="text-blue-500">AI Accuracy</span>, Tested Daily</h2>
-          <p className={`text-lg ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>We benchmark every model to ensure maximum accuracy. Multi-AI consensus reduces false positives.</p>
+        <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+          {/* Video placeholder */}
+          <div style={{
+            aspectRatio: "16/9", borderRadius: "16px", overflow: "hidden",
+            background: "linear-gradient(135deg, rgba(59,130,246,0.08), rgba(59,130,246,0.02))",
+            border: `1px solid rgba(59,130,246,0.15)`,
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            position: "relative",
+          }}>
+            <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(59,130,246,0.15)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "16px", border: "1px solid rgba(59,130,246,0.3)" }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill={C.blue}><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <p style={{ color: "#fff", fontSize: "16px", fontWeight: 600, marginBottom: "4px" }}>Demo Video Coming Soon</p>
+            <p style={{ color: C.dimmed, fontSize: "13px" }}>Real verification walkthrough — no scripts, no fakes</p>
+            <a href="#" style={{ color: C.blue, fontSize: "14px", marginTop: "12px", textDecoration: "none" }}>Full video here →</a>
+          </div>
         </div>
-        <div className="space-y-3">
-          {models.map((model, index) => (
-            <div key={index} className={`rounded-xl overflow-hidden transition-all duration-300 cursor-pointer ${expandedModel === index ? isDark ? 'border-2 border-blue-500/50 bg-gradient-to-r from-blue-500/5 to-transparent' : 'border-2 border-blue-300 bg-blue-50' : isDark ? 'border border-gray-700 bg-gray-800/50 hover:border-gray-600' : 'border border-gray-200 bg-white hover:border-gray-300'}`} onClick={() => setExpandedModel(expandedModel === index ? null : index)}>
-              <div className="flex items-center justify-between p-5">
-                <div className="flex items-center gap-4">
-                  <span className={`font-mono text-sm ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>00{index + 1}</span>
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}><span className="text-lg">🤖</span></div>
-                  <span className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{model.name}</span>
+      </section>
+
+      {/* ============================================================
+         SECTION 7: "Here's why" → Blog link
+         ============================================================ */}
+      <section style={{ padding: "48px 24px", textAlign: "center", borderTop: `1px solid ${C.line}` }}>
+        <p style={{ color: C.muted, fontSize: "18px", marginBottom: "8px" }}>
+          ...and all the verification softwares
+        </p>
+        <p style={{ fontSize: "16px" }}>
+          <span style={{ color: C.muted }}>Here&apos;s why: </span>
+          <a href="/how-it-works" style={{ color: C.blue, textDecoration: "underline" }}>a detailed technological blog</a>
+        </p>
+      </section>
+
+      {/* ============================================================
+         SECTION 8: PRICING
+         ============================================================ */}
+      <section id="pricing" style={{ padding: "80px 24px", borderTop: `1px solid ${C.line}` }}>
+        <SectionTitle title="Pricing" subtitle="Simple and transparent pricing for everyone" />
+
+        <div style={{ textAlign: "center", marginBottom: "40px" }}>
+          <div style={{ display: "inline-flex", background: C.card, border: `1px solid ${C.cardBorder}`, borderRadius: "12px", padding: "4px" }}>
+            <button onClick={() => setAnnual(false)} style={{ padding: "8px 20px", borderRadius: "10px", fontSize: "14px", fontWeight: 600, border: "none", cursor: "pointer", background: !annual ? "rgba(59,130,246,0.2)" : "transparent", color: !annual ? "#fff" : C.muted }}>Monthly</button>
+            <button onClick={() => setAnnual(true)} style={{ padding: "8px 20px", borderRadius: "10px", fontSize: "14px", fontWeight: 600, border: "none", cursor: "pointer", background: annual ? "rgba(59,130,246,0.2)" : "transparent", color: annual ? "#fff" : C.muted, display: "flex", alignItems: "center", gap: "8px" }}>
+              Annual <span style={{ fontSize: "11px", fontWeight: 700, background: "rgba(34,197,94,0.15)", color: C.green, padding: "2px 8px", borderRadius: "9999px" }}>Save 20%</span>
+            </button>
+          </div>
+        </div>
+
+        <div style={{ maxWidth: "1100px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "16px", alignItems: "start" }} className="grid-4-responsive">
+          {[
+            { name: "Free", desc: "For individuals exploring AI verification.", price: 0, pa: 0, cta: "Get Started Free", pop: false, features: ["5 verifications/day", "Basic claim extraction", "Standard sources", "Community support"], limits: ["No batch", "No API", "No export"] },
+            { name: "Pro", desc: "For recruiters who verify daily.", price: 29, pa: 24, cta: "Start Free Trial", pop: true, features: ["Unlimited verifications", "Advanced extraction", "All source tiers + bias filter", "Confidence breakdowns", "Audit trail & export", "Priority checking", "Email support (24h)"], limits: [] },
+            { name: "Team", desc: "For HR teams verifying at scale.", price: 99, pa: 79, cta: "Start Free Trial", pop: false, features: ["Everything in Pro", "10 team members", "Batch CSV (500 claims)", "Team dashboard", "API access (10K/mo)", "Slack integration", "Priority support (4h)"], limits: [] },
+            { name: "Enterprise", desc: "Custom security and scale.", price: null, pa: null, cta: "Contact Sales", pop: false, features: ["Everything in Team", "Unlimited members", "Unlimited API", "SSO/SAML", "Custom integrations", "SOC 2 report", "Dedicated manager", "99.9% SLA"], limits: [] },
+          ].map(p => (
+            <div key={p.name} style={{
+              background: p.pop ? "rgba(59,130,246,0.06)" : C.card,
+              border: `1px solid ${p.pop ? "rgba(59,130,246,0.3)" : C.cardBorder}`,
+              borderRadius: "16px", padding: "28px 24px", position: "relative",
+              boxShadow: p.pop ? `0 0 40px rgba(59,130,246,0.1)` : "none",
+            }}>
+              {p.pop && <div style={{ position: "absolute", top: "-12px", left: "50%", transform: "translateX(-50%)", background: C.blue, color: "#fff", fontSize: "11px", fontWeight: 700, padding: "4px 14px", borderRadius: "9999px" }}>MOST POPULAR</div>}
+              <p style={{ color: "#fff", fontSize: "20px", fontWeight: 700, marginBottom: "4px" }}>{p.name}</p>
+              <p style={{ color: C.dimmed, fontSize: "13px", marginBottom: "20px", minHeight: "36px" }}>{p.desc}</p>
+              {p.price !== null ? (
+                <div style={{ marginBottom: "20px" }}>
+                  <span style={{ fontSize: "40px", fontWeight: 800, color: "#fff" }}>${annual ? p.pa : p.price}</span>
+                  <span style={{ color: C.muted, fontSize: "14px" }}>/mo</span>
+                  {annual && p.price > 0 && <p style={{ color: C.green, fontSize: "12px", marginTop: "2px" }}>Billed annually</p>}
                 </div>
-                <div className="flex items-center gap-6">
-                  <span className={`text-sm hidden sm:block ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Updated {model.lastUpdated}</span>
-                  <span className="w-2 h-2 bg-green-500 rounded-full" />
-                  <span className="text-green-400 text-sm font-medium">{model.status}</span>
-                  <svg className={`w-5 h-5 transition-transform ${isDark ? 'text-gray-500' : 'text-gray-400'} ${expandedModel === index ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                </div>
-              </div>
-              {expandedModel === index && (
-                <div className="px-5 pb-5">
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>Verification accuracy</span>
-                      <span className="text-green-400 font-bold">{model.accuracy}</span>
-                    </div>
-                    <div className={`h-2 rounded-full overflow-hidden ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`}>
-                      <div className="h-full bg-gradient-to-r from-green-500 to-green-400 rounded-full transition-all duration-500" style={{ width: model.accuracy }} />
-                    </div>
-                  </div>
+              ) : (
+                <div style={{ marginBottom: "20px" }}>
+                  <span style={{ fontSize: "32px", fontWeight: 800, color: "#fff" }}>Custom</span>
                 </div>
               )}
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ============================================================================
-// CASE STUDIES (NEW - B2B)
-// ============================================================================
-
-function CaseStudies({ isDark }: { isDark: boolean }) {
-  const caseStudies = [
-    { company: 'TechCorp', industry: 'Technology', metric: '40%', description: 'Reduction in bad hires', quote: 'We caught a candidate claiming 5 years at Google when it was actually 2. Trustie saved us from a $100,000 mistake.' },
-    { company: 'FinanceInc', industry: 'Financial Services', metric: '6 hrs → 30 sec', description: 'Verification time reduction', quote: 'What used to take our team 2 days now takes 2 minutes. Game changer for high-volume hiring.' },
-    { company: 'HealthCare Plus', industry: 'Healthcare', metric: '85%', description: 'Credential discrepancy detection rate', quote: 'In healthcare, credential fraud can be life or death. Trustie gives us confidence in every hire.' },
-  ];
-
-  return (
-    <section className={`py-24 px-6 ${isDark ? 'bg-gray-800/30' : 'bg-gray-50'}`}>
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Real <span className="text-blue-500">Results</span></h2>
-          <p className={`text-lg ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>See how companies are using Trustie to reduce hiring risk</p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          {caseStudies.map((study, index) => (
-            <div key={index} className={`rounded-2xl p-8 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
-              <div className={`text-sm font-medium mb-2 ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>{study.industry}</div>
-              <div className="text-4xl font-bold text-blue-500 mb-2">{study.metric}</div>
-              <div className={`text-sm mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{study.description}</div>
-              <p className={`text-sm italic mb-4 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>"{study.quote}"</p>
-              <div className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>— {study.company}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ============================================================================
-// TESTIMONIALS
-// ============================================================================
-
-function Testimonials({ isDark }: { isDark: boolean }) {
-  const testimonials = [
-    { quote: 'The multi-AI consensus feature gives us confidence that we are not getting false positives. Worth every penny.', author: 'Sarah M.', role: 'Head of Talent', company: 'Tech Startup' },
-    { quote: 'We integrated Trustie with Greenhouse in 30 minutes. Now every candidate gets verified automatically.', author: 'Mike R.', role: 'HR Director', company: 'Enterprise Company' },
-    { quote: 'The source links are invaluable. When we flag something, we can show exactly where it came from.', author: 'Jennifer L.', role: 'Recruiting Lead', company: 'Consulting Firm' },
-  ];
-
-  return (
-    <section className="py-24 px-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>What HR Teams Are <span className="text-blue-500">Saying</span></h2>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          {testimonials.map((testimonial, index) => (
-            <div key={index} className={`rounded-2xl p-8 ${isDark ? 'bg-gray-800/50 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
-              <div className="flex gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (<svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>))}
-              </div>
-              <p className={`mb-6 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>"{testimonial.quote}"</p>
-              <div>
-                <div className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{testimonial.author}</div>
-                <div className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{testimonial.role}, {testimonial.company}</div>
+              <a href="#" style={{ display: "block", textAlign: "center", padding: "12px", borderRadius: "10px", fontSize: "14px", fontWeight: 600, textDecoration: "none", marginBottom: "24px", background: p.pop ? C.blue : "transparent", color: "#fff", border: p.pop ? "none" : `1px solid ${C.cardBorder}`, boxShadow: p.pop ? `0 0 20px ${C.blueGlow}` : "none" }}>{p.cta}</a>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {p.features.map(f => (
+                  <div key={f} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.green} strokeWidth="2.5"><path d="M5 12l5 5L20 7"/></svg>
+                    <span style={{ color: C.text, fontSize: "13px" }}>{f}</span>
+                  </div>
+                ))}
+                {p.limits.map(f => (
+                  <div key={f} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.dimmed} strokeWidth="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                    <span style={{ color: C.dimmed, fontSize: "13px" }}>{f}</span>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
         </div>
-      </div>
-    </section>
-  );
-}
+      </section>
 
-// ============================================================================
-// PRICING
-// ============================================================================
-
-function Pricing({ isDark, setShowDemoModal }: { isDark: boolean; setShowDemoModal: (v: boolean) => void }) {
-  const scrollToSection = (id: string) => { const element = document.getElementById(id); if (element) element.scrollIntoView({ behavior: 'smooth' }); };
-
-  return (
-    <section id="pricing" className={`py-24 px-6 ${isDark ? 'bg-gray-800/30' : 'bg-gray-50'}`}>
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Pricing</h2>
-          <p className={`text-lg ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>Plans that scale with your hiring needs</p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          {/* Free */}
-          <div className={`rounded-2xl p-8 transition-colors ${isDark ? 'bg-gray-800/50 border border-gray-700 hover:border-gray-600' : 'bg-white border border-gray-200 hover:border-gray-300 shadow-sm'}`}>
-            <div className="mb-6">
-              <h3 className={`text-xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>Personal</h3>
-              <div className="flex items-baseline gap-1"><span className={`text-5xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>$0</span><span className={isDark ? 'text-gray-500' : 'text-gray-500'}>/forever</span></div>
-              <p className={`text-sm mt-2 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>For individuals and testing</p>
-            </div>
-            <button onClick={() => scrollToSection('faq')} className={`w-full py-3 font-semibold rounded-xl transition-colors mb-6 ${isDark ? 'bg-white text-gray-900 hover:bg-gray-100' : 'bg-gray-900 text-white hover:bg-gray-800'}`}>Get Started Free</button>
-            <ul className="space-y-3">
-              {['10 verifications per month', 'Basic source citations', 'Single AI model', 'Web interface'].map((f, i) => (<li key={i} className={`flex items-center gap-3 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}><svg className={`w-5 h-5 ${isDark ? 'text-gray-600' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>{f}</li>))}
-            </ul>
-          </div>
-          {/* Team */}
-          <div className={`relative rounded-2xl p-8 ${isDark ? 'bg-gradient-to-b from-blue-500/10 to-transparent border-2 border-blue-500/50' : 'bg-gradient-to-b from-blue-50 to-white border-2 border-blue-300 shadow-lg'}`}>
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-500 text-white text-sm font-bold rounded-full">MOST POPULAR</div>
-            <div className="mb-6 mt-2">
-              <h3 className={`text-xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>Team</h3>
-              <div className="flex items-baseline gap-1"><span className={`text-5xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>$499</span><span className={isDark ? 'text-gray-500' : 'text-gray-500'}>/month</span></div>
-              <p className={`text-sm mt-2 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>For growing HR teams</p>
-            </div>
-            <button onClick={() => setShowDemoModal(true)} className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors mb-6 shadow-lg shadow-blue-500/25">Start 14-Day Trial</button>
-            <ul className="space-y-3">
-              {['500 verifications per month', 'Multi-AI consensus', 'Full source citations', 'Team dashboard (5 seats)', 'API access', 'Priority support', 'ATS integrations'].map((f, i) => (<li key={i} className={`flex items-center gap-3 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}><svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>{f}</li>))}
-            </ul>
-          </div>
-          {/* Enterprise */}
-          <div className={`rounded-2xl p-8 transition-colors ${isDark ? 'bg-gray-800/50 border border-gray-600 hover:border-gray-500' : 'bg-white border border-gray-300 hover:border-gray-400 shadow-md'}`}>
-            <div className="mb-6">
-              <h3 className={`text-xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>Enterprise</h3>
-              <div className="flex items-baseline gap-1"><span className={`text-5xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Custom</span></div>
-              <p className={`text-sm mt-2 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>For large organizations</p>
-            </div>
-            <button onClick={() => setShowDemoModal(true)} className={`w-full py-3 font-semibold rounded-xl transition-colors mb-6 border ${isDark ? 'border-gray-600 hover:border-gray-500 text-white' : 'border-gray-300 hover:border-gray-400 text-gray-900'}`}>Contact Sales</button>
-            <ul className="space-y-3">
-              {['Unlimited verifications', 'Custom AI model training', 'SSO and SAML', 'Unlimited seats', 'Dedicated account manager', 'SLA guarantee', 'On-premise deployment'].map((f, i) => (<li key={i} className={`flex items-center gap-3 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}><svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>{f}</li>))}
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ============================================================================
-// FAQ
-// ============================================================================
-
-function FAQ({ isDark }: { isDark: boolean }) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-  const faqs = [
-    { question: 'How does Trustie verify information?', answer: 'We use multi-AI consensus (GPT-4, Claude, Gemini) combined with verified databases, public records, and direct source verification. Each claim is cross-referenced across multiple sources. We always show our sources. We never guess or make claims without evidence.' },
-    { question: 'What can Trustie verify?', answer: 'Employment history, educational credentials, professional certifications, LinkedIn profiles, and any factual claims on resumes or applications. We can also verify general claims for journalism and legal use cases.' },
-    { question: 'How accurate is the verification?', answer: 'Our multi-AI consensus achieves 94%+ accuracy. We always provide confidence scores and source links so you can verify our verification. When we are unsure, we say so and flag items for manual review.' },
-    { question: 'What is your truth-maximizing methodology?', answer: 'Our stack: (1) Search multiple authoritative sources, (2) Cross-reference findings across sources, (3) Run multi-AI consensus to reduce false positives, (4) Score source quality (.edu/.gov = high trust, commercial = flagged), (5) Generate human-readable verdict with full audit trail. We prioritize authoritative sources and flag any commercial bias.' },
-    { question: 'Is my data secure?', answer: 'Yes. We are SOC 2 compliant, use end-to-end encryption, and never share candidate data. We do not track or sell your data. Enterprise plans include on-premise deployment options.' },
-    { question: 'Can I integrate Trustie with my ATS?', answer: 'Yes. We have integrations with Greenhouse, Lever, Workday, and other major ATS platforms. API access is available on Team and Enterprise plans. Webhooks notify your systems in real-time.' },
-    { question: 'How does the audit trail work?', answer: 'Every verification is logged with: timestamp, sources checked, AI models used, confidence scores, and final verdict. You can export PDF reports for compliance documentation. Audit IDs are provided for each verification for easy reference.' },
-    { question: 'What is the ROI?', answer: 'The average bad hire costs $75,000 to $150,000. At $499 per month for the Team plan, you only need to catch one misrepresented candidate per year to see 150x or greater ROI.' },
-  ];
-
-  return (
-    <section id="faq" className="py-24 px-6">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-16">
-          <p className={`text-lg mb-2 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Got Questions?</p>
-          <h2 className={`text-4xl md:text-5xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>We Have Got Answers</h2>
-        </div>
-        <div className="space-y-3">
-          {faqs.map((faq, index) => (
-            <div key={index} className={`rounded-xl overflow-hidden transition-all duration-300 cursor-pointer ${openIndex === index ? isDark ? 'border-2 border-blue-500/50 bg-gradient-to-r from-blue-500/5 to-transparent' : 'border-2 border-blue-300 bg-blue-50' : isDark ? 'border border-gray-700 bg-gray-800/50 hover:border-gray-600' : 'border border-gray-200 bg-white hover:border-gray-300'}`} onClick={() => setOpenIndex(openIndex === index ? null : index)}>
-              <div className="flex items-center justify-between p-5">
-                <span className={`font-medium pr-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>{faq.question}</span>
-                <div className={`w-8 h-8 rounded-full border flex items-center justify-center flex-shrink-0 transition-colors ${openIndex === index ? 'border-blue-500/50 bg-blue-500/10' : isDark ? 'border-gray-700' : 'border-gray-300'}`}>
-                  {openIndex === index ? (<svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" /></svg>) : (<svg className={`w-4 h-4 ${isDark ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>)}
-                </div>
+      {/* ============================================================
+         SECTION 9: FAQ
+         ============================================================ */}
+      <section style={{ padding: "80px 24px", borderTop: `1px solid ${C.line}` }}>
+        <SectionTitle title="Frequently Asked Questions" />
+        <div style={{ maxWidth: "700px", margin: "0 auto" }}>
+          {[
+            { q: "Is there really a free plan?", a: "Yes. 5 verifications per day, forever. No credit card required." },
+            { q: "Can I cancel anytime?", a: "Absolutely. No contracts, no cancellation fees. Cancel in one click." },
+            { q: "What counts as one verification?", a: "One piece of text submitted. It can contain multiple claims — we extract and verify each individually." },
+            { q: "Do you offer startup/nonprofit discounts?", a: "Yes. Email support@trustieapp.com with details and we'll work something out." },
+            { q: "What payment methods do you accept?", a: "All major credit cards via Stripe. Enterprise customers can pay via invoice." },
+            { q: "Is my data secure?", a: "Yes. We don't store the content you verify — it's processed in real-time and discarded." },
+          ].map((f, i) => (
+            <details key={i} style={{ marginBottom: "8px", background: C.card, border: `1px solid ${C.cardBorder}`, borderRadius: "12px", overflow: "hidden" }}>
+              <summary style={{ padding: "16px 20px", color: "#fff", fontSize: "15px", fontWeight: 600, cursor: "pointer", listStyle: "none", display: "flex", justifyContent: "space-between" }}>
+                {f.q} <span style={{ color: C.dimmed }}>+</span>
+              </summary>
+              <div style={{ padding: "0 20px 16px" }}>
+                <p style={{ color: C.muted, fontSize: "14px", lineHeight: 1.6 }}>{f.a}</p>
               </div>
-              {openIndex === index && <div className="px-5 pb-5"><p className={isDark ? 'text-gray-400' : 'text-gray-600'}>{faq.answer}</p></div>}
-            </div>
+            </details>
           ))}
         </div>
-      </div>
-    </section>
-  );
-}
+      </section>
 
-// ============================================================================
-// FINAL CTA
-// ============================================================================
-
-function FinalCTA({ isDark, setShowDemoModal }: { isDark: boolean; setShowDemoModal: (v: boolean) => void }) {
-  return (
-    <section className={`py-24 px-6 ${isDark ? 'bg-gray-800/30' : 'bg-white'}`}>
-      <div className="max-w-4xl mx-auto text-center">
-        <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-blue-500/25">
-          <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-        </div>
-        <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Stop Hiring <span className="text-red-500">Liars</span></h2>
-        <p className={`text-lg mb-10 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Start your 14-day free trial. No credit card required.</p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <button onClick={() => setShowDemoModal(true)} className="px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors flex items-center gap-3 shadow-lg shadow-blue-500/25">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-            Request a Demo
-          </button>
-          <button onClick={() => setShowDemoModal(true)} className={`px-8 py-4 font-semibold rounded-xl transition-colors flex items-center gap-3 ${isDark ? 'bg-white text-gray-900 hover:bg-gray-100' : 'bg-gray-900 text-white hover:bg-gray-800'}`}>
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-            Talk to Sales
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ============================================================================
-// FOOTER
-// ============================================================================
-
-function Footer({ isDark }: { isDark: boolean }) {
-  const scrollToSection = (id: string) => { const element = document.getElementById(id); if (element) element.scrollIntoView({ behavior: 'smooth' }); };
-
-  return (
-    <footer className={`border-t py-16 px-6 ${isDark ? 'border-gray-800/50' : 'border-gray-200'}`}>
-      <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-4 gap-12 mb-12">
-          <div className="md:col-span-1">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center"><svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
-              <span className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Trustie</span>
+      {/* ============================================================
+         SECTION 10: AFFILIATE PROGRAM
+         ============================================================ */}
+      <section style={{ padding: "80px 24px", borderTop: `1px solid ${C.line}` }}>
+        <div style={{ maxWidth: "700px", margin: "0 auto", textAlign: "center", background: C.card, border: `1px solid ${C.cardBorder}`, borderRadius: "20px", padding: "48px 32px" }}>
+          <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginBottom: "24px" }}>
+            <div style={{ width: 40, height: 40, borderRadius: "10px", background: "rgba(59,130,246,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="2"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
             </div>
-            <p className={`text-sm mb-6 ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>AI-powered verification for HR teams, legal, insurance, and journalism. We always show sources. We never guess.</p>
-            <div className="flex items-center gap-4 mb-6">
-              {[{ label: 'X', href: 'https://twitter.com' }, { label: 'LI', href: 'https://linkedin.com' }, { label: 'YT', href: 'https://youtube.com' }].map((social) => (<a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer" className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-colors ${isDark ? 'bg-gray-800 hover:bg-gray-700 text-gray-500 hover:text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-900'}`}>{social.label}</a>))}
+            <div style={{ width: 40, height: 40, borderRadius: "10px", background: "rgba(59,130,246,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="2"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
-            <div className="flex items-center gap-2"><span className="w-2 h-2 bg-green-500 rounded-full" /><span className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>All systems online</span></div>
+          </div>
+          <h2 style={{ fontSize: "28px", fontWeight: 700, color: "#fff", marginBottom: "12px" }}>Earn with Trustie</h2>
+          <p style={{ color: C.muted, fontSize: "15px", lineHeight: 1.6, marginBottom: "24px" }}>
+            Trustie offers a generous referral program. Earn 30% of all earnings from people using your referral code.
+          </p>
+          <a href="#" style={{
+            display: "inline-block", background: C.blue, color: "#fff", padding: "12px 28px",
+            borderRadius: "10px", fontSize: "15px", fontWeight: 600, textDecoration: "none",
+            boxShadow: `0 0 20px ${C.blueGlow}`,
+          }}>Join affiliate program (30% commission)</a>
+          <p style={{ color: C.dimmed, fontSize: "12px", marginTop: "16px" }}>Email us at: <strong style={{ color: C.muted }}>danny@trustieapp.com</strong></p>
+        </div>
+      </section>
+
+      {/* ============================================================
+         SECTION 11: FINAL CTA
+         ============================================================ */}
+      <section style={{ padding: "80px 24px", textAlign: "center", borderTop: `1px solid ${C.line}` }}>
+        <div style={{ width: 56, height: 56, borderRadius: "50%", background: C.blue, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px", boxShadow: `0 0 30px ${C.blueGlow}` }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><path d="M9 12l2 2 4-4"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <h2 style={{ fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 800, color: "#fff", marginBottom: "12px", letterSpacing: "-0.02em" }}>
+          Ready to Verify Any Claim with 100% AI-Powered Accuracy?
+        </h2>
+        <p style={{ color: C.muted, fontSize: "16px", marginBottom: "28px" }}>Start Your Free Trial Today</p>
+        <a href="#" style={{
+          display: "inline-block", background: C.blue, color: "#fff", padding: "16px 40px",
+          borderRadius: "12px", fontSize: "17px", fontWeight: 700, textDecoration: "none",
+          boxShadow: `0 0 40px ${C.blueGlow}`, transition: "transform 0.2s",
+        }}>Try Trustie Free</a>
+      </section>
+
+      {/* ============================================================
+         FOOTER
+         ============================================================ */}
+      <footer style={{ borderTop: `1px solid ${C.line}`, padding: "48px 24px 32px" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto", display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 1fr", gap: "40px" }} className="grid-4-responsive">
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
+              <div style={{ width: 28, height: 28, borderRadius: "50%", background: C.blue, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><path d="M9 12l2 2 4-4"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <span style={{ color: "#fff", fontWeight: 700, fontSize: "16px" }}>Trustie</span>
+            </div>
+            <p style={{ color: C.dimmed, fontSize: "13px", lineHeight: 1.6, maxWidth: "260px", marginBottom: "16px" }}>
+              AI-powered verification for everyone. Stop fraud, verify claims, and build trust.
+            </p>
+            <a href="https://x.com/UseTrustie" target="_blank" rel="noopener" style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: C.muted, fontSize: "13px", textDecoration: "none" }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              @UseTrustie
+            </a>
           </div>
           <div>
-            <h4 className={`font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Product</h4>
-            <ul className="space-y-3">
-              {[{ label: 'Features', id: 'features' }, { label: 'Security', id: 'security' }, { label: 'Pricing', id: 'pricing' }, { label: 'FAQ', id: 'faq' }].map((link) => (<li key={link.label}><button onClick={() => scrollToSection(link.id)} className={`text-sm transition-colors ${isDark ? 'text-gray-500 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}>{link.label}</button></li>))}
-            </ul>
+            <p style={{ color: "#fff", fontWeight: 600, fontSize: "14px", marginBottom: "14px" }}>Pages</p>
+            {[
+              { label: "Proof", href: "/proof" },
+              { label: "Pricing", href: "/pricing" },
+              { label: "Help", href: "/help" },
+              { label: "Blog", href: "/blog" },
+              { label: "How it works", href: "/how-it-works" },
+              { label: "Database", href: "/database" },
+            ].map(l => <a key={l.label} href={l.href} style={{ display: "block", color: C.dimmed, fontSize: "13px", textDecoration: "none", marginBottom: "10px" }}>{l.label}</a>)}
           </div>
           <div>
-            <h4 className={`font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Use Cases</h4>
-            <ul className="space-y-3">
-              {['HR and Recruitment', 'Legal Teams', 'Insurance', 'Journalism'].map((link) => (<li key={link}><span className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>{link}</span></li>))}
-            </ul>
+            <p style={{ color: "#fff", fontWeight: 600, fontSize: "14px", marginBottom: "14px" }}>Use Cases</p>
+            {["Resume Verification", "HR Background Checks", "Insurance Claims", "Legal Due Diligence", "Journalism", "Academic Research", "Enterprise API"].map(l => <a key={l} href="#" style={{ display: "block", color: C.dimmed, fontSize: "13px", textDecoration: "none", marginBottom: "10px" }}>{l}</a>)}
           </div>
           <div>
-            <h4 className={`font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Legal</h4>
-            <ul className="space-y-3">
-              {['Privacy Policy', 'Terms of Service', 'Security', 'GDPR'].map((link) => (<li key={link}><span className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>{link}</span></li>))}
-            </ul>
+            <p style={{ color: "#fff", fontWeight: 600, fontSize: "14px", marginBottom: "14px" }}>Legal</p>
+            {["Privacy Policy", "Terms of Service", "Refund Policy"].map(l => <a key={l} href="#" style={{ display: "block", color: C.dimmed, fontSize: "13px", textDecoration: "none", marginBottom: "10px" }}>{l}</a>)}
           </div>
         </div>
-        <div className={`pt-8 border-t ${isDark ? 'border-gray-800/50' : 'border-gray-200'}`}><p className={`text-sm ${isDark ? 'text-gray-600' : 'text-gray-500'}`}>© 2026 Trustie. All rights reserved.</p></div>
-        <div className="mt-8 overflow-hidden"><span className={`text-[8rem] md:text-[12rem] font-bold select-none ${isDark ? 'text-gray-800/30' : 'text-gray-100'}`}>Trustie</span></div>
-      </div>
-    </footer>
-  );
-}
-
-// ============================================================================
-// DEMO MODAL
-// ============================================================================
-
-function DemoModal({ isDark, onClose }: { isDark: boolean; onClose: () => void }) {
-  const [formData, setFormData] = useState({ name: '', email: '', company: '', teamSize: '' });
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const response = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: formData.name, email: formData.email, company: formData.company, teamSize: formData.teamSize, _subject: 'New Trustie Demo Request!' }),
-      });
-      if (response.ok) setSubmitted(true);
-      else setSubmitted(true);
-    } catch (error) {
-      console.error('Error:', error);
-      setSubmitted(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className={`relative w-full max-w-md rounded-2xl p-8 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white shadow-2xl'}`}>
-        <button onClick={onClose} className={`absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-gray-400' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'}`}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
-        {!submitted ? (
-          <>
-            <h3 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>Request a Demo</h3>
-            <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>See how Trustie can help your team verify candidates</p>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input type="text" placeholder="Full Name" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className={`w-full px-4 py-3 rounded-xl border transition-colors outline-none ${isDark ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500 focus:border-blue-500' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500'}`} />
-              <input type="email" placeholder="Work Email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className={`w-full px-4 py-3 rounded-xl border transition-colors outline-none ${isDark ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500 focus:border-blue-500' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500'}`} />
-              <input type="text" placeholder="Company Name" required value={formData.company} onChange={(e) => setFormData({...formData, company: e.target.value})} className={`w-full px-4 py-3 rounded-xl border transition-colors outline-none ${isDark ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500 focus:border-blue-500' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500'}`} />
-              <select required value={formData.teamSize} onChange={(e) => setFormData({...formData, teamSize: e.target.value})} className={`w-full px-4 py-3 rounded-xl border transition-colors outline-none ${isDark ? 'bg-gray-900 border-gray-700 text-white focus:border-blue-500' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500'}`}>
-                <option value="">Team Size</option>
-                <option value="1-10">1-10 employees</option>
-                <option value="11-50">11-50 employees</option>
-                <option value="51-200">51-200 employees</option>
-                <option value="201-1000">201-1000 employees</option>
-                <option value="1000+">1000+ employees</option>
-              </select>
-              <button type="submit" disabled={loading} className="w-full py-3 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-blue-500/25">{loading ? 'Submitting...' : 'Request Demo'}</button>
-            </form>
-          </>
-        ) : (
-          <div className="text-center py-8">
-            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg></div>
-            <h3 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>Thanks!</h3>
-            <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Want to skip the wait? Book a demo now:</p>
-            <a href={CALENDLY_LINK} target="_blank" rel="noopener noreferrer" className="inline-block px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors mb-6">Book Demo Now</a>
-            <div className={`pt-6 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
-              <p className={`text-sm mb-3 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Was this form easy to use?</p>
-              <div className="flex justify-center gap-3">
-                <button className={`px-4 py-2 rounded-lg text-sm ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}>👍 Yes</button>
-                <button className={`px-4 py-2 rounded-lg text-sm ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}>👎 No</button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ============================================================================
-// VIDEO MODAL
-// ============================================================================
-
-function VideoModal({ onClose }: { onClose: () => void }) {
-  const hasVideo = YOUTUBE_VIDEO_ID !== 'YOUR_YOUTUBE_VIDEO_ID';
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-4xl">
-        <button onClick={onClose} className="absolute -top-12 right-0 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
-        <div className="aspect-video bg-gray-900 rounded-2xl overflow-hidden">
-          {hasVideo ? (
-            <iframe width="100%" height="100%" src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1`} title="Trustie Demo" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg></div>
-                <p className="text-white text-xl font-bold mb-2">Demo Video Coming Soon</p>
-                <p className="text-gray-400">Record your video on Loom and upload to YouTube</p>
-              </div>
-            </div>
-          )}
+        <div style={{ maxWidth: "1100px", margin: "32px auto 0", paddingTop: "24px", borderTop: `1px solid ${C.line}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <p style={{ color: C.dimmed, fontSize: "12px" }}>© 2025 Trustie. All rights reserved.</p>
+          <p style={{ color: C.dimmed, fontSize: "12px" }}>Built with trust.</p>
         </div>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================================
-// EXIT INTENT POPUP (Email Capture)
-// ============================================================================
-
-function ExitIntentPopup({ isDark, onClose, onShowDemo }: { isDark: boolean; onClose: () => void; onShowDemo: () => void }) {
-  const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, _subject: 'Trustie Exit Intent - Email Capture', type: 'exit_intent' }),
-      });
-      setSubmitted(true);
-    } catch (error) {
-      setSubmitted(true);
-    }
-  };
-
-  // Loading facts for the popup
-  const loadingFacts = [
-    "70% of resumes contain at least one lie",
-    "The average bad hire costs $150,000",
-    "85% of employers have caught applicants lying",
-    "Manual verification takes 6+ hours per candidate",
-    "AI hallucinations affect 15-20% of generated content",
-  ];
-  const [factIndex, setFactIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFactIndex((prev) => (prev + 1) % loadingFacts.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className={`relative w-full max-w-md rounded-2xl p-8 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white shadow-2xl'}`}>
-        <button onClick={onClose} className={`absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-gray-400' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'}`}><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
-        
-        {!submitted ? (
-          <>
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-              </div>
-              <h3 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>Wait! Before You Go...</h3>
-              <p className={`mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Get our free guide: <strong>"5 Resume Red Flags AI Can Catch (That Humans Miss)"</strong></p>
-              
-              {/* Loading Fact */}
-              <div className={`p-3 rounded-lg mb-4 ${isDark ? 'bg-gray-700/50' : 'bg-gray-100'}`}>
-                <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>💡 Did you know? {loadingFacts[factIndex]}</p>
-              </div>
-            </div>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input type="email" placeholder="Enter your work email" required value={email} onChange={(e) => setEmail(e.target.value)} className={`w-full px-4 py-3 rounded-xl border transition-colors outline-none ${isDark ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500 focus:border-blue-500' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500'}`} />
-              <button type="submit" className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors">Get Free Guide</button>
-            </form>
-            
-            <div className="mt-4 text-center">
-              <button onClick={onShowDemo} className={`text-sm ${isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'}`}>Or request a live demo instead →</button>
-            </div>
-          </>
-        ) : (
-          <div className="text-center py-8">
-            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg></div>
-            <h3 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>Check Your Email!</h3>
-            <p className={`mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>We have sent the guide to {email}</p>
-            <button onClick={onClose} className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors">Continue Browsing</button>
-          </div>
-        )}
-      </div>
+      </footer>
     </div>
   );
 }
