@@ -1,30 +1,44 @@
-import type { Metadata } from 'next'
-import './globals.css'
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Trustie - AI-Powered Resume & Credential Verification',
-  description: 'Stop resume fraud before it costs you $150,000. Verify credentials, employment history, and claims in seconds with multi-AI consensus.',
-  keywords: 'resume verification, credential verification, background check, AI verification, HR tools, recruitment',
+  title: 'Trustie - AI-Powered Fact Verification',
+  description: 'Verify any claim with AI-powered multi-source verification. Stop resume fraud, catch lies, and build trust. Used by HR teams, recruiters, and compliance officers.',
+  keywords: 'fact checking, resume verification, AI verification, credential verification, background check, claim verification, HR technology',
+  authors: [{ name: 'Trustie' }],
   openGraph: {
-    title: 'Trustie - AI-Powered Resume Verification',
-    description: 'Stop resume fraud before it costs you $150,000. Verify credentials in seconds.',
+    title: 'Trustie - Verify Any Claim with AI',
+    description: 'AI-powered fact verification that cross-checks claims across multiple sources and AI models. Stop fraud. Build trust.',
+    url: 'https://trustieapp.com',
+    siteName: 'Trustie',
     type: 'website',
   },
-}
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Trustie - AI-Powered Fact Verification',
+    description: 'Verify any claim with multi-source AI verification.',
+    creator: '@UseTrustie',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+        <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className="font-sans">{children}</body>
+      <body className={inter.className}>{children}</body>
     </html>
-  )
+  );
 }
