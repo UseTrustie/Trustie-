@@ -1,0 +1,539 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+
+// ============================================================================
+// TRUSTIE APP - The Core Product
+// ============================================================================
+
+interface Source {
+  url: string;
+  snippet: string;
+  tier: number;
+  tier_label: string;
+  weight: number;
+  commercial_bias: boolean;
+}
+
+interface VerifiedClaim {
+  id: number;
+  claim: string;
+  category: string;
+  verdict: 'VERIFIED' | 'UNVERIFIED' | 'PARTIAL' | 'UNABLE_TO_VERIFY';
+  confidence: number;
+  evidence: string;
+  discrepancies: string | null;
+  sources: Source[];
+}
+
+interface VerificationResult {
+  success: boolean;
+  summary: {
+    total_claims: number;
+    verified: number;
+    unverified: number;
+    partial: number;
+    unable_to_verify: number;
+    confidence: number;
+  };
+  claims: VerifiedClaim[];
+  audit: {
+    id: string;
+    timestamp: string;
+    processing_time_ms: number;
+    model: string;
+    mode: string;
+  };
+}
+
+export default function AppPage() {
+  const [isDark, setIsDark] = useState(true);
+  const [inputText, setInputText] = useState('');
+  const [mode, setMode] = useState<'resume' | 'general'>('resume');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [result, setResult] = useState<VerificationResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [verificationCount, setVerificationCount] = useState(0);
+
+  // Load verification count from localStorage
+  useEffect(() => {
+    const today = new Date().toDateString();
+    const stored = localStorage.getItem('trustie_usage');
+    if (stored) {
+      const { date, count } = JSON.parse(stored);
+      if (date === today) {
+        setVerificationCount(count);
+      } else {
+        localStorage.setItem('trustie_usage', JSON.stringify({ date: today, count: 0 }));
+      }
+    }
+  }, []);
+
+  const handleVerify = async () => {
+    if (!inputText.trim()) {
+      setError('Please enter text to verify');
+      return;
+    }
+
+    // Check daily limit (5 for free users)
+    if (verificationCount >= 5) {
+      setError('Daily limit reached (5/5). Upgrade to Pro for unlimited verifications.');
+      return;
+    }
+
+    setIsVerifying(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      const response = await fetch('/api/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: inputText, mode }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Verification failed');
+      }
+
+      setResult(data);
+
+      // Update usage count
+      const newCount = verificationCount + 1;
+      setVerificationCount(newCount);
+      const today = new Date().toDateString();
+      localStorage.setItem('trustie_usage', JSON.stringify({ date: today, count: newCount }));
+
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong');
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleExportJSON = () => {
+    if (!result) return;
+    const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `trustie_verification_${result.audit.id}.json`;
+    a.click();
+  };
+
+  const handleClear = () => {
+    setInputText('');
+    setResult(null);
+    setError(null);
+  };
+
+  return (
+    <div className={`min-h-screen font-sans antialiased transition-colors duration-300 ${isDark ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
+      {/* Header */}
+      <header className={`sticky top-0 z-50 border-b ${isDark ? 'bg-gray-950/95 border-gray-800 backdrop-blur-md' : 'bg-white/95 border-gray-200 backdrop-blur-md'}`}>
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span className="text-lg font-bold">Trustie</span>
+            <span className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-100 text-blue-600'}`}>BETA</span>
+          </Link>
+
+          <div className="flex items-center gap-3">
+            {/* Usage Counter */}
+            <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              <span className={verificationCount >= 5 ? 'text-red-400' : 'text-green-400'}>{verificationCount}</span>/5 today
+            </div>
+
+            {/* Theme Toggle */}
+            <button
+              onClick={() => setIsDark(!isDark)}
+              className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${isDark ? 'bg-gray-800 hover:bg-gray-700 text-yellow-400' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}`}
+            >
+              {isDark ? <SunIcon /> : <MoonIcon />}
+            </button>
+
+            {/* Upgrade Button */}
+            <Link
+              href="/#pricing"
+              className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors"
+            >
+              Upgrade
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-6xl mx-auto px-4 py-8">
+        {/* Input Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              Verify Claims
+            </h1>
+
+            {/* Mode Toggle */}
+            <div className={`inline-flex rounded-lg p-1 ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`}>
+              <button
+                onClick={() => setMode('resume')}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${mode === 'resume' ? 'bg-blue-500 text-white' : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}
+              >
+                Resume
+              </button>
+              <button
+                onClick={() => setMode('general')}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${mode === 'general' ? 'bg-blue-500 text-white' : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}
+              >
+                General Text
+              </button>
+            </div>
+          </div>
+
+          {/* Text Input */}
+          <div className={`rounded-2xl border ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
+            <textarea
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder={mode === 'resume' 
+                ? "Paste a resume, CV, or candidate bio here...\n\nExample:\nJohn Smith\nSenior Software Engineer at Google (2019-2024)\nStanford University, B.S. Computer Science, 2018\nAWS Solutions Architect Certified"
+                : "Paste any text with claims to verify...\n\nExample:\nThe company was founded in 2015 and has raised $50M in funding.\nThe CEO previously worked at McKinsey for 8 years."
+              }
+              className={`w-full h-64 p-6 bg-transparent resize-none outline-none text-base ${isDark ? 'text-white placeholder-gray-600' : 'text-gray-900 placeholder-gray-400'}`}
+            />
+            
+            {/* Input Footer */}
+            <div className={`flex items-center justify-between px-6 py-4 border-t ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
+              <div className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                {inputText.length.toLocaleString()} characters
+              </div>
+              <div className="flex items-center gap-3">
+                {inputText && (
+                  <button
+                    onClick={handleClear}
+                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${isDark ? 'text-gray-400 hover:text-white hover:bg-gray-800' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}
+                  >
+                    Clear
+                  </button>
+                )}
+                <button
+                  onClick={handleVerify}
+                  disabled={isVerifying || !inputText.trim()}
+                  className={`px-6 py-2.5 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center gap-2`}
+                >
+                  {isVerifying ? (
+                    <>
+                      <LoadingSpinner />
+                      Verifying...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Verify Claims
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+        </div>
+
+        {/* Loading State */}
+        {isVerifying && (
+          <div className={`rounded-2xl border p-12 text-center ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
+            <div className="w-16 h-16 mx-auto mb-6 relative">
+              <div className="absolute inset-0 rounded-full border-4 border-blue-500/20"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
+            </div>
+            <h3 className={`text-xl font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              Verifying Claims...
+            </h3>
+            <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+              Searching multiple sources and cross-referencing with AI models
+            </p>
+            <div className={`mt-6 flex items-center justify-center gap-6 text-sm ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
+              <span className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                Extracting claims
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                Searching sources
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></span>
+                AI verification
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Results */}
+        {result && !isVerifying && (
+          <div className="space-y-6">
+            {/* Summary Card */}
+            <div className={`rounded-2xl border p-6 ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  Verification Summary
+                </h2>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleExportJSON}
+                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${isDark ? 'bg-gray-800 hover:bg-gray-700 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Export JSON
+                  </button>
+                </div>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                <StatCard
+                  label="Total Claims"
+                  value={result.summary.total_claims}
+                  isDark={isDark}
+                />
+                <StatCard
+                  label="Verified"
+                  value={result.summary.verified}
+                  color="green"
+                  isDark={isDark}
+                />
+                <StatCard
+                  label="Unverified"
+                  value={result.summary.unverified}
+                  color="red"
+                  isDark={isDark}
+                />
+                <StatCard
+                  label="Partial"
+                  value={result.summary.partial}
+                  color="yellow"
+                  isDark={isDark}
+                />
+                <StatCard
+                  label="Confidence"
+                  value={`${Math.round(result.summary.confidence * 100)}%`}
+                  color="blue"
+                  isDark={isDark}
+                />
+              </div>
+
+              {/* Audit Info */}
+              <div className={`flex flex-wrap items-center gap-4 text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                <span>ID: {result.audit.id}</span>
+                <span>•</span>
+                <span>Model: {result.audit.model}</span>
+                <span>•</span>
+                <span>Time: {(result.audit.processing_time_ms / 1000).toFixed(1)}s</span>
+              </div>
+            </div>
+
+            {/* Individual Claims */}
+            <div className="space-y-4">
+              <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                Claim Details
+              </h3>
+              {result.claims.map((claim) => (
+                <ClaimCard key={claim.id} claim={claim} isDark={isDark} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!result && !isVerifying && !inputText && (
+          <div className={`rounded-2xl border p-12 text-center ${isDark ? 'bg-gray-900/50 border-gray-800' : 'bg-white border-gray-200'}`}>
+            <div className={`w-16 h-16 mx-auto mb-6 rounded-2xl flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>
+              <svg className={`w-8 h-8 ${isDark ? 'text-gray-600' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 className={`text-xl font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              Ready to Verify
+            </h3>
+            <p className={`text-sm max-w-md mx-auto ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+              Paste a resume, bio, or any text with claims. Trustie will extract and verify each claim using multiple AI models and authoritative sources.
+            </p>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
+
+// ============================================================================
+// COMPONENTS
+// ============================================================================
+
+function StatCard({ label, value, color, isDark }: { label: string; value: string | number; color?: string; isDark: boolean }) {
+  const colorClasses = {
+    green: 'text-green-500',
+    red: 'text-red-500',
+    yellow: 'text-yellow-500',
+    blue: 'text-blue-500',
+    default: isDark ? 'text-white' : 'text-gray-900',
+  };
+
+  return (
+    <div className={`rounded-xl p-4 ${isDark ? 'bg-gray-800' : 'bg-gray-50'}`}>
+      <div className={`text-2xl font-bold ${colorClasses[color as keyof typeof colorClasses] || colorClasses.default}`}>
+        {value}
+      </div>
+      <div className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{label}</div>
+    </div>
+  );
+}
+
+function ClaimCard({ claim, isDark }: { claim: VerifiedClaim; isDark: boolean }) {
+  const [expanded, setExpanded] = useState(false);
+
+  const verdictStyles = {
+    VERIFIED: { bg: 'bg-green-500/10', border: 'border-green-500/30', text: 'text-green-500', icon: '✓' },
+    UNVERIFIED: { bg: 'bg-red-500/10', border: 'border-red-500/30', text: 'text-red-500', icon: '✗' },
+    PARTIAL: { bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', text: 'text-yellow-500', icon: '◐' },
+    UNABLE_TO_VERIFY: { bg: 'bg-gray-500/10', border: 'border-gray-500/30', text: 'text-gray-400', icon: '?' },
+  };
+
+  const style = verdictStyles[claim.verdict];
+
+  return (
+    <div className={`rounded-xl border overflow-hidden ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
+      {/* Header */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className={`w-full flex items-start gap-4 p-5 text-left transition-colors ${isDark ? 'hover:bg-gray-800/50' : 'hover:bg-gray-50'}`}
+      >
+        {/* Verdict Badge */}
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold ${style.bg} ${style.border} border ${style.text}`}>
+          {style.icon}
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-3 mb-1">
+            <span className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'}`}>
+              {claim.category}
+            </span>
+            <span className={`text-xs ${style.text} font-medium`}>
+              {Math.round(claim.confidence * 100)}% confidence
+            </span>
+          </div>
+          <p className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            {claim.claim}
+          </p>
+        </div>
+
+        {/* Expand Icon */}
+        <svg
+          className={`w-5 h-5 transition-transform ${isDark ? 'text-gray-500' : 'text-gray-400'} ${expanded ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Expanded Content */}
+      {expanded && (
+        <div className={`px-5 pb-5 pt-0 border-t ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
+          <div className="pt-4 space-y-4">
+            {/* Evidence */}
+            <div>
+              <h4 className={`text-sm font-medium mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Evidence</h4>
+              <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{claim.evidence}</p>
+            </div>
+
+            {/* Discrepancies */}
+            {claim.discrepancies && (
+              <div>
+                <h4 className={`text-sm font-medium mb-2 text-yellow-500`}>Discrepancies Found</h4>
+                <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{claim.discrepancies}</p>
+              </div>
+            )}
+
+            {/* Sources */}
+            {claim.sources.length > 0 && (
+              <div>
+                <h4 className={`text-sm font-medium mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Sources ({claim.sources.length})</h4>
+                <div className="space-y-2">
+                  {claim.sources.map((source, idx) => (
+                    <div key={idx} className={`rounded-lg p-3 ${isDark ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${source.tier === 1 ? 'bg-green-500/20 text-green-400' : source.tier === 2 ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                          {source.tier_label}
+                        </span>
+                        {source.commercial_bias && (
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400">
+                            Commercial Bias
+                          </span>
+                        )}
+                      </div>
+                      <a
+                        href={source.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-500 hover:text-blue-400 truncate block"
+                      >
+                        {source.url}
+                      </a>
+                      {source.snippet && (
+                        <p className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                          "{source.snippet}"
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LoadingSpinner() {
+  return (
+    <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+    </svg>
+  );
+}
+
+function SunIcon() {
+  return (
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+    </svg>
+  );
+}
