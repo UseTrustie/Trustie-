@@ -1,6 +1,6 @@
 {
   "name": "trustie",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Verify AI with Real Sources",
   "private": true,
   "scripts": {
@@ -12,9 +12,11 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
+    "@clerk/nextjs": "^4.29.0",
     "next": "14.0.4",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "stripe": "^14.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
