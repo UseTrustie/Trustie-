@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useUser } from '@clerk/nextjs';
+import { useUser, SignOutButton } from '@clerk/nextjs';
 
 export default function LandingPage() {
   const { isSignedIn } = useUser();
@@ -44,9 +44,17 @@ export default function LandingPage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <Link href={loginLink} className="hidden sm:block px-4 py-2 text-gray-400 hover:text-white text-sm transition-colors">
-                {isSignedIn ? 'Dashboard' : 'Login'}
-              </Link>
+              {isSignedIn ? (
+                <SignOutButton signOutOptions={{ redirectUrl: '/' }}>
+                  <button className="px-4 py-2 text-gray-400 hover:text-white text-sm transition-colors">
+                    Sign Out
+                  </button>
+                </SignOutButton>
+              ) : (
+                <Link href={loginLink} className="hidden sm:block px-4 py-2 text-gray-400 hover:text-white text-sm transition-colors">
+                  Login
+                </Link>
+              )}
               <Link href={authLink} className="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-xl transition-colors">
                 {isSignedIn ? 'Open App' : 'Try Free'}
               </Link>
@@ -80,7 +88,7 @@ export default function LandingPage() {
               <span className="text-blue-500">Trust Every Hire.</span>
             </h1>
             <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
-              AI-powered fact verification that cross-checks claims across multiple sources and AI models. Stop fraud. Build trust.
+              AI-powered fact verification that cross-checks claims across multiple sources. Stop fraud. Build trust.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href={authLink} className="w-full sm:w-auto px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors">
@@ -102,7 +110,7 @@ export default function LandingPage() {
                   <div className="w-3 h-3 rounded-full bg-green-500" />
                 </div>
                 <div className="flex-1 text-center">
-                  <span className="text-sm text-gray-500">app.trustie.io/verify</span>
+                  <span className="text-sm text-gray-500">trustieapp.com/app</span>
                 </div>
               </div>
               <div className="p-8">
@@ -115,11 +123,12 @@ export default function LandingPage() {
                       <p>"Stanford CS, Class of 2018"</p>
                       <p>"AWS Solutions Architect Certified"</p>
                     </div>
-                    <button className="w-full mt-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors">
-                      Verify All Claims
-                    </button>
+                    <Link href={authLink} className="block w-full mt-6 py-3 text-center bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors">
+                      Try It Yourself →
+                    </Link>
                   </div>
                   <div className="rounded-xl p-6 border bg-gray-800/50 border-gray-700">
+                    <h3 className="font-semibold mb-4 text-white">Example Results</h3>
                     <div className="space-y-3">
                       <div className="flex items-center gap-3 p-3 rounded-lg bg-green-500/10 border border-green-500/30">
                         <span className="text-green-500 text-xl">✓</span>
@@ -142,13 +151,13 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Logo Strip */}
-      <section className="py-12 border-y border-gray-800">
+      {/* Use Cases */}
+      <section className="py-16 border-y border-gray-800">
         <div className="max-w-7xl mx-auto px-6">
-          <p className="text-center text-sm text-gray-500 mb-8">Trusted by teams verifying claims at</p>
+          <p className="text-center text-sm text-gray-500 mb-8">Built for</p>
           <div className="flex flex-wrap items-center justify-center gap-8">
-            {['HR Teams', 'Insurance Firms', 'Legal Depts', 'Recruiters', 'Compliance'].map((item) => (
-              <span key={item} className="text-lg font-medium text-gray-600">{item}</span>
+            {['HR Teams', 'Recruiters', 'Insurance', 'Legal', 'Compliance'].map((item) => (
+              <span key={item} className="text-lg font-medium text-gray-500">{item}</span>
             ))}
           </div>
         </div>
@@ -158,41 +167,41 @@ export default function LandingPage() {
       <section className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-gray-500 text-sm mb-4">2.0 Updates</p>
-            <h2 className="text-4xl md:text-5xl font-bold">Built Different</h2>
+            <h2 className="text-4xl md:text-5xl font-bold">How Trustie Works</h2>
             <p className="mt-4 text-lg text-gray-400">Every verification feature designed to catch what others miss.</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-12">
-            {/* Feature 1 */}
+            {/* Feature 1 - HONEST VERSION */}
             <div className="rounded-2xl p-8 bg-gray-900 border border-gray-800">
-              <h3 className="text-2xl font-bold mb-4">Multi-AI Consensus Engine</h3>
-              <p className="text-gray-400 mb-6">Three AI models must agree before a claim is marked verified. GPT-4, Claude, and Gemini cross-check each other — reducing false positives by 90%.</p>
-              <div className="grid grid-cols-3 gap-4">
-                {[{ name: 'GPT-4', score: '94%' }, { name: 'Claude', score: '96%' }, { name: 'Gemini', score: '91%' }].map((model) => (
-                  <div key={model.name} className="rounded-xl p-4 text-center bg-gray-800">
-                    <span className="text-2xl">🤖</span>
-                    <p className="text-sm mt-2 text-gray-400">{model.name}</p>
-                    <p className="text-green-500 font-bold">{model.score}</p>
+              <h3 className="text-2xl font-bold mb-4">AI-Powered Verification</h3>
+              <p className="text-gray-400 mb-6">Powered by Claude, one of the most advanced AI models. Claims are extracted, searched across the web, and verified against authoritative sources in real-time.</p>
+              <div className="rounded-xl p-4 bg-gray-800">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🤖</span>
+                  <div>
+                    <p className="font-medium text-white">Claude AI</p>
+                    <p className="text-sm text-gray-500">by Anthropic</p>
                   </div>
-                ))}
+                  <span className="ml-auto text-green-500 font-bold">Active</span>
+                </div>
               </div>
             </div>
 
             {/* Feature 2 */}
             <div className="rounded-2xl p-8 bg-gray-900 border border-gray-800">
               <h3 className="text-2xl font-bold mb-4">Source Quality Tiers</h3>
-              <p className="text-gray-400 mb-6">Not all sources are equal. We weight .gov, .edu, and peer-reviewed databases higher than blogs and commercial sites.</p>
+              <p className="text-gray-400 mb-6">Not all sources are equal. We weight .gov, .edu, and professional networks higher than blogs and commercial sites.</p>
               <div className="space-y-3">
                 {[
-                  { tier: 'High Trust', weight: '3x', color: 'green', sources: '.gov, .edu, LinkedIn' },
-                  { tier: 'Medium Trust', weight: '2x', color: 'yellow', sources: 'News, Company sites' },
-                  { tier: 'Low Trust', weight: '1x', color: 'red', sources: 'Blogs, Forums, Wikipedia' },
+                  { tier: 'Tier 1 (3x weight)', color: 'green', sources: '.gov, .edu, LinkedIn, Credly' },
+                  { tier: 'Tier 2 (2x weight)', color: 'yellow', sources: 'News sites, GitHub, Company sites' },
+                  { tier: 'Tier 3 (1x weight)', color: 'red', sources: 'Blogs, Forums, Wikipedia' },
                 ].map((item) => (
                   <div key={item.tier} className="flex items-center gap-4 p-4 rounded-xl bg-gray-800">
                     <div className={`w-3 h-3 rounded-full ${item.color === 'green' ? 'bg-green-500' : item.color === 'yellow' ? 'bg-yellow-500' : 'bg-red-500'}`} />
                     <div className="flex-1">
-                      <p className="font-medium text-white">{item.tier} <span className="text-gray-500">{item.weight} weight</span></p>
+                      <p className="font-medium text-white">{item.tier}</p>
                       <p className="text-sm text-gray-500">{item.sources}</p>
                     </div>
                   </div>
@@ -202,7 +211,7 @@ export default function LandingPage() {
 
             {/* Feature 3 */}
             <div className="rounded-2xl p-8 bg-gray-900 border border-gray-800">
-              <h3 className="text-2xl font-bold mb-4">Anti-Commercial Bias Filter</h3>
+              <h3 className="text-2xl font-bold mb-4">Commercial Bias Detection</h3>
               <p className="text-gray-400 mb-6">Sources with financial interest in the claim are automatically flagged and deprioritized.</p>
               <div className="space-y-3">
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-800">
@@ -226,18 +235,18 @@ export default function LandingPage() {
             {/* Feature 4 */}
             <div className="rounded-2xl p-8 bg-gray-900 border border-gray-800">
               <h3 className="text-2xl font-bold mb-4">Full Audit Trail</h3>
-              <p className="text-gray-400 mb-6">Every verification is logged with timestamps, sources checked, AI models used, and confidence scores. Export PDF reports for compliance.</p>
+              <p className="text-gray-400 mb-6">Every verification is logged with timestamps, sources checked, and confidence scores. Export JSON reports for compliance.</p>
               <div className="rounded-xl overflow-hidden bg-gray-950">
                 <div className="px-4 py-2 border-b border-gray-800">
-                  <span className="text-gray-500 text-sm">audit_trail.json</span>
+                  <span className="text-gray-500 text-sm">verification_report.json</span>
                 </div>
                 <pre className="p-4 text-sm text-gray-300 overflow-x-auto">
 {`{
-  "audit_id": "ver_abc123",
-  "timestamp": "2025-02-22T14:30:00Z",
+  "id": "ver_abc123",
+  "timestamp": "2025-03-01T14:30:00Z",
   "claims_verified": 3,
   "confidence": 0.92,
-  "verdict": "PARTIAL_MATCH"
+  "sources_checked": 12
 }`}
                 </pre>
               </div>
@@ -246,73 +255,26 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Comparison */}
+      {/* Why Trustie */}
       <section className="py-24 px-6 bg-gray-900/50">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold">The Proof Is in the Comparison</h2>
+            <h2 className="text-4xl md:text-5xl font-bold">Why Trustie?</h2>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-800">
-                  <th className="text-left py-4 px-4"></th>
-                  <th className="py-4 px-4 text-blue-500 font-bold">Trustie</th>
-                  <th className="py-4 px-4 text-gray-500">Checkr</th>
-                  <th className="py-4 px-4 text-gray-500">HireRight</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  'AI-Powered Claim Extraction',
-                  'Multi-AI Consensus',
-                  'Source Quality Tiering',
-                  'Real-Time Verification',
-                  'Full Audit Trail',
-                  'Free Tier Available',
-                ].map((feature, idx) => (
-                  <tr key={feature} className="border-b border-gray-800/50">
-                    <td className="py-4 px-4 text-gray-300">{feature}</td>
-                    <td className="py-4 px-4 text-center text-green-500 text-xl">✓</td>
-                    <td className="py-4 px-4 text-center text-red-500 text-xl">{idx < 3 ? '✗' : '✓'}</td>
-                    <td className="py-4 px-4 text-center text-red-500 text-xl">{idx < 2 ? '✗' : '✓'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-24 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold">Real Results from Real Users</h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="space-y-6">
             {[
-              { name: 'Sarah K.', role: 'HR Director', quote: 'Caught 3 inflated titles in one batch. Trustie paid for itself in the first week.' },
-              { name: 'Marcus R.', role: 'Recruiter', quote: 'I verify every resume now. The multi-AI consensus gives me confidence no other tool does.' },
-              { name: 'Jennifer L.', role: 'Compliance Officer', quote: 'The audit trail exports are exactly what our legal team needed. Clean, thorough, defensible.' },
-              { name: 'David T.', role: 'Hiring Manager', quote: 'We went from 2 bad hires per quarter to zero. The ROI is insane.' },
-              { name: 'Amy W.', role: 'Legal Analyst', quote: 'Used Trustie for due diligence on a merger. Found material misrepresentations.' },
-              { name: 'Chris P.', role: 'Content Lead', quote: 'We fact-check every AI-generated article before publishing. Trustie catches things others miss.' },
-            ].map((t, idx) => (
-              <div key={idx} className="rounded-2xl p-6 bg-gray-900 border border-gray-800">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold bg-gray-800 text-gray-400">
-                    {t.name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-medium text-white">{t.name}</p>
-                    <p className="text-sm text-gray-500">{t.role}</p>
-                  </div>
+              { title: 'Real-Time Verification', desc: 'No waiting days for results. Get verification in seconds.' },
+              { title: 'Web Search Integration', desc: 'AI searches the live web for current, accurate information.' },
+              { title: 'Transparent Confidence Scores', desc: 'Know exactly how confident the AI is in each verification.' },
+              { title: 'Source Citations', desc: 'Every claim shows which sources were checked and what was found.' },
+              { title: 'Privacy First', desc: 'Text is processed in real-time and immediately discarded. We don\'t store your data.' },
+            ].map((item, idx) => (
+              <div key={idx} className="flex gap-4 p-6 rounded-xl bg-gray-800">
+                <span className="text-green-500 text-xl">✓</span>
+                <div>
+                  <h3 className="font-bold text-white mb-1">{item.title}</h3>
+                  <p className="text-gray-400">{item.desc}</p>
                 </div>
-                <div className="flex gap-1 mb-3">
-                  {[...Array(5)].map((_, i) => (<span key={i} className="text-yellow-400">★</span>))}
-                </div>
-                <p className="text-gray-300">"{t.quote}"</p>
               </div>
             ))}
           </div>
@@ -320,11 +282,11 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-24 px-6 bg-gray-900/50">
+      <section id="pricing" className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">Pricing</h2>
-            <p className="text-lg text-gray-400 mb-8">Simple and transparent pricing for everyone</p>
+            <p className="text-lg text-gray-400 mb-8">Simple and transparent pricing</p>
             <div className="inline-flex rounded-xl p-1 bg-gray-800">
               <button onClick={() => setBillingCycle('monthly')} className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${billingCycle === 'monthly' ? 'bg-blue-500 text-white' : 'text-gray-400'}`}>
                 Monthly
@@ -348,9 +310,8 @@ export default function LandingPage() {
               </Link>
               <ul className="space-y-3 text-sm">
                 <li className="flex items-center gap-2 text-gray-300"><span className="text-green-500">✓</span>5 verifications total</li>
-                <li className="flex items-center gap-2 text-gray-300"><span className="text-green-500">✓</span>Basic sources</li>
+                <li className="flex items-center gap-2 text-gray-300"><span className="text-green-500">✓</span>All source tiers</li>
                 <li className="flex items-center gap-2 text-gray-300"><span className="text-green-500">✓</span>Web interface</li>
-                <li className="flex items-center gap-2 text-gray-600"><span className="text-gray-600">✗</span>No export</li>
               </ul>
             </div>
 
@@ -369,8 +330,8 @@ export default function LandingPage() {
               <ul className="space-y-3 text-sm">
                 <li className="flex items-center gap-2 text-gray-300"><span className="text-green-500">✓</span>50 verifications</li>
                 <li className="flex items-center gap-2 text-gray-300"><span className="text-green-500">✓</span>Never expires</li>
-                <li className="flex items-center gap-2 text-gray-300"><span className="text-green-500">✓</span>All source tiers</li>
                 <li className="flex items-center gap-2 text-gray-300"><span className="text-green-500">✓</span>Export reports</li>
+                <li className="flex items-center gap-2 text-gray-300"><span className="text-green-500">✓</span>Priority support</li>
               </ul>
             </div>
 
@@ -387,31 +348,31 @@ export default function LandingPage() {
               </Link>
               <ul className="space-y-3 text-sm">
                 <li className="flex items-center gap-2 text-gray-300"><span className="text-green-500">✓</span>Unlimited verifications</li>
-                <li className="flex items-center gap-2 text-gray-300"><span className="text-green-500">✓</span>Priority support</li>
-                <li className="flex items-center gap-2 text-gray-300"><span className="text-green-500">✓</span>API access</li>
+                <li className="flex items-center gap-2 text-gray-300"><span className="text-green-500">✓</span>API access (coming soon)</li>
                 <li className="flex items-center gap-2 text-gray-300"><span className="text-green-500">✓</span>Team features</li>
+                <li className="flex items-center gap-2 text-gray-300"><span className="text-green-500">✓</span>Priority support</li>
               </ul>
             </div>
           </div>
 
           <p className="text-center text-gray-500 text-sm mt-8">
-            Need enterprise? <a href="mailto:danny@trustieapp.com" className="text-blue-500 hover:text-blue-400">Contact us</a>
+            Need enterprise? <a href="mailto:trustietechnologies@gmail.com" className="text-blue-500 hover:text-blue-400">Contact us</a>
           </p>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="py-24 px-6">
+      <section className="py-24 px-6 bg-gray-900/50">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-12">Frequently Asked Questions</h2>
           <div className="space-y-3">
             {[
               { q: 'Is there really a free plan?', a: 'Yes. 5 verifications total, forever. No credit card required.' },
-              { q: 'Can I cancel anytime?', a: 'Absolutely. No contracts, no cancellation fees. Cancel in one click.' },
               { q: 'What counts as one verification?', a: 'One piece of text submitted. It can contain multiple claims — we extract and verify each individually.' },
-              { q: 'Do you offer startup/nonprofit discounts?', a: 'Yes. Email danny@trustieapp.com with details and we\'ll work something out.' },
-              { q: 'What payment methods do you accept?', a: 'All major credit cards via Stripe. Enterprise customers can pay via invoice.' },
+              { q: 'How accurate is it?', a: 'Accuracy depends on available public information. We show confidence scores so you know when to dig deeper manually.' },
               { q: 'Is my data secure?', a: 'Yes. We don\'t store the content you verify — it\'s processed in real-time and discarded.' },
+              { q: 'Can I get a refund?', a: '14-day money-back guarantee on all paid plans.' },
+              { q: 'Do you offer startup/nonprofit discounts?', a: 'Yes. Email trustietechnologies@gmail.com with details and we\'ll work something out.' },
             ].map((faq, idx) => (
               <div key={idx} className="rounded-xl overflow-hidden bg-gray-800">
                 <button onClick={() => setOpenFaq(openFaq === idx ? null : idx)} className="w-full flex items-center justify-between p-5 text-left hover:bg-gray-700 transition-colors">
@@ -428,25 +389,25 @@ export default function LandingPage() {
       </section>
 
       {/* Affiliate */}
-      <section className="py-24 px-6 bg-gray-900/50">
+      <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-4">Earn with Trustie</h2>
           <p className="text-lg text-gray-400 mb-8">
-            Trustie offers a generous referral program. Earn 30% of all earnings from people using your referral code.
+            Interested in our affiliate program? Earn 30% commission on referrals.
           </p>
-          <a href="mailto:danny@trustieapp.com" className="inline-block px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors">
-            Join affiliate program (30% commission)
+          <a href="mailto:trustietechnologies@gmail.com?subject=Affiliate%20Program%20Interest" className="inline-block px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors">
+            Join Affiliate Program (30% commission)
           </a>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-24 px-6">
+      <section className="py-24 px-6 bg-gray-900/50">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Ready to Verify Any Claim?
+            Ready to Verify Claims?
           </h2>
-          <p className="text-lg text-gray-400 mb-8">Start Your Free Trial Today</p>
+          <p className="text-lg text-gray-400 mb-8">Start free. No credit card required.</p>
           <Link href={authLink} className="inline-block px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors">
             {isSignedIn ? 'Open Dashboard' : 'Try Trustie Free'}
           </Link>
@@ -466,30 +427,27 @@ export default function LandingPage() {
                 </div>
                 <span className="text-xl font-bold">Trustie</span>
               </div>
-              <p className="text-sm text-gray-500 mb-4">AI-powered verification for everyone.</p>
+              <p className="text-sm text-gray-500 mb-4">AI-powered verification.</p>
               <a href="https://x.com/UseTrustie" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-400 text-sm">
                 @UseTrustie
               </a>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Pages</h4>
+              <h4 className="font-semibold mb-4">Product</h4>
               <ul className="space-y-2">
-                <li><Link href="/proof" className="text-sm text-gray-500 hover:text-white">Proof</Link></li>
-                <li><Link href="#pricing" className="text-sm text-gray-500 hover:text-white">Pricing</Link></li>
-                <li><Link href="/help" className="text-sm text-gray-500 hover:text-white">Help</Link></li>
-                <li><Link href="/blog" className="text-sm text-gray-500 hover:text-white">Blog</Link></li>
                 <li><Link href="/how-it-works" className="text-sm text-gray-500 hover:text-white">How it works</Link></li>
+                <li><Link href="#pricing" className="text-sm text-gray-500 hover:text-white">Pricing</Link></li>
+                <li><Link href="/proof" className="text-sm text-gray-500 hover:text-white">Proof</Link></li>
+                <li><Link href="/help" className="text-sm text-gray-500 hover:text-white">Help</Link></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Use Cases</h4>
+              <h4 className="font-semibold mb-4">Resources</h4>
               <ul className="space-y-2">
-                <li><Link href={authLink} className="text-sm text-gray-500 hover:text-white">Resume Verification</Link></li>
-                <li><Link href={authLink} className="text-sm text-gray-500 hover:text-white">HR Background Checks</Link></li>
-                <li><Link href={authLink} className="text-sm text-gray-500 hover:text-white">Insurance Claims</Link></li>
-                <li><Link href={authLink} className="text-sm text-gray-500 hover:text-white">Legal Due Diligence</Link></li>
+                <li><Link href="/blog" className="text-sm text-gray-500 hover:text-white">Blog</Link></li>
+                <li><a href="mailto:trustietechnologies@gmail.com" className="text-sm text-gray-500 hover:text-white">Contact</a></li>
               </ul>
             </div>
 
@@ -498,7 +456,6 @@ export default function LandingPage() {
               <ul className="space-y-2">
                 <li><Link href="/privacy" className="text-sm text-gray-500 hover:text-white">Privacy Policy</Link></li>
                 <li><Link href="/terms" className="text-sm text-gray-500 hover:text-white">Terms of Service</Link></li>
-                <li><Link href="/terms#refunds" className="text-sm text-gray-500 hover:text-white">Refund Policy</Link></li>
               </ul>
             </div>
           </div>
