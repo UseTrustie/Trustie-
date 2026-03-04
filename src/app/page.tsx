@@ -457,7 +457,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className={`py-16 px-6 border-t ${borderColor}`}>
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
+          <div className="grid md:grid-cols-5 gap-12 mb-12">
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
@@ -467,35 +467,47 @@ export default function LandingPage() {
                 </div>
                 <span className={`text-xl font-bold ${textPrimary}`}>Trustie</span>
               </div>
-              <p className={`text-sm ${textMuted} mb-4`}>AI-powered verification.</p>
+              <p className={`text-sm ${textMuted} mb-4`}>AI-powered verification for everyone.</p>
               <a href="https://x.com/UseTrustie" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-400 text-sm">
                 @UseTrustie
               </a>
             </div>
 
             <div>
-              <h4 className={`font-semibold mb-4 ${textPrimary}`}>Product</h4>
+              <h4 className={`font-semibold mb-4 ${textPrimary}`}>Pages</h4>
               <ul className="space-y-2">
-                <li><Link href="/how-it-works" className={`text-sm ${textMuted} hover:${isDark ? 'text-white' : 'text-gray-900'}`}>How it works</Link></li>
-                <li><Link href="#pricing" className={`text-sm ${textMuted} hover:${isDark ? 'text-white' : 'text-gray-900'}`}>Pricing</Link></li>
-                <li><Link href="/proof" className={`text-sm ${textMuted} hover:${isDark ? 'text-white' : 'text-gray-900'}`}>Proof</Link></li>
-                <li><Link href="/help" className={`text-sm ${textMuted} hover:${isDark ? 'text-white' : 'text-gray-900'}`}>Help</Link></li>
+                <li><Link href="/proof" className={`text-sm ${textMuted} hover:text-blue-400`}>Proof</Link></li>
+                <li><Link href="#pricing" className={`text-sm ${textMuted} hover:text-blue-400`}>Pricing</Link></li>
+                <li><Link href="/help" className={`text-sm ${textMuted} hover:text-blue-400`}>Help</Link></li>
+                <li><Link href="/blog" className={`text-sm ${textMuted} hover:text-blue-400`}>Blog</Link></li>
+                <li><Link href="/how-it-works" className={`text-sm ${textMuted} hover:text-blue-400`}>How it works</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className={`font-semibold mb-4 ${textPrimary}`}>Use Cases</h4>
+              <ul className="space-y-2">
+                <li><span className={`text-sm ${textMuted}`}>Resume Verification</span></li>
+                <li><span className={`text-sm ${textMuted}`}>HR Background Checks</span></li>
+                <li><span className={`text-sm ${textMuted}`}>Insurance Claims</span></li>
+                <li><span className={`text-sm ${textMuted}`}>Legal Due Diligence</span></li>
               </ul>
             </div>
 
             <div>
               <h4 className={`font-semibold mb-4 ${textPrimary}`}>Resources</h4>
               <ul className="space-y-2">
-                <li><Link href="/blog" className={`text-sm ${textMuted} hover:${isDark ? 'text-white' : 'text-gray-900'}`}>Blog</Link></li>
-                <li><a href="mailto:trustietechnologies@gmail.com" className={`text-sm ${textMuted} hover:${isDark ? 'text-white' : 'text-gray-900'}`}>Contact</a></li>
+                <li><Link href="/blog" className={`text-sm ${textMuted} hover:text-blue-400`}>Blog</Link></li>
+                <li><a href="mailto:trustietechnologies@gmail.com" className={`text-sm ${textMuted} hover:text-blue-400`}>Contact</a></li>
               </ul>
             </div>
 
             <div>
               <h4 className={`font-semibold mb-4 ${textPrimary}`}>Legal</h4>
               <ul className="space-y-2">
-                <li><Link href="/privacy" className={`text-sm ${textMuted} hover:${isDark ? 'text-white' : 'text-gray-900'}`}>Privacy Policy</Link></li>
-                <li><Link href="/terms" className={`text-sm ${textMuted} hover:${isDark ? 'text-white' : 'text-gray-900'}`}>Terms of Service</Link></li>
+                <li><Link href="/privacy" className={`text-sm ${textMuted} hover:text-blue-400`}>Privacy Policy</Link></li>
+                <li><Link href="/terms" className={`text-sm ${textMuted} hover:text-blue-400`}>Terms of Service</Link></li>
+                <li><Link href="/refund" className={`text-sm ${textMuted} hover:text-blue-400`}>Refund Policy</Link></li>
               </ul>
             </div>
           </div>
@@ -505,6 +517,3 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
-    </div>
-  );
-}
