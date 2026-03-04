@@ -11,6 +11,10 @@ export default authMiddleware({
     "/database",
     "/privacy",
     "/terms",
+    "/sign-in",
+    "/sign-in/(.*)",
+    "/sign-up",
+    "/sign-up/(.*)",
     "/api/webhook",
   ],
 });
