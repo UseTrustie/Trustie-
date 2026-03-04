@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, clerkClient } from '@clerk/nextjs';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 import Anthropic from '@anthropic-ai/sdk';
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
 
 const SOURCE_TIERS: Record<string, { tier: number; weight: number; label: string }> = {
   '.gov': { tier: 1, weight: 3, label: 'Government' },
@@ -30,39 +26,68 @@ function getSourceTier(url: string) {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.error('ANTHROPIC_API_KEY is not set');
+      return NextResponse.json({ error: 'Server configuration error. Please contact support.' }, { status: 500 });
+    }
+
+    const anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    });
+
     const { userId } = auth();
-    
+
     if (!userId) {
       return NextResponse.json({ error: 'Please sign in to verify claims' }, { status: 401 });
     }
 
-    const user = await clerkClient.users.getUser(userId);
+    let user;
+    try {
+      user = await clerkClient.users.getUser(userId);
+    } catch (clerkError: any) {
+      console.error('Clerk error:', clerkError.message);
+      return NextResponse.json({ error: 'Authentication error. Please sign out and sign in again.' }, { status: 401 });
+    }
+
     const metadata = user.publicMetadata as any;
-    
+
     const plan = metadata?.plan || 'free';
     const verificationsUsed = metadata?.verificationsUsed || 0;
     const limit = plan === 'pro' ? Infinity : (plan === 'starter' ? 50 : 5);
 
     if (verificationsUsed >= limit) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: 'Verification limit reached. Upgrade to continue.',
         limitReached: true,
       }, { status: 403 });
     }
 
-    const { text, mode = 'resume' } = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch (e) {
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    }
+
+    const { text, mode = 'resume' } = body;
 
     if (!text || typeof text !== 'string') {
       return NextResponse.json({ error: 'Text is required' }, { status: 400 });
     }
 
-    const extractionResponse = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 4096,
-      messages: [
-        {
-          role: 'user',
-          content: `Extract all verifiable factual claims from this ${mode === 'resume' ? 'resume/CV' : 'text'}. Return ONLY valid JSON:
+    if (text.length > 10000) {
+      return NextResponse.json({ error: 'Text too long. Maximum 10,000 characters.' }, { status: 400 });
+    }
+
+    let claims: any[] = [];
+    try {
+      const extractionResponse = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4096,
+        messages: [
+          {
+            role: 'user',
+            content: `Extract all verifiable factual claims from this ${mode === 'resume' ? 'resume/CV' : 'text'}. Return ONLY valid JSON:
 {
   "claims": [
     { "id": 1, "text": "claim text", "category": "education|employment|certification|achievement|other", "entities": ["entity1"] }
@@ -72,20 +97,23 @@ Maximum 10 claims. Skip opinions and soft skills.
 
 TEXT:
 ${text}`
-        }
-      ],
-    });
+          }
+        ],
+      });
 
-    let claims: any[] = [];
-    const extractionText = extractionResponse.content[0].type === 'text' ? extractionResponse.content[0].text : '';
-    
-    try {
-      const jsonMatch = extractionText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        claims = JSON.parse(jsonMatch[0]).claims || [];
+      const extractionText = extractionResponse.content[0].type === 'text' ? extractionResponse.content[0].text : '';
+
+      try {
+        const jsonMatch = extractionText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          claims = JSON.parse(jsonMatch[0]).claims || [];
+        }
+      } catch (e) {
+        claims = [];
       }
-    } catch (e) {
-      claims = [];
+    } catch (aiError: any) {
+      console.error('Anthropic extraction error:', aiError.message);
+      return NextResponse.json({ error: 'AI service temporarily unavailable. Please try again.' }, { status: 503 });
     }
 
     if (claims.length === 0) {
@@ -110,7 +138,7 @@ ${text}`
             {
               role: 'user',
               content: `Verify this claim: "${claim.text}"
-              
+
 Return ONLY JSON:
 {
   "verdict": "VERIFIED|UNVERIFIED|PARTIAL|UNABLE_TO_VERIFY",
@@ -122,8 +150,8 @@ Return ONLY JSON:
           ],
         });
 
-        let result = { verdict: 'UNABLE_TO_VERIFY', confidence: 0.5, evidence: 'Could not verify', sources: [] };
-        
+        let result = { verdict: 'UNABLE_TO_VERIFY', confidence: 0.5, evidence: 'Could not verify', sources: [] as any[] };
+
         for (const block of verificationResponse.content) {
           if (block.type === 'text') {
             try {
@@ -143,7 +171,7 @@ Return ONLY JSON:
           verdict: result.verdict,
           confidence: result.confidence,
           evidence: result.evidence,
-          sources: result.sources.map((s: any) => ({
+          sources: (result.sources || []).map((s: any) => ({
             ...s,
             ...getSourceTier(s.url || ''),
           })),
@@ -155,15 +183,19 @@ Return ONLY JSON:
           category: claim.category,
           verdict: 'UNABLE_TO_VERIFY',
           confidence: 0.5,
-          evidence: 'Error occurred',
+          evidence: 'Error during verification',
           sources: [],
         });
       }
     }
 
-    await clerkClient.users.updateUser(userId, {
-      publicMetadata: { ...metadata, verificationsUsed: verificationsUsed + 1 }
-    });
+    try {
+      await clerkClient.users.updateUser(userId, {
+        publicMetadata: { ...metadata, verificationsUsed: verificationsUsed + 1 }
+      });
+    } catch (e) {
+      console.error('Failed to update usage count');
+    }
 
     const summary = {
       total_claims: verifiedClaims.length,
@@ -182,6 +214,7 @@ Return ONLY JSON:
     });
 
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Verification failed' }, { status: 500 });
+    console.error('Verify route error:', error);
+    return NextResponse.json({ error: error.message || 'Verification failed. Please try again.' }, { status: 500 });
   }
 }
