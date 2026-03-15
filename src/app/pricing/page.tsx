@@ -1,263 +1,475 @@
-'use client';
-// @ts-nocheck
+"use client";
 
 import { useState } from "react";
 
-const C = {
-  bg: "#0B1120", card: "rgba(30,41,66,0.5)", cardBorder: "rgba(59,130,246,0.12)",
-  blue: "#3b82f6", blueGlow: "rgba(59,130,246,0.25)", red: "#ef4444",
-  green: "#22c55e", amber: "#f59e0b", text: "#e2e8f0", muted: "#94a3b8",
-  dimmed: "#475569", line: "rgba(148,163,184,0.08)",
-};
-
-function Navbar() {
-  const links = [
-    { label: "Proof", href: "/proof" },
-    { label: "Pricing", href: "/pricing" },
-    { label: "Help", href: "/help" },
-    { label: "Blog", href: "/blog" },
-    { label: "How it works", href: "/how-it-works" },
-    { label: "Verification Database", href: "/database", badge: "NEW" },
-  ];
-  return (
-    <nav style={{ position:"sticky",top:0,zIndex:50,background:"rgba(11,17,32,0.85)",backdropFilter:"blur(16px)",borderBottom:`1px solid ${C.line}`,padding:"0 24px" }}>
-      <div style={{ maxWidth:"1200px",margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",height:"64px" }}>
-        <a href="/" style={{ display:"flex",alignItems:"center",gap:"10px",textDecoration:"none" }}>
-          <div style={{ width:30,height:30,borderRadius:"50%",background:C.blue,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 0 12px ${C.blueGlow}` }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          </div>
-          <span style={{ color:"#fff",fontWeight:700,fontSize:"18px" }}>Trustie</span>
-        </a>
-        <div style={{ display:"flex",alignItems:"center",gap:"24px" }}>
-          {links.map(l=>(
-            <a key={l.label} href={l.href} style={{ color:l.label==="Pricing"?"#fff":C.muted,fontSize:"14px",textDecoration:"none",fontWeight:l.label==="Pricing"?600:400,display:"flex",alignItems:"center",gap:"6px" }}>
-              {l.label}
-              {l.badge&&<span style={{ fontSize:"10px",fontWeight:700,background:C.blue,color:"#fff",padding:"2px 6px",borderRadius:"9999px" }}>{l.badge}</span>}
-            </a>
-          ))}
-        </div>
-        <div style={{ display:"flex",alignItems:"center",gap:"16px" }}>
-          <div style={{ width:8,height:8,borderRadius:"50%",background:C.green }}/>
-          <a href="#" style={{ color:C.muted,fontSize:"14px",textDecoration:"none" }}>Login</a>
-          <a href="#" style={{ background:C.blue,color:"#fff",padding:"8px 18px",borderRadius:"8px",fontSize:"14px",fontWeight:600,textDecoration:"none",boxShadow:`0 0 16px ${C.blueGlow}` }}>Request Demo</a>
-        </div>
-      </div>
-    </nav>
-  );
-}
+// TRUSTIE PRICING PAGE — OPTIMIZED FOR CONVERSION
+// Design principles applied:
+// 1. 3 tiers + enterprise (proven optimal: 3-4 tiers)
+// 2. "Most Popular" badge on middle tier (anchoring)
+// 3. Annual toggle with 20% savings (standard SaaS)
+// 4. Cost-per-verification breakdown (value clarity)
+// 5. Anchored against Checkr pricing ($29.99/check vs $0.20/check)
+// 6. 14-day money-back guarantee (risk reversal)
+// 7. FAQ section (objection handling)
+// 8. NO fake testimonials, NO fake user counts
+// 9. "Early Adopter" framing — honest about being new
+// 10. Clear CTAs with minimal friction
 
 export default function PricingPage() {
-  const [annual, setAnnual] = useState(true);
+  const [annual, setAnnual] = useState(false);
 
   const plans = [
     {
       name: "Free",
-      desc: "For individuals exploring AI verification.",
-      price: 0,
-      priceAnnual: 0,
-      cta: "Get Started Free",
-      ctaStyle: { background:"transparent",color:"#fff",border:`1px solid ${C.cardBorder}` },
+      description: "See how Trustie works",
+      monthlyPrice: 0,
+      annualPrice: 0,
+      verifications: "5 total",
+      perCheck: null,
       features: [
-        "5 verifications per day",
-        "Basic claim extraction",
-        "Tier 1 & 2 source checking",
-        "Standard confidence scores",
-        "Community support",
+        "5 verifications (one-time)",
+        "AI-powered claim extraction",
+        "Source quality indicators",
+        "Confidence scores",
       ],
-      limits: [
-        "No batch processing",
-        "No API access",
-        "No export/audit trail",
-      ],
+      cta: "Start Free",
+      ctaStyle: "border border-gray-600 text-white hover:bg-gray-800",
+      highlight: false,
+      badge: null,
     },
     {
-      name: "Pro",
-      desc: "For recruiters and freelancers who verify daily.",
-      price: 29,
-      priceAnnual: 24,
-      popular: true,
+      name: "Starter",
+      description: "For individual recruiters",
+      monthlyPrice: 49,
+      annualPrice: 39,
+      verifications: "100 / month",
+      perCheck: "$0.49",
+      perCheckAnnual: "$0.39",
+      features: [
+        "100 verifications per month",
+        "AI-powered claim extraction",
+        "Source quality weighting",
+        "Confidence scores",
+        "Verification history",
+        "Email support",
+      ],
       cta: "Start 14-Day Free Trial",
-      ctaStyle: { background:C.blue,color:"#fff",boxShadow:`0 0 20px ${C.blueGlow}` },
+      ctaStyle: "bg-gray-700 text-white hover:bg-gray-600",
+      highlight: false,
+      badge: null,
+    },
+    {
+      name: "Professional",
+      description: "For HR teams",
+      monthlyPrice: 99,
+      annualPrice: 79,
+      verifications: "500 / month",
+      perCheck: "$0.20",
+      perCheckAnnual: "$0.16",
+      features: [
+        "500 verifications per month",
+        "Everything in Starter",
+        "Batch verification (multiple resumes)",
+        "Detailed source audit logs",
+        "Priority processing",
+        "Priority email support",
+      ],
+      cta: "Start 14-Day Free Trial",
+      ctaStyle: "bg-blue-600 text-white hover:bg-blue-700",
+      highlight: true,
+      badge: "Most Popular",
+    },
+    {
+      name: "Business",
+      description: "For teams that verify at scale",
+      monthlyPrice: 249,
+      annualPrice: 199,
+      verifications: "Unlimited",
+      perCheck: null,
       features: [
         "Unlimited verifications",
-        "Advanced claim extraction",
-        "All source tiers + anti-bias filter",
-        "Detailed confidence breakdowns",
-        "Full audit trail & export (PDF/CSV)",
-        "Priority source checking",
-        "Email support (24h response)",
+        "Everything in Professional",
+        "Team accounts (up to 10 users)",
+        "API access",
+        "Dedicated support",
+        "Custom integrations",
       ],
-      limits: [],
-    },
-    {
-      name: "Team",
-      desc: "For HR departments and agencies verifying at scale.",
-      price: 99,
-      priceAnnual: 79,
       cta: "Start 14-Day Free Trial",
-      ctaStyle: { background:"transparent",color:"#fff",border:`1px solid ${C.cardBorder}` },
-      features: [
-        "Everything in Pro",
-        "Up to 10 team members",
-        "Batch CSV upload (500 claims)",
-        "Team dashboard & analytics",
-        "REST API access (10K calls/mo)",
-        "Shared verification history",
-        "Slack & webhook integrations",
-        "Priority support (4h response)",
-      ],
-      limits: [],
-    },
-    {
-      name: "Enterprise",
-      desc: "For organizations with custom security and scale needs.",
-      price: null,
-      priceAnnual: null,
-      cta: "Contact Sales",
-      ctaStyle: { background:"transparent",color:"#fff",border:`1px solid ${C.cardBorder}` },
-      features: [
-        "Everything in Team",
-        "Unlimited team members",
-        "Unlimited API calls",
-        "SSO / SAML authentication",
-        "Custom integrations (ATS, CRM)",
-        "SOC 2 compliance report",
-        "Dedicated account manager",
-        "SLA with 99.9% uptime",
-        "On-premise deployment option",
-        "Custom AI model training",
-      ],
-      limits: [],
+      ctaStyle: "bg-gray-700 text-white hover:bg-gray-600",
+      highlight: false,
+      badge: null,
     },
   ];
 
-  const Check = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.green} strokeWidth="2.5" style={{ flexShrink:0 }}><path d="M5 12l5 5L20 7"/></svg>;
-  const Cross = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.dimmed} strokeWidth="2" style={{ flexShrink:0 }}><path d="M6 6l12 12M18 6L6 18"/></svg>;
-
   return (
-    <div style={{ minHeight:"100vh",color:"#fff",background:C.bg,fontFamily:'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif' }}>
-      <Navbar />
+    <div className="min-h-screen bg-gray-950 text-white">
+      {/* Header */}
+      <section className="pt-20 pb-8 px-6 text-center">
+        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          Simple, Honest Pricing
+        </h1>
+        <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-2">
+          Verify claims in seconds for a fraction of what traditional background
+          checks cost.
+        </p>
 
-      {/* Hero */}
-      <div style={{ textAlign:"center",padding:"64px 24px 40px",position:"relative" }}>
-        <div style={{ position:"absolute",top:"-200px",left:"50%",transform:"translateX(-50%)",width:"800px",height:"800px",borderRadius:"50%",background:`radial-gradient(circle, ${C.blueGlow}, transparent 70%)`,pointerEvents:"none" }}/>
-        <div style={{ position:"relative",zIndex:1 }}>
-          <h1 style={{ fontSize:"44px",fontWeight:800,color:"#fff",lineHeight:1.15,marginBottom:"12px",letterSpacing:"-0.02em" }}>
-            Simple, Transparent Pricing
-          </h1>
-          <p style={{ color:C.muted,fontSize:"17px",maxWidth:"500px",margin:"0 auto 28px" }}>
-            Start free. Upgrade when you need more. No hidden fees.
+        {/* Anchor against competitors */}
+        <p className="text-sm text-gray-500 mt-4">
+          Traditional background checks cost{" "}
+          <span className="text-red-400 font-semibold">$29.99–$79.99 per check</span>{" "}
+          and take days. Trustie starts at{" "}
+          <span className="text-green-400 font-semibold">$0.20 per verification</span>{" "}
+          and delivers in seconds.
+        </p>
+      </section>
+
+      {/* Annual/Monthly Toggle */}
+      <div className="flex items-center justify-center gap-4 pb-12">
+        <span
+          className={`text-sm ${!annual ? "text-white font-semibold" : "text-gray-500"}`}
+        >
+          Monthly
+        </span>
+        <button
+          onClick={() => setAnnual(!annual)}
+          className={`relative w-14 h-7 rounded-full transition-colors ${
+            annual ? "bg-blue-600" : "bg-gray-700"
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 w-6 h-6 bg-white rounded-full transition-transform ${
+              annual ? "translate-x-7" : "translate-x-0.5"
+            }`}
+          />
+        </button>
+        <span
+          className={`text-sm ${annual ? "text-white font-semibold" : "text-gray-500"}`}
+        >
+          Annual{" "}
+          <span className="text-green-400 font-semibold">(Save 20%)</span>
+        </span>
+      </div>
+
+      {/* Pricing Cards */}
+      <section className="px-6 pb-16">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-6">
+          {plans.map((plan) => (
+            <div
+              key={plan.name}
+              className={`relative rounded-2xl p-6 flex flex-col ${
+                plan.highlight
+                  ? "bg-gray-900 border-2 border-blue-500 shadow-lg shadow-blue-500/10"
+                  : "bg-gray-900 border border-gray-800"
+              }`}
+            >
+              {plan.badge && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                    {plan.badge}
+                  </span>
+                </div>
+              )}
+
+              <div className="mb-6">
+                <h3 className="text-xl font-bold">{plan.name}</h3>
+                <p className="text-sm text-gray-500 mt-1">{plan.description}</p>
+              </div>
+
+              <div className="mb-6">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-bold">
+                    ${annual ? plan.annualPrice : plan.monthlyPrice}
+                  </span>
+                  {plan.monthlyPrice > 0 && (
+                    <span className="text-gray-500">/mo</span>
+                  )}
+                </div>
+                {plan.monthlyPrice === 0 && (
+                  <p className="text-sm text-gray-500 mt-1">No credit card required</p>
+                )}
+                {annual && plan.monthlyPrice > 0 && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    <span className="line-through">${plan.monthlyPrice}/mo</span>{" "}
+                    billed annually
+                  </p>
+                )}
+                <p className="text-sm text-gray-400 mt-2">
+                  {plan.verifications} verifications
+                </p>
+                {plan.perCheck && (
+                  <p className="text-xs text-green-400 mt-1">
+                    {annual && plan.perCheckAnnual
+                      ? plan.perCheckAnnual
+                      : plan.perCheck}{" "}
+                    per verification
+                  </p>
+                )}
+              </div>
+
+              <ul className="space-y-3 mb-8 flex-grow">
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-sm">
+                    <span className="text-green-500 mt-0.5 flex-shrink-0">
+                      &#10003;
+                    </span>
+                    <span className="text-gray-300">{f}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                className={`w-full py-3 rounded-lg font-semibold transition-colors ${plan.ctaStyle}`}
+              >
+                {plan.cta}
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Risk Reversal — 14-Day Guarantee */}
+      <section className="py-12 px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="rounded-2xl p-8 bg-gray-900 border border-green-500/30">
+            <p className="text-2xl font-bold mb-3">14-Day Money-Back Guarantee</p>
+            <p className="text-gray-400">
+              Try any paid plan risk-free. If Trustie does not meet your needs
+              within the first 14 days, we will refund you in full. No questions
+              asked.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Cost Comparison — Anchor against alternatives */}
+      <section className="py-16 px-6">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-4">
+            How Trustie Compares
+          </h2>
+          <p className="text-center text-gray-500 mb-10 text-sm">
+            Pricing based on publicly available information as of March 2026.
           </p>
 
-          {/* Toggle */}
-          <div style={{ display:"inline-flex",alignItems:"center",gap:"12px",background:"rgba(30,41,66,0.5)",border:`1px solid ${C.cardBorder}`,borderRadius:"12px",padding:"4px" }}>
-            <button onClick={()=>setAnnual(false)} style={{ padding:"8px 20px",borderRadius:"10px",fontSize:"14px",fontWeight:600,border:"none",cursor:"pointer",background:!annual?"rgba(59,130,246,0.2)":"transparent",color:!annual?"#fff":C.muted }}>Monthly</button>
-            <button onClick={()=>setAnnual(true)} style={{ padding:"8px 20px",borderRadius:"10px",fontSize:"14px",fontWeight:600,border:"none",cursor:"pointer",background:annual?"rgba(59,130,246,0.2)":"transparent",color:annual?"#fff":C.muted,display:"flex",alignItems:"center",gap:"8px" }}>
-              Annual
-              <span style={{ fontSize:"11px",fontWeight:700,background:"rgba(34,197,94,0.15)",color:C.green,padding:"2px 8px",borderRadius:"9999px" }}>Save 20%</span>
-            </button>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-800">
+                  <th className="text-left py-4 px-4 text-gray-400 text-sm font-normal">
+                    &nbsp;
+                  </th>
+                  <th className="py-4 px-4 text-blue-400 font-bold">Trustie</th>
+                  <th className="py-4 px-4 text-gray-500">Checkr</th>
+                  <th className="py-4 px-4 text-gray-500">HireRight</th>
+                  <th className="py-4 px-4 text-gray-500">Manual</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm">
+                <tr className="border-b border-gray-800/50">
+                  <td className="py-3 px-4 text-gray-400">Cost per check</td>
+                  <td className="py-3 px-4 text-center text-green-400 font-bold">
+                    $0.20–$0.49
+                  </td>
+                  <td className="py-3 px-4 text-center text-gray-400">
+                    $29.99–$79.99
+                  </td>
+                  <td className="py-3 px-4 text-center text-gray-400">
+                    $30–$100+
+                  </td>
+                  <td className="py-3 px-4 text-center text-gray-400">
+                    1–2 hrs staff time
+                  </td>
+                </tr>
+                <tr className="border-b border-gray-800/50">
+                  <td className="py-3 px-4 text-gray-400">Speed</td>
+                  <td className="py-3 px-4 text-center text-green-400 font-bold">
+                    Seconds
+                  </td>
+                  <td className="py-3 px-4 text-center text-gray-400">
+                    3–5 business days
+                  </td>
+                  <td className="py-3 px-4 text-center text-gray-400">
+                    2–7 business days
+                  </td>
+                  <td className="py-3 px-4 text-center text-gray-400">
+                    Hours to days
+                  </td>
+                </tr>
+                <tr className="border-b border-gray-800/50">
+                  <td className="py-3 px-4 text-gray-400">
+                    AI claim extraction
+                  </td>
+                  <td className="py-3 px-4 text-center text-green-400">
+                    &#10003;
+                  </td>
+                  <td className="py-3 px-4 text-center text-red-400">&#10007;</td>
+                  <td className="py-3 px-4 text-center text-red-400">&#10007;</td>
+                  <td className="py-3 px-4 text-center text-red-400">&#10007;</td>
+                </tr>
+                <tr className="border-b border-gray-800/50">
+                  <td className="py-3 px-4 text-gray-400">Self-serve signup</td>
+                  <td className="py-3 px-4 text-center text-green-400">
+                    &#10003;
+                  </td>
+                  <td className="py-3 px-4 text-center text-green-400">
+                    &#10003;
+                  </td>
+                  <td className="py-3 px-4 text-center text-red-400">
+                    Sales call required
+                  </td>
+                  <td className="py-3 px-4 text-center text-gray-500">N/A</td>
+                </tr>
+                <tr className="border-b border-gray-800/50">
+                  <td className="py-3 px-4 text-gray-400">
+                    FCRA-compliant background check
+                  </td>
+                  <td className="py-3 px-4 text-center text-yellow-400">
+                    No*
+                  </td>
+                  <td className="py-3 px-4 text-center text-green-400">
+                    &#10003;
+                  </td>
+                  <td className="py-3 px-4 text-center text-green-400">
+                    &#10003;
+                  </td>
+                  <td className="py-3 px-4 text-center text-gray-500">
+                    Varies
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Honest disclaimer about FCRA */}
+          <p className="text-xs text-gray-600 mt-4 text-center">
+            *Trustie is an AI-powered verification tool, not an FCRA-compliant
+            consumer reporting agency. It is designed to supplement, not replace,
+            formal background check services. Use Trustie for fast preliminary
+            screening, then use Checkr or similar for legally required checks.
+          </p>
+        </div>
+      </section>
+
+      {/* Early Adopter Section — HONEST about being new */}
+      <section className="py-16 px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="rounded-2xl p-8 bg-gradient-to-br from-blue-900/30 to-purple-900/30 border border-blue-500/20">
+            <p className="text-xs text-blue-400 font-semibold uppercase tracking-wider mb-2">
+              Early Adopter Advantage
+            </p>
+            <h2 className="text-2xl font-bold mb-4">
+              You Are Getting In Early
+            </h2>
+            <p className="text-gray-400 mb-4">
+              Trustie is a new product, and we are transparent about that.
+              Current pricing is introductory. Early customers who sign up now
+              will keep these rates as we grow and add features.
+            </p>
+            <p className="text-gray-400">
+              We are actively improving accuracy based on user feedback. Every
+              verification you run helps make Trustie better for everyone.
+            </p>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Cards */}
-      <div style={{ maxWidth:"1200px",margin:"0 auto",padding:"0 24px 64px",display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"16px",alignItems:"start" }}>
-        {plans.map((p,i)=>(
-          <div key={p.name} style={{ background:p.popular?"rgba(59,130,246,0.06)":C.card,border:`1px solid ${p.popular?"rgba(59,130,246,0.3)":C.cardBorder}`,borderRadius:"16px",padding:"28px 24px",position:"relative",backdropFilter:"blur(8px)",boxShadow:p.popular?`0 0 40px rgba(59,130,246,0.12)`:"none" }}>
-            {p.popular&&<div style={{ position:"absolute",top:"-12px",left:"50%",transform:"translateX(-50%)",background:C.blue,color:"#fff",fontSize:"11px",fontWeight:700,padding:"4px 14px",borderRadius:"9999px",boxShadow:`0 0 12px ${C.blueGlow}` }}>MOST POPULAR</div>}
+      {/* FAQ — Handle objections */}
+      <section className="py-16 px-6">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">
+            Frequently Asked Questions
+          </h2>
 
-            <p style={{ color:"#fff",fontSize:"20px",fontWeight:700,marginBottom:"4px" }}>{p.name}</p>
-            <p style={{ color:C.dimmed,fontSize:"13px",marginBottom:"20px",minHeight:"36px" }}>{p.desc}</p>
-
-            {p.price!==null ? (
-              <div style={{ marginBottom:"20px" }}>
-                <span style={{ fontSize:"40px",fontWeight:800,color:"#fff",letterSpacing:"-0.02em" }}>${annual?p.priceAnnual:p.price}</span>
-                <span style={{ color:C.muted,fontSize:"14px" }}>/mo</span>
-                {annual&&p.price>0&&<p style={{ color:C.green,fontSize:"12px",marginTop:"2px" }}>Billed annually (${(annual?p.priceAnnual:p.price)*12}/yr)</p>}
-              </div>
-            ) : (
-              <div style={{ marginBottom:"20px" }}>
-                <span style={{ fontSize:"32px",fontWeight:800,color:"#fff" }}>Custom</span>
-                <p style={{ color:C.muted,fontSize:"13px",marginTop:"4px" }}>Tailored to your needs</p>
-              </div>
-            )}
-
-            <a href="#" style={{ display:"block",textAlign:"center",padding:"12px",borderRadius:"10px",fontSize:"14px",fontWeight:600,textDecoration:"none",marginBottom:"24px",...p.ctaStyle }}>{p.cta}</a>
-
-            <div style={{ display:"flex",flexDirection:"column",gap:"10px" }}>
-              {p.features.map(f=>(
-                <div key={f} style={{ display:"flex",alignItems:"flex-start",gap:"10px" }}>
-                  <Check/>
-                  <span style={{ color:C.text,fontSize:"13px",lineHeight:1.4 }}>{f}</span>
-                </div>
-              ))}
-              {p.limits.map(f=>(
-                <div key={f} style={{ display:"flex",alignItems:"flex-start",gap:"10px" }}>
-                  <Cross/>
-                  <span style={{ color:C.dimmed,fontSize:"13px",lineHeight:1.4 }}>{f}</span>
-                </div>
-              ))}
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-lg font-bold mb-2">
+                Is Trustie a replacement for background check services like
+                Checkr?
+              </h3>
+              <p className="text-gray-400">
+                No. Trustie is a fast, AI-powered preliminary screening tool.
+                It searches publicly available information to verify claims in
+                seconds. For legally required FCRA-compliant background checks
+                (criminal records, credit checks, etc.), you should still use a
+                service like Checkr. Trustie helps you screen faster before
+                investing in a full background check.
+              </p>
             </div>
-          </div>
-        ))}
-      </div>
 
-      {/* FAQ */}
-      <div style={{ maxWidth:"700px",margin:"0 auto",padding:"0 24px 64px" }}>
-        <h2 style={{ fontSize:"28px",fontWeight:700,color:"#fff",textAlign:"center",marginBottom:"32px" }}>Frequently Asked Questions</h2>
-        {[
-          { q:"Is there really a free plan?", a:"Yes. 5 verifications per day, forever. No credit card required. We want you to see the value before you pay." },
-          { q:"Can I cancel anytime?", a:"Absolutely. No contracts, no cancellation fees. Cancel from your dashboard in one click." },
-          { q:"What counts as one verification?", a:"One verification = one piece of text submitted. It can contain multiple claims — we extract and verify each claim individually at no extra cost." },
-          { q:"Do you offer discounts for startups or nonprofits?", a:"Yes. Email us at support@trustieapp.com with details about your organization and we will work something out." },
-          { q:"What payment methods do you accept?", a:"All major credit cards (Visa, Mastercard, Amex) via Stripe. Enterprise customers can pay via invoice." },
-          { q:"Is my data secure?", a:"Yes. We are SOC 2 compliant. We do not store the content you verify — it is processed in real-time and discarded. See our Security page for details." },
-        ].map((faq,i)=>(
-          <details key={i} style={{ marginBottom:"8px",background:C.card,border:`1px solid ${C.cardBorder}`,borderRadius:"12px",overflow:"hidden" }}>
-            <summary style={{ padding:"16px 20px",color:"#fff",fontSize:"15px",fontWeight:600,cursor:"pointer",listStyle:"none",display:"flex",justifyContent:"space-between",alignItems:"center" }}>
-              {faq.q}
-              <span style={{ color:C.dimmed,fontSize:"18px" }}>+</span>
-            </summary>
-            <div style={{ padding:"0 20px 16px" }}>
-              <p style={{ color:C.muted,fontSize:"14px",lineHeight:1.6 }}>{faq.a}</p>
+            <div>
+              <h3 className="text-lg font-bold mb-2">
+                How accurate is Trustie?
+              </h3>
+              <p className="text-gray-400">
+                Trustie uses AI to search publicly available sources and provides
+                confidence scores with every verification. No AI system is 100%
+                accurate. We show you the sources so you can verify the results
+                yourself. We recommend using Trustie as one input in your
+                decision-making process, not the sole factor.
+              </p>
             </div>
-          </details>
-        ))}
-      </div>
 
-      {/* CTA */}
-      <div style={{ textAlign:"center",padding:"48px 24px 32px",borderTop:`1px solid ${C.line}` }}>
-        <h2 style={{ fontSize:"28px",fontWeight:700,color:"#fff",marginBottom:"12px" }}>Still not sure? Start free.</h2>
-        <p style={{ color:C.muted,fontSize:"15px",marginBottom:"24px" }}>5 verifications per day. No credit card. No commitment.</p>
-        <a href="#" style={{ background:C.blue,color:"#fff",padding:"12px 32px",borderRadius:"10px",fontSize:"15px",fontWeight:600,textDecoration:"none",boxShadow:`0 0 20px ${C.blueGlow}` }}>Get Started Free</a>
-      </div>
-
-      {/* Footer */}
-      <footer style={{ borderTop:`1px solid ${C.line}`,padding:"48px 24px 32px",marginTop:"32px" }}>
-        <div style={{ maxWidth:"1100px",margin:"0 auto",display:"grid",gridTemplateColumns:"1.5fr 1fr 1fr 1fr",gap:"40px" }}>
-          <div>
-            <div style={{ display:"flex",alignItems:"center",gap:"10px",marginBottom:"12px" }}>
-              <div style={{ width:28,height:28,borderRadius:"50%",background:C.blue,display:"flex",alignItems:"center",justifyContent:"center" }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><path d="M9 12l2 2 4-4"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              </div>
-              <span style={{ color:"#fff",fontWeight:700,fontSize:"16px" }}>Trustie</span>
+            <div>
+              <h3 className="text-lg font-bold mb-2">
+                Can I cancel anytime?
+              </h3>
+              <p className="text-gray-400">
+                Yes. All paid plans are month-to-month (or annual if you choose).
+                Cancel anytime from your account settings. No cancellation fees.
+                If you cancel within 14 days, you get a full refund.
+              </p>
             </div>
-            <p style={{ color:C.dimmed,fontSize:"13px",lineHeight:1.6,maxWidth:"260px" }}>AI-powered verification for businesses. Stop resume fraud, verify claims, and build trust in every hire.</p>
-          </div>
-          <div>
-            <p style={{ color:"#fff",fontWeight:600,fontSize:"14px",marginBottom:"14px" }}>Legal</p>
-            {["Privacy Policy","Terms of Service","Refund Policy"].map(l=>(<a key={l} href="#" style={{ display:"block",color:C.dimmed,fontSize:"13px",textDecoration:"none",marginBottom:"10px" }}>{l}</a>))}
-          </div>
-          <div>
-            <p style={{ color:"#fff",fontWeight:600,fontSize:"14px",marginBottom:"14px" }}>Pages</p>
-            {["Proof","Pricing","Help","Blog","How it works","Database"].map(l=>(<a key={l} href="#" style={{ display:"block",color:C.dimmed,fontSize:"13px",textDecoration:"none",marginBottom:"10px" }}>{l}</a>))}
-          </div>
-          <div>
-            <p style={{ color:"#fff",fontWeight:600,fontSize:"14px",marginBottom:"14px" }}>Use Cases</p>
-            {["Resume Verification","HR Background Checks","Insurance Claims","Legal Due Diligence","Journalism","Academic Research","Enterprise API"].map(l=>(<a key={l} href="#" style={{ display:"block",color:C.dimmed,fontSize:"13px",textDecoration:"none",marginBottom:"10px" }}>{l}</a>))}
+
+            <div>
+              <h3 className="text-lg font-bold mb-2">
+                What counts as one verification?
+              </h3>
+              <p className="text-gray-400">
+                One verification is one text submission. For example, pasting one
+                resume and clicking &quot;Verify&quot; counts as one
+                verification. Trustie automatically extracts all claims from that
+                submission and verifies each one.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold mb-2">
+                What happens if I run out of verifications?
+              </h3>
+              <p className="text-gray-400">
+                You will be prompted to upgrade to a higher plan. You will not be
+                charged overage fees without your consent.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold mb-2">
+                Is my data secure?
+              </h3>
+              <p className="text-gray-400">
+                Trustie does not store the content you submit for verification
+                beyond what is needed to deliver results. We do not sell or share
+                your data. All connections are encrypted via HTTPS.
+              </p>
+            </div>
           </div>
         </div>
-      </footer>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-20 px-6 text-center">
+        <h2 className="text-3xl font-bold mb-4">Start Verifying Today</h2>
+        <p className="text-gray-400 mb-8 max-w-lg mx-auto">
+          5 free verifications. No credit card required. See how Trustie works
+          in under 60 seconds.
+        </p>
+        <a
+          href="/app"
+          className="inline-block px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-lg"
+        >
+          Try Trustie Free
+        </a>
+      </section>
     </div>
   );
 }
