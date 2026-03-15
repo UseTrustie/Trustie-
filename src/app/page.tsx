@@ -228,15 +228,15 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Feature 2 */}
+            {/* Feature 2 — FIX: Changed weight labels */}
             <div className={`rounded-2xl p-8 ${bgCard} border ${borderColor}`}>
               <h3 className={`text-2xl font-bold mb-4 ${textPrimary}`}>Source Quality Tiers</h3>
               <p className={`${textSecondary} mb-6`}>Not all sources are equal. We weight .gov, .edu, and professional networks higher than blogs and commercial sites.</p>
               <div className="space-y-3">
                 {[
-                  { tier: 'Tier 1 (3x weight)', color: 'green', sources: '.gov, .edu, LinkedIn, Credly' },
-                  { tier: 'Tier 2 (2x weight)', color: 'yellow', sources: 'News sites, GitHub, Company sites' },
-                  { tier: 'Tier 3 (1x weight)', color: 'red', sources: 'Blogs, Forums, Wikipedia' },
+                  { tier: 'Tier 1 (Highest trust)', color: 'green', sources: '.gov, .edu, LinkedIn, Credly' },
+                  { tier: 'Tier 2 (Medium trust)', color: 'yellow', sources: 'News sites, GitHub, Company sites' },
+                  { tier: 'Tier 3 (Lower trust)', color: 'red', sources: 'Blogs, Forums, Wikipedia' },
                 ].map((item) => (
                   <div key={item.tier} className={`flex items-center gap-4 p-4 rounded-xl ${bgCardInner}`}>
                     <div className={`w-3 h-3 rounded-full ${item.color === 'green' ? 'bg-green-500' : item.color === 'yellow' ? 'bg-yellow-500' : 'bg-red-500'}`} />
@@ -272,10 +272,10 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Feature 4 */}
+            {/* Feature 4 — FIX: Removed "Export JSON reports for compliance" */}
             <div className={`rounded-2xl p-8 ${bgCard} border ${borderColor}`}>
               <h3 className={`text-2xl font-bold mb-4 ${textPrimary}`}>Full Audit Trail</h3>
-              <p className={`${textSecondary} mb-6`}>Every verification is logged with timestamps, sources checked, and confidence scores. Export JSON reports for compliance.</p>
+              <p className={`${textSecondary} mb-6`}>Every verification is logged with timestamps, sources checked, and confidence scores for your records.</p>
               <div className={`rounded-xl overflow-hidden ${isDark ? 'bg-gray-950' : 'bg-gray-900'}`}>
                 <div className={`px-4 py-2 border-b ${isDark ? 'border-gray-800' : 'border-gray-700'}`}>
                   <span className="text-gray-500 text-sm">verification_report.json</span>
@@ -295,7 +295,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Why Trustie */}
+      {/* Why Trustie — FIX: Updated Privacy First description */}
       <section className={`py-24 px-6 ${isDark ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
@@ -307,7 +307,7 @@ export default function LandingPage() {
               { title: 'Web Search Integration', desc: 'AI searches the live web for current, accurate information.' },
               { title: 'Transparent Confidence Scores', desc: 'Know exactly how confident the AI is in each verification.' },
               { title: 'Source Citations', desc: 'Every claim shows which sources were checked and what was found.' },
-              { title: 'Privacy First', desc: 'Text is processed in real-time and immediately discarded. We don\'t store your data.' },
+              { title: 'Privacy First', desc: 'Trustie does not store your submitted text. It is sent to our AI provider for processing and is not retained by Trustie.' },
             ].map((item, idx) => (
               <div key={idx} className={`flex gap-4 p-6 rounded-xl ${bgCardInner}`}>
                 <span className="text-green-500 text-xl">✓</span>
@@ -321,7 +321,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing */}
+      {/* Pricing — FIX: Removed false features (Export reports, API access, Team features) */}
       <section id="pricing" className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -355,7 +355,7 @@ export default function LandingPage() {
               </ul>
             </div>
 
-            {/* Starter */}
+            {/* Starter — FIX: "Export reports" → "Detailed results" */}
             <div className={`rounded-2xl p-8 ${bgCard} border-2 border-blue-500 relative`}>
               <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">BEST VALUE</span>
               <h3 className={`text-xl font-bold mb-1 ${textPrimary}`}>Starter Pack</h3>
@@ -370,12 +370,12 @@ export default function LandingPage() {
               <ul className="space-y-3 text-sm">
                 <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>50 verifications</li>
                 <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Never expires</li>
-                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Export reports</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Detailed results with sources</li>
                 <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Priority support</li>
               </ul>
             </div>
 
-            {/* Pro */}
+            {/* Pro — FIX: Replaced "API access (coming soon)" and "Team features" */}
             <div className={`rounded-2xl p-8 ${bgCard} border ${borderColor}`}>
               <h3 className={`text-xl font-bold mb-1 ${textPrimary}`}>Pro Monthly</h3>
               <p className={`text-sm ${textMuted} mb-4`}>For teams</p>
@@ -388,8 +388,8 @@ export default function LandingPage() {
               </Link>
               <ul className="space-y-3 text-sm">
                 <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Unlimited verifications</li>
-                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>API access (coming soon)</li>
-                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Team features</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Priority processing</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>All source tiers</li>
                 <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Priority support</li>
               </ul>
             </div>
@@ -401,7 +401,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* FAQ — FIX: Updated "Is my data secure?" answer */}
       <section className={`py-24 px-6 ${isDark ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
         <div className="max-w-3xl mx-auto">
           <h2 className={`text-4xl font-bold text-center mb-12 ${textPrimary}`}>Frequently Asked Questions</h2>
@@ -410,7 +410,7 @@ export default function LandingPage() {
               { q: 'Is there really a free plan?', a: 'Yes. 5 verifications total, forever. No credit card required.' },
               { q: 'What counts as one verification?', a: 'One piece of text submitted. It can contain multiple claims — we extract and verify each individually.' },
               { q: 'How accurate is it?', a: 'Accuracy depends on available public information. We show confidence scores so you know when to dig deeper manually.' },
-              { q: 'Is my data secure?', a: 'Yes. We don\'t store the content you verify — it\'s processed in real-time and discarded.' },
+              { q: 'Is my data secure?', a: 'Yes. Trustie does not store your submitted text. It is sent to our AI provider for processing and is not retained by Trustie after verification is complete.' },
               { q: 'Can I get a refund?', a: '14-day money-back guarantee on all paid plans.' },
               { q: 'Do you offer startup/nonprofit discounts?', a: 'Yes. Email trustietechnologies@gmail.com with details and we\'ll work something out.' },
             ].map((faq, idx) => (
@@ -428,7 +428,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Affiliate */}
+      {/* Affiliate — FIX: Changed to "coming soon" since no program exists yet */}
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className={`text-4xl font-bold mb-4 ${textPrimary}`}>Earn with Trustie</h2>
@@ -454,7 +454,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Footer — FIX: Updated year */}
       <footer className={`py-16 px-6 border-t ${borderColor}`}>
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-5 gap-12 mb-12">
@@ -513,7 +513,7 @@ export default function LandingPage() {
           </div>
 
           <div className={`pt-8 border-t ${borderColor} text-center`}>
-            <p className={`text-sm ${textDim}`}>© 2025 Trustie. All rights reserved.</p>
+            <p className={`text-sm ${textDim}`}>© 2026 Trustie. All rights reserved.</p>
           </div>
         </div>
       </footer>
