@@ -80,7 +80,8 @@ export default function HelpPage() {
 
 function GettingStarted({ authLink }: { authLink: string }) {
   const steps = [
-    { title: 'Create an account', description: 'Sign up at trustieapp.com — free, no credit card required.' },
+    // FIX: Removed "trustieapp.com" — may not resolve
+    { title: 'Create an account', description: 'Sign up for free, no credit card required.' },
     { title: 'Open the verification tool', description: 'Go to the App page to access the verification interface.' },
     { title: 'Paste your text', description: 'Copy and paste a resume, bio, or any text with claims to verify.' },
     { title: 'Click Verify', description: 'Trustie extracts claims and verifies each one against multiple sources.' },
@@ -147,22 +148,23 @@ function Verification() {
           </div>
         </div>
 
+        {/* FIX: Changed weight labels to match home page */}
         <div className="rounded-xl p-6 bg-gray-900 border border-gray-800">
           <h3 className="font-semibold mb-3 text-white">Source Tiers</h3>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <span className="w-3 h-3 rounded-full bg-green-500"></span>
-              <span className="text-white">Tier 1 (3x weight)</span>
+              <span className="text-white">Tier 1 (Highest trust)</span>
               <span className="text-gray-500">— .gov, .edu, LinkedIn, Credly</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
-              <span className="text-white">Tier 2 (2x weight)</span>
+              <span className="text-white">Tier 2 (Medium trust)</span>
               <span className="text-gray-500">— News, GitHub, company sites</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="w-3 h-3 rounded-full bg-red-500"></span>
-              <span className="text-white">Tier 3 (1x weight)</span>
+              <span className="text-white">Tier 3 (Lower trust)</span>
               <span className="text-gray-500">— Wikipedia, blogs, forums</span>
             </div>
           </div>
@@ -227,7 +229,8 @@ function FAQ() {
   const faqs = [
     { q: 'What can Trustie verify?', a: 'Employment history, education credentials, certifications, achievements, and any factual claims in text.' },
     { q: 'How accurate is it?', a: 'Accuracy depends on available public information. We show confidence scores so you know when to verify manually.' },
-    { q: 'Is my data stored?', a: 'No. Text is processed in real-time and immediately discarded.' },
+    // FIX: Updated data storage answer to be honest about AI provider
+    { q: 'Is my data stored?', a: 'Trustie does not store your submitted text. It is sent to our AI provider for processing and is not retained by Trustie after verification is complete.' },
     { q: 'What sources do you check?', a: 'LinkedIn, .edu/.gov sites, company websites, news archives, professional certification bodies, and more.' },
   ];
 
