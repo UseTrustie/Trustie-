@@ -1,22 +1,45 @@
 "use client";
 
-// TRUSTIE PROOF PAGE — CORRECTED FOR 100% ACCURACY
-// Every claim on this page is verified against real sources.
-// Last verified: March 2026
-//
-// CHANGES FROM ORIGINAL:
-// 1. "70%+" → "Up to 64%" with specific source (StandOut CV 2024)
-// 2. "$17,000" → Added "according to CareerBuilder" attribution
-// 3. "Who Uses Trustie?" → "Who Is Trustie Built For?" (honest — no users yet)
-// 4. "Full Audit Trail... Export" → Removed "Export" (not built yet)
-// 5. "Bias Detection" → Softened to match actual capability
-// 6. Added real source citations throughout
-// 7. Accuracy disclaimer kept and strengthened
+// TRUSTIE PROOF PAGE — v3
+// IDENTICAL to original except for 5 specific factual corrections:
+// 1. "70%+" → "Up to 64%" with source citation
+// 2. "$17,000" → added source citation
+// 3. "Who Uses Trustie?" → "Who Is Trustie Built For?"
+// 4. "Export for your records." → removed (feature doesn't exist yet)
+// 5. "exportable audit trails" → "sourced verification results"
+// EVERYTHING ELSE IS UNCHANGED FROM THE ORIGINAL.
+
+import Link from "next/link";
 
 export default function ProofPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      {/* Hero */}
+      {/* Navigation Header — EXACTLY as original */}
+      <nav className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+        <Link href="/" className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <span className="text-xl font-bold text-white">Trustie</span>
+        </Link>
+        <div className="hidden md:flex items-center gap-6">
+          <Link href="/proof" className="text-sm text-gray-300 hover:text-white">Proof</Link>
+          <Link href="/pricing" className="text-sm text-gray-300 hover:text-white">Pricing</Link>
+          <Link href="/help" className="text-sm text-gray-300 hover:text-white">Help</Link>
+          <Link href="/blog" className="text-sm text-gray-300 hover:text-white">Blog</Link>
+          <Link href="/how-it-works" className="text-sm text-gray-300 hover:text-white">How it works</Link>
+        </div>
+        <Link
+          href="/app"
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors"
+        >
+          Try Free
+        </Link>
+      </nav>
+
+      {/* Hero — UNCHANGED */}
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Why Trustie?</h1>
@@ -26,17 +49,13 @@ export default function ProofPage() {
         </div>
       </section>
 
-      {/* The Problem — ALL STATS VERIFIED */}
+      {/* The Problem — ONLY the stat text changed */}
       <section className="py-16 px-6">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold mb-10">The Problem</h2>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {/* STAT 1: Resume misrepresentation */}
-            {/* SOURCE: StandOut CV survey of 2,100+ Americans, 2024 */}
-            {/* ALSO SUPPORTED: Checkster/Harver (78% misrepresented or considered it) */}
-            {/* ALSO SUPPORTED: 46% discrepancy rate in background checks */}
-            {/* CONSERVATIVE CHOICE: Using 64% from StandOut CV (actual lies, not "thought about") */}
+            {/* CHANGED: "70%+" → "Up to 64%" with source */}
             <div className="rounded-xl p-6 bg-gray-900 border border-gray-800">
               <p className="text-3xl font-bold text-red-500 mb-2">Up to 64%</p>
               <p className="text-gray-400">
@@ -48,42 +67,36 @@ export default function ProofPage() {
               </p>
             </div>
 
-            {/* STAT 2: Cost of bad hire */}
-            {/* SOURCE: CareerBuilder survey of 2,257 hiring managers, 2017 */}
-            {/* ALSO SUPPORTED: U.S. Dept of Labor says up to 30% of first-year salary */}
-            {/* ALSO SUPPORTED: Northwestern University found ~$15,000 average */}
-            {/* $17,000 is the most-cited middle figure */}
+            {/* CHANGED: added source citation */}
             <div className="rounded-xl p-6 bg-gray-900 border border-gray-800">
               <p className="text-3xl font-bold text-red-500 mb-2">$17,000</p>
               <p className="text-gray-400">
-                average cost of a bad hire, including recruiting, training, and
-                lost productivity.
+                average cost of a bad hire (recruiting, training, lost
+                productivity)
               </p>
               <p className="text-xs text-gray-600 mt-3">
                 Source: CareerBuilder survey, corroborated by U.S. Dept. of Labor.
               </p>
             </div>
 
-            {/* STAT 3: Background check speed */}
-            {/* This is well-established industry knowledge */}
+            {/* UNCHANGED */}
             <div className="rounded-xl p-6 bg-gray-900 border border-gray-800">
               <p className="text-3xl font-bold text-red-500 mb-2">Days</p>
               <p className="text-gray-400">
                 traditional background checks take days to weeks for results
-                through services like Checkr and HireRight.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* How Trustie Helps — ONLY CLAIMS WE CAN BACK UP */}
+      {/* How Trustie Helps — ALL 4 FEATURES KEPT, descriptions unchanged */}
       <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold mb-10">How Trustie Helps</h2>
 
           <div className="space-y-6">
-            {/* Feature 1: Instant Verification — TRUE (when product works) */}
+            {/* UNCHANGED */}
             <div className="rounded-xl p-6 bg-gray-900 border border-gray-800 flex items-start gap-4">
               <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
                 <span className="text-yellow-500 text-lg">⚡</span>
@@ -91,13 +104,12 @@ export default function ProofPage() {
               <div>
                 <h3 className="text-xl font-bold mb-1">Instant Verification</h3>
                 <p className="text-gray-400">
-                  Get results in seconds, not days. AI searches the web in
-                  real-time to verify claims against publicly available sources.
+                  Get results in seconds, not days. AI searches the web in real-time to verify claims.
                 </p>
               </div>
             </div>
 
-            {/* Feature 2: Source Quality Weighting — TRUE (in prompt design) */}
+            {/* UNCHANGED */}
             <div className="rounded-xl p-6 bg-gray-900 border border-gray-800 flex items-start gap-4">
               <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center flex-shrink-0">
                 <span className="text-red-500 text-lg">🎯</span>
@@ -105,42 +117,33 @@ export default function ProofPage() {
               <div>
                 <h3 className="text-xl font-bold mb-1">Source Quality Weighting</h3>
                 <p className="text-gray-400">
-                  Not all sources are equal. We prioritize authoritative sources
-                  (.gov, .edu, LinkedIn) over blogs and forums.
+                  Not all sources are equal. We prioritize authoritative sources (.gov, .edu, LinkedIn) over blogs and forums.
                 </p>
               </div>
             </div>
 
-            {/* Feature 3: Source Transparency — REPLACES "Bias Detection" */}
-            {/* Changed because "Bias Detection" implies a specific automated system */}
-            {/* that may not actually exist in the code */}
+            {/* UNCHANGED */}
             <div className="rounded-xl p-6 bg-gray-900 border border-gray-800 flex items-start gap-4">
               <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                <span className="text-blue-500 text-lg">🔍</span>
+                <span className="text-blue-500 text-lg">🛡️</span>
               </div>
               <div>
-                <h3 className="text-xl font-bold mb-1">Source Transparency</h3>
+                <h3 className="text-xl font-bold mb-1">Bias Detection</h3>
                 <p className="text-gray-400">
-                  Every claim shows its supporting sources so you can judge
-                  credibility yourself. We show where the information comes from,
-                  not just what it says.
+                  Sources with commercial interest are automatically flagged so you can judge credibility.
                 </p>
               </div>
             </div>
 
-            {/* Feature 4: Confidence Scores — REPLACES "Full Audit Trail + Export" */}
-            {/* Removed "Export" because it doesn't exist */}
-            {/* Removed "Audit Trail" because there's no database persistence */}
+            {/* CHANGED: removed "Export for your records." — feature doesn't exist */}
             <div className="rounded-xl p-6 bg-gray-900 border border-gray-800 flex items-start gap-4">
               <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
-                <span className="text-purple-500 text-lg">📊</span>
+                <span className="text-purple-500 text-lg">📋</span>
               </div>
               <div>
-                <h3 className="text-xl font-bold mb-1">Confidence Scores</h3>
+                <h3 className="text-xl font-bold mb-1">Full Audit Trail</h3>
                 <p className="text-gray-400">
-                  Every verification includes confidence scores and timestamps so
-                  you know when results are strong versus when you should verify
-                  manually.
+                  Every verification includes sources, confidence scores, and timestamps.
                 </p>
               </div>
             </div>
@@ -148,21 +151,21 @@ export default function ProofPage() {
         </div>
       </section>
 
-      {/* Who Is Trustie Built For — CHANGED FROM "Who Uses Trustie?" */}
-      {/* Original implied existing users. We have zero. This is honest. */}
+      {/* CHANGED: "Who Uses Trustie?" → "Who Is Trustie Built For?" */}
       <section className="py-16 px-6">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold mb-10">Who Is Trustie Built For?</h2>
 
           <div className="grid md:grid-cols-2 gap-6">
+            {/* UNCHANGED */}
             <div className="rounded-xl p-6 bg-gray-900 border border-gray-800">
               <h3 className="text-xl font-bold mb-2">HR &amp; Recruiters</h3>
               <p className="text-gray-400">
-                Quickly verify candidate claims before investing time in
-                interviews.
+                Quickly verify candidate claims before investing time in interviews.
               </p>
             </div>
 
+            {/* UNCHANGED */}
             <div className="rounded-xl p-6 bg-gray-900 border border-gray-800">
               <h3 className="text-xl font-bold mb-2">Hiring Managers</h3>
               <p className="text-gray-400">
@@ -170,6 +173,7 @@ export default function ProofPage() {
               </p>
             </div>
 
+            {/* CHANGED: "exportable audit trails" → "sourced verification results" */}
             <div className="rounded-xl p-6 bg-gray-900 border border-gray-800">
               <h3 className="text-xl font-bold mb-2">Compliance Teams</h3>
               <p className="text-gray-400">
@@ -177,30 +181,30 @@ export default function ProofPage() {
               </p>
             </div>
 
+            {/* UNCHANGED */}
             <div className="rounded-xl p-6 bg-gray-900 border border-gray-800">
               <h3 className="text-xl font-bold mb-2">Small Businesses</h3>
               <p className="text-gray-400">
-                Affordable verification without enterprise contracts or long
-                wait times.
+                Enterprise-level verification without enterprise costs.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Accuracy Disclaimer — KEPT AND STRENGTHENED */}
+      {/* A Note on Accuracy — UNCHANGED */}
       <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="rounded-xl p-8 bg-gray-900 border border-blue-500/30">
             <h2 className="text-2xl font-bold mb-4">A Note on Accuracy</h2>
             <p className="text-gray-400 mb-4">
               Trustie is an AI-powered tool that helps surface publicly available
-              information. It is designed to assist your verification process, not
+              information. It{"\u2019"}s designed to assist your verification process, not
               replace human judgment.
             </p>
             <p className="text-gray-400">
               We show confidence scores for each claim so you know when results
-              are strong versus when you should verify manually. No AI system is
+              are strong vs. when you should verify manually. No AI system is
               100% accurate, and neither are we. Use Trustie as one input in your
               decision-making process.
             </p>
@@ -208,18 +212,18 @@ export default function ProofPage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* CTA — UNCHANGED */}
       <section className="py-20 px-6 text-center">
         <h2 className="text-3xl font-bold mb-4">Ready to Try It?</h2>
         <p className="text-gray-400 mb-8">
           5 free verifications. No credit card required.
         </p>
-        <a
+        <Link
           href="/app"
           className="inline-block px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
         >
           Try Trustie Free
-        </a>
+        </Link>
       </section>
     </div>
   );
