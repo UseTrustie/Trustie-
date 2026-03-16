@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
+import Footer from "@/components/Footer";
 
 export default function PricingPage() {
   const { isSignedIn } = useUser();
@@ -370,6 +371,8 @@ export default function PricingPage() {
           Try Trustie Free
         </Link>
       </section>
+
+      <Footer />
     </div>
   );
 }
