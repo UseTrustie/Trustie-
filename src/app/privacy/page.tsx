@@ -24,13 +24,14 @@ export default function PrivacyPage() {
 
       <main className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-4xl font-bold mb-4">Privacy Policy</h1>
-        <p className="text-gray-500 mb-12">Last updated: March 1, 2025</p>
+        {/* FIX: 2025 → 2026 */}
+        <p className="text-gray-500 mb-12">Last updated: March 15, 2026</p>
 
         <div className="space-y-8 text-gray-300">
           <section>
             <h2 className="text-2xl font-bold mb-4 text-white">Overview</h2>
             <p>
-              Trustie ("we", "our", or "us") is committed to protecting your privacy. This policy explains how we handle your information when you use our verification service.
+              Trustie (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) is committed to protecting your privacy. This policy explains how we handle your information when you use our verification service.
             </p>
           </section>
 
@@ -40,16 +41,17 @@ export default function PrivacyPage() {
             <ul className="list-disc list-inside space-y-2 text-gray-400">
               <li><strong className="text-gray-300">Account Information:</strong> Email address and name when you sign up</li>
               <li><strong className="text-gray-300">Usage Data:</strong> Number of verifications used (for plan limits)</li>
-              <li><strong className="text-gray-300">Payment Information:</strong> Processed securely by Stripe; we don't store card details</li>
+              <li><strong className="text-gray-300">Payment Information:</strong> Processed securely by Stripe; we don&apos;t store card details</li>
             </ul>
           </section>
 
+          {/* FIX: Updated to be honest about AI provider processing */}
           <section>
             <h2 className="text-2xl font-bold mb-4 text-white">Text You Submit</h2>
             <div className="rounded-xl p-6 bg-green-500/10 border border-green-500/30">
-              <p className="text-green-400 font-medium mb-2">We do NOT store the text you verify.</p>
+              <p className="text-green-400 font-medium mb-2">Trustie does NOT store the text you verify.</p>
               <p className="text-gray-400">
-                Content submitted for verification is processed in real-time and immediately discarded. We don't save resumes, bios, or any text you submit.
+                Content submitted for verification is sent to our AI provider (Anthropic) for processing and is not retained by Trustie. We do not save resumes, bios, or any text you submit. Please review Anthropic&apos;s privacy policy for details on how they handle data sent through their API.
               </p>
             </div>
           </section>
@@ -70,7 +72,8 @@ export default function PrivacyPage() {
             <ul className="list-disc list-inside space-y-2 text-gray-400">
               <li><strong className="text-gray-300">Clerk:</strong> Authentication</li>
               <li><strong className="text-gray-300">Stripe:</strong> Payment processing</li>
-              <li><strong className="text-gray-300">Anthropic:</strong> AI verification (Claude)</li>
+              {/* FIX: Added note that submitted text is sent to Anthropic */}
+              <li><strong className="text-gray-300">Anthropic:</strong> AI verification (Claude) — submitted text is sent to Anthropic for processing</li>
               <li><strong className="text-gray-300">Vercel:</strong> Hosting</li>
             </ul>
           </section>
