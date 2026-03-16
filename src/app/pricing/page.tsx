@@ -1,21 +1,12 @@
 "use client";
 
 import { useState } from "react";
-
-// TRUSTIE PRICING PAGE — OPTIMIZED FOR CONVERSION
-// Design principles applied:
-// 1. 3 tiers + enterprise (proven optimal: 3-4 tiers)
-// 2. "Most Popular" badge on middle tier (anchoring)
-// 3. Annual toggle with 20% savings (standard SaaS)
-// 4. Cost-per-verification breakdown (value clarity)
-// 5. Anchored against Checkr pricing ($29.99/check vs $0.20/check)
-// 6. 14-day money-back guarantee (risk reversal)
-// 7. FAQ section (objection handling)
-// 8. NO fake testimonials, NO fake user counts
-// 9. "Early Adopter" framing — honest about being new
-// 10. Clear CTAs with minimal friction
+import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
 
 export default function PricingPage() {
+  const { isSignedIn } = useUser();
+  const authLink = isSignedIn ? "/app" : "/sign-up";
   const [annual, setAnnual] = useState(false);
 
   const plans = [
@@ -103,6 +94,30 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
+      {/* Nav Bar */}
+      <header className="sticky top-0 z-50 bg-gray-950/95 border-b border-gray-800 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span className="text-xl font-bold">Trustie</span>
+          </Link>
+          <div className="hidden md:flex items-center gap-8">
+            <Link href="/proof" className="text-gray-400 hover:text-white text-sm">Proof</Link>
+            <Link href="/#pricing" className="text-white text-sm">Pricing</Link>
+            <Link href="/help" className="text-gray-400 hover:text-white text-sm">Help</Link>
+            <Link href="/blog" className="text-gray-400 hover:text-white text-sm">Blog</Link>
+            <Link href="/how-it-works" className="text-gray-400 hover:text-white text-sm">How it works</Link>
+          </div>
+          <Link href={authLink} className="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-xl">
+            {isSignedIn ? "Open App" : "Try Free"}
+          </Link>
+        </div>
+      </header>
+
       {/* Header */}
       <section className="pt-20 pb-8 px-6 text-center">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -112,8 +127,6 @@ export default function PricingPage() {
           Verify claims in seconds for a fraction of what traditional background
           checks cost.
         </p>
-
-        {/* Anchor against competitors */}
         <p className="text-sm text-gray-500 mt-4">
           Traditional background checks cost{" "}
           <span className="text-red-400 font-semibold">$29.99–$79.99 per check</span>{" "}
@@ -125,28 +138,17 @@ export default function PricingPage() {
 
       {/* Annual/Monthly Toggle */}
       <div className="flex items-center justify-center gap-4 pb-12">
-        <span
-          className={`text-sm ${!annual ? "text-white font-semibold" : "text-gray-500"}`}
-        >
+        <span className={`text-sm ${!annual ? "text-white font-semibold" : "text-gray-500"}`}>
           Monthly
         </span>
         <button
           onClick={() => setAnnual(!annual)}
-          className={`relative w-14 h-7 rounded-full transition-colors ${
-            annual ? "bg-blue-600" : "bg-gray-700"
-          }`}
+          className={`relative w-14 h-7 rounded-full transition-colors ${annual ? "bg-blue-600" : "bg-gray-700"}`}
         >
-          <span
-            className={`absolute top-0.5 w-6 h-6 bg-white rounded-full transition-transform ${
-              annual ? "translate-x-7" : "translate-x-0.5"
-            }`}
-          />
+          <span className={`absolute top-0.5 w-6 h-6 bg-white rounded-full transition-transform ${annual ? "translate-x-7" : "translate-x-0.5"}`} />
         </button>
-        <span
-          className={`text-sm ${annual ? "text-white font-semibold" : "text-gray-500"}`}
-        >
-          Annual{" "}
-          <span className="text-green-400 font-semibold">(Save 20%)</span>
+        <span className={`text-sm ${annual ? "text-white font-semibold" : "text-gray-500"}`}>
+          Annual <span className="text-green-400 font-semibold">(Save 20%)</span>
         </span>
       </div>
 
@@ -198,9 +200,7 @@ export default function PricingPage() {
                 </p>
                 {plan.perCheck && (
                   <p className="text-xs text-green-400 mt-1">
-                    {annual && plan.perCheckAnnual
-                      ? plan.perCheckAnnual
-                      : plan.perCheck}{" "}
+                    {annual && plan.perCheckAnnual ? plan.perCheckAnnual : plan.perCheck}{" "}
                     per verification
                   </p>
                 )}
@@ -209,55 +209,48 @@ export default function PricingPage() {
               <ul className="space-y-3 mb-8 flex-grow">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm">
-                    <span className="text-green-500 mt-0.5 flex-shrink-0">
-                      &#10003;
-                    </span>
+                    <span className="text-green-500 mt-0.5 flex-shrink-0">&#10003;</span>
                     <span className="text-gray-300">{f}</span>
                   </li>
                 ))}
               </ul>
 
-              <button
-                className={`w-full py-3 rounded-lg font-semibold transition-colors ${plan.ctaStyle}`}
+              <Link
+                href={authLink}
+                className={`w-full py-3 rounded-lg font-semibold transition-colors text-center block ${plan.ctaStyle}`}
               >
                 {plan.cta}
-              </button>
+              </Link>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Risk Reversal — 14-Day Guarantee */}
+      {/* Risk Reversal */}
       <section className="py-12 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <div className="rounded-2xl p-8 bg-gray-900 border border-green-500/30">
             <p className="text-2xl font-bold mb-3">14-Day Money-Back Guarantee</p>
             <p className="text-gray-400">
               Try any paid plan risk-free. If Trustie does not meet your needs
-              within the first 14 days, we will refund you in full. No questions
-              asked.
+              within the first 14 days, we will refund you in full. No questions asked.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Cost Comparison — Anchor against alternatives */}
+      {/* Cost Comparison */}
       <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">
-            How Trustie Compares
-          </h2>
+          <h2 className="text-3xl font-bold text-center mb-4">How Trustie Compares</h2>
           <p className="text-center text-gray-500 mb-10 text-sm">
             Pricing based on publicly available information as of March 2026.
           </p>
-
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-800">
-                  <th className="text-left py-4 px-4 text-gray-400 text-sm font-normal">
-                    &nbsp;
-                  </th>
+                  <th className="text-left py-4 px-4 text-gray-400 text-sm font-normal">&nbsp;</th>
                   <th className="py-4 px-4 text-blue-400 font-bold">Trustie</th>
                   <th className="py-4 px-4 text-gray-500">Checkr</th>
                   <th className="py-4 px-4 text-gray-500">HireRight</th>
@@ -267,80 +260,42 @@ export default function PricingPage() {
               <tbody className="text-sm">
                 <tr className="border-b border-gray-800/50">
                   <td className="py-3 px-4 text-gray-400">Cost per check</td>
-                  <td className="py-3 px-4 text-center text-green-400 font-bold">
-                    $0.20–$0.49
-                  </td>
-                  <td className="py-3 px-4 text-center text-gray-400">
-                    $29.99–$79.99
-                  </td>
-                  <td className="py-3 px-4 text-center text-gray-400">
-                    $30–$100+
-                  </td>
-                  <td className="py-3 px-4 text-center text-gray-400">
-                    1–2 hrs staff time
-                  </td>
+                  <td className="py-3 px-4 text-center text-green-400 font-bold">$0.20–$0.49</td>
+                  <td className="py-3 px-4 text-center text-gray-400">$29.99–$79.99</td>
+                  <td className="py-3 px-4 text-center text-gray-400">$30–$100+</td>
+                  <td className="py-3 px-4 text-center text-gray-400">1–2 hrs staff time</td>
                 </tr>
                 <tr className="border-b border-gray-800/50">
                   <td className="py-3 px-4 text-gray-400">Speed</td>
-                  <td className="py-3 px-4 text-center text-green-400 font-bold">
-                    Seconds
-                  </td>
-                  <td className="py-3 px-4 text-center text-gray-400">
-                    3–5 business days
-                  </td>
-                  <td className="py-3 px-4 text-center text-gray-400">
-                    2–7 business days
-                  </td>
-                  <td className="py-3 px-4 text-center text-gray-400">
-                    Hours to days
-                  </td>
+                  <td className="py-3 px-4 text-center text-green-400 font-bold">Seconds</td>
+                  <td className="py-3 px-4 text-center text-gray-400">3–5 business days</td>
+                  <td className="py-3 px-4 text-center text-gray-400">2–7 business days</td>
+                  <td className="py-3 px-4 text-center text-gray-400">Hours to days</td>
                 </tr>
                 <tr className="border-b border-gray-800/50">
-                  <td className="py-3 px-4 text-gray-400">
-                    AI claim extraction
-                  </td>
-                  <td className="py-3 px-4 text-center text-green-400">
-                    &#10003;
-                  </td>
+                  <td className="py-3 px-4 text-gray-400">AI claim extraction</td>
+                  <td className="py-3 px-4 text-center text-green-400">&#10003;</td>
                   <td className="py-3 px-4 text-center text-red-400">&#10007;</td>
                   <td className="py-3 px-4 text-center text-red-400">&#10007;</td>
                   <td className="py-3 px-4 text-center text-red-400">&#10007;</td>
                 </tr>
                 <tr className="border-b border-gray-800/50">
                   <td className="py-3 px-4 text-gray-400">Self-serve signup</td>
-                  <td className="py-3 px-4 text-center text-green-400">
-                    &#10003;
-                  </td>
-                  <td className="py-3 px-4 text-center text-green-400">
-                    &#10003;
-                  </td>
-                  <td className="py-3 px-4 text-center text-red-400">
-                    Sales call required
-                  </td>
+                  <td className="py-3 px-4 text-center text-green-400">&#10003;</td>
+                  <td className="py-3 px-4 text-center text-green-400">&#10003;</td>
+                  <td className="py-3 px-4 text-center text-red-400">Sales call required</td>
                   <td className="py-3 px-4 text-center text-gray-500">N/A</td>
                 </tr>
                 <tr className="border-b border-gray-800/50">
-                  <td className="py-3 px-4 text-gray-400">
-                    FCRA-compliant background check
-                  </td>
-                  <td className="py-3 px-4 text-center text-yellow-400">
-                    No*
-                  </td>
-                  <td className="py-3 px-4 text-center text-green-400">
-                    &#10003;
-                  </td>
-                  <td className="py-3 px-4 text-center text-green-400">
-                    &#10003;
-                  </td>
-                  <td className="py-3 px-4 text-center text-gray-500">
-                    Varies
-                  </td>
+                  <td className="py-3 px-4 text-gray-400">FCRA-compliant background check</td>
+                  <td className="py-3 px-4 text-center text-yellow-400">No*</td>
+                  <td className="py-3 px-4 text-center text-green-400">&#10003;</td>
+                  <td className="py-3 px-4 text-center text-green-400">&#10003;</td>
+                  <td className="py-3 px-4 text-center text-gray-500">Varies</td>
                 </tr>
               </tbody>
             </table>
           </div>
-
-          {/* Honest disclaimer about FCRA */}
           <p className="text-xs text-gray-600 mt-4 text-center">
             *Trustie is an AI-powered verification tool, not an FCRA-compliant
             consumer reporting agency. It is designed to supplement, not replace,
@@ -350,16 +305,12 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Early Adopter Section — HONEST about being new */}
+      {/* Early Adopter */}
       <section className="py-16 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <div className="rounded-2xl p-8 bg-gradient-to-br from-blue-900/30 to-purple-900/30 border border-blue-500/20">
-            <p className="text-xs text-blue-400 font-semibold uppercase tracking-wider mb-2">
-              Early Adopter Advantage
-            </p>
-            <h2 className="text-2xl font-bold mb-4">
-              You Are Getting In Early
-            </h2>
+            <p className="text-xs text-blue-400 font-semibold uppercase tracking-wider mb-2">Early Adopter Advantage</p>
+            <h2 className="text-2xl font-bold mb-4">You Are Getting In Early</h2>
             <p className="text-gray-400 mb-4">
               Trustie is a new product, and we are transparent about that.
               Current pricing is introductory. Early customers who sign up now
@@ -373,84 +324,34 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* FAQ — Handle objections */}
+      {/* FAQ */}
       <section className="py-16 px-6">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            Frequently Asked Questions
-          </h2>
-
+          <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
           <div className="space-y-8">
             <div>
-              <h3 className="text-lg font-bold mb-2">
-                Is Trustie a replacement for background check services like
-                Checkr?
-              </h3>
-              <p className="text-gray-400">
-                No. Trustie is a fast, AI-powered preliminary screening tool.
-                It searches publicly available information to verify claims in
-                seconds. For legally required FCRA-compliant background checks
-                (criminal records, credit checks, etc.), you should still use a
-                service like Checkr. Trustie helps you screen faster before
-                investing in a full background check.
-              </p>
+              <h3 className="text-lg font-bold mb-2">Is Trustie a replacement for background check services like Checkr?</h3>
+              <p className="text-gray-400">No. Trustie is a fast, AI-powered preliminary screening tool. It searches publicly available information to verify claims in seconds. For legally required FCRA-compliant background checks (criminal records, credit checks, etc.), you should still use a service like Checkr. Trustie helps you screen faster before investing in a full background check.</p>
             </div>
-
             <div>
-              <h3 className="text-lg font-bold mb-2">
-                How accurate is Trustie?
-              </h3>
-              <p className="text-gray-400">
-                Trustie uses AI to search publicly available sources and provides
-                confidence scores with every verification. No AI system is 100%
-                accurate. We show you the sources so you can verify the results
-                yourself. We recommend using Trustie as one input in your
-                decision-making process, not the sole factor.
-              </p>
+              <h3 className="text-lg font-bold mb-2">How accurate is Trustie?</h3>
+              <p className="text-gray-400">Trustie uses AI to search publicly available sources and provides confidence scores with every verification. No AI system is 100% accurate. We show you the sources so you can verify the results yourself. We recommend using Trustie as one input in your decision-making process, not the sole factor.</p>
             </div>
-
             <div>
-              <h3 className="text-lg font-bold mb-2">
-                Can I cancel anytime?
-              </h3>
-              <p className="text-gray-400">
-                Yes. All paid plans are month-to-month (or annual if you choose).
-                Cancel anytime from your account settings. No cancellation fees.
-                If you cancel within 14 days, you get a full refund.
-              </p>
+              <h3 className="text-lg font-bold mb-2">Can I cancel anytime?</h3>
+              <p className="text-gray-400">Yes. All paid plans are month-to-month (or annual if you choose). Cancel anytime from your account settings. No cancellation fees. If you cancel within 14 days, you get a full refund.</p>
             </div>
-
             <div>
-              <h3 className="text-lg font-bold mb-2">
-                What counts as one verification?
-              </h3>
-              <p className="text-gray-400">
-                One verification is one text submission. For example, pasting one
-                resume and clicking &quot;Verify&quot; counts as one
-                verification. Trustie automatically extracts all claims from that
-                submission and verifies each one.
-              </p>
+              <h3 className="text-lg font-bold mb-2">What counts as one verification?</h3>
+              <p className="text-gray-400">One verification is one text submission. For example, pasting one resume and clicking &quot;Verify&quot; counts as one verification. Trustie automatically extracts all claims from that submission and verifies each one.</p>
             </div>
-
             <div>
-              <h3 className="text-lg font-bold mb-2">
-                What happens if I run out of verifications?
-              </h3>
-              <p className="text-gray-400">
-                You will be prompted to upgrade to a higher plan. You will not be
-                charged overage fees without your consent.
-              </p>
+              <h3 className="text-lg font-bold mb-2">What happens if I run out of verifications?</h3>
+              <p className="text-gray-400">You will be prompted to upgrade to a higher plan. You will not be charged overage fees without your consent.</p>
             </div>
-
             <div>
-              <h3 className="text-lg font-bold mb-2">
-                Is my data secure?
-              </h3>
-              <p className="text-gray-400">
-                Trustie does not store the content you submit for verification
-                beyond what is needed to deliver results. We do not sell or share
-                your data. All connections are encrypted via HTTPS.
-              </p>
+              <h3 className="text-lg font-bold mb-2">Is my data secure?</h3>
+              <p className="text-gray-400">Trustie does not store the content you submit for verification beyond what is needed to deliver results. We do not sell or share your data. All connections are encrypted via HTTPS.</p>
             </div>
           </div>
         </div>
@@ -460,15 +361,14 @@ export default function PricingPage() {
       <section className="py-20 px-6 text-center">
         <h2 className="text-3xl font-bold mb-4">Start Verifying Today</h2>
         <p className="text-gray-400 mb-8 max-w-lg mx-auto">
-          5 free verifications. No credit card required. See how Trustie works
-          in under 60 seconds.
+          5 free verifications. No credit card required. See how Trustie works in under 60 seconds.
         </p>
-        <a
-          href="/app"
+        <Link
+          href={authLink}
           className="inline-block px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-lg"
         >
           Try Trustie Free
-        </a>
+        </Link>
       </section>
     </div>
   );
