@@ -41,7 +41,7 @@ export default function HowItWorksPage() {
 
         {/* Steps */}
         <div className="space-y-12">
-          {/* Step 1 */}
+          {/* Step 1 — UNCHANGED */}
           <div className="flex gap-6">
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-xl font-bold">1</div>
             <div>
@@ -51,12 +51,12 @@ export default function HowItWorksPage() {
               </p>
               <div className="rounded-xl p-4 bg-gray-900 border border-gray-800">
                 <p className="text-sm text-gray-500 mb-2">Example input:</p>
-                <p className="text-gray-300">"John Smith, Senior Engineer at Google (2019-2024), Stanford CS 2018, AWS Certified"</p>
+                <p className="text-gray-300">&quot;John Smith, Senior Engineer at Google (2019-2024), Stanford CS 2018, AWS Certified&quot;</p>
               </div>
             </div>
           </div>
 
-          {/* Step 2 */}
+          {/* Step 2 — UNCHANGED */}
           <div className="flex gap-6">
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-xl font-bold">2</div>
             <div>
@@ -67,15 +67,15 @@ export default function HowItWorksPage() {
               <div className="rounded-xl p-4 bg-gray-900 border border-gray-800">
                 <p className="text-sm text-gray-500 mb-2">Claims extracted:</p>
                 <ul className="space-y-2 text-gray-300">
-                  <li>• Employment: "Senior Engineer at Google (2019-2024)"</li>
-                  <li>• Education: "Stanford CS 2018"</li>
-                  <li>• Certification: "AWS Certified"</li>
+                  <li>• Employment: &quot;Senior Engineer at Google (2019-2024)&quot;</li>
+                  <li>• Education: &quot;Stanford CS 2018&quot;</li>
+                  <li>• Certification: &quot;AWS Certified&quot;</li>
                 </ul>
               </div>
             </div>
           </div>
 
-          {/* Step 3 */}
+          {/* Step 3 — FIX: Weight labels changed to match all other pages */}
           <div className="flex gap-6">
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-xl font-bold">3</div>
             <div>
@@ -87,17 +87,17 @@ export default function HowItWorksPage() {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                    <span className="text-gray-300">Tier 1 (3x weight):</span>
+                    <span className="text-gray-300">Tier 1 (Highest trust):</span>
                     <span className="text-gray-500">.gov, .edu, LinkedIn</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
-                    <span className="text-gray-300">Tier 2 (2x weight):</span>
+                    <span className="text-gray-300">Tier 2 (Medium trust):</span>
                     <span className="text-gray-500">News, company sites</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                    <span className="text-gray-300">Tier 3 (1x weight):</span>
+                    <span className="text-gray-300">Tier 3 (Lower trust):</span>
                     <span className="text-gray-500">Blogs, forums</span>
                   </div>
                 </div>
@@ -105,11 +105,11 @@ export default function HowItWorksPage() {
             </div>
           </div>
 
-          {/* Step 4 */}
+          {/* Step 4 — UNCHANGED */}
           <div className="flex gap-6">
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-xl font-bold">4</div>
             <div>
-              <h2 className="text-2xl font-bold mb-3">Verdict & Confidence Score</h2>
+              <h2 className="text-2xl font-bold mb-3">Verdict &amp; Confidence Score</h2>
               <p className="text-gray-400 mb-4">
                 Each claim receives a verdict based on what the AI found, along with a confidence score.
               </p>
@@ -134,16 +134,16 @@ export default function HowItWorksPage() {
             </div>
           </div>
 
-          {/* Step 5 */}
+          {/* Step 5 — FIX: "Review & Export" → "Review Results", removed export claim */}
           <div className="flex gap-6">
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-xl font-bold">5</div>
             <div>
-              <h2 className="text-2xl font-bold mb-3">Review & Export</h2>
+              <h2 className="text-2xl font-bold mb-3">Review Results</h2>
               <p className="text-gray-400 mb-4">
-                Review the results with full evidence and source links. Export as JSON for your records.
+                Review the full results with evidence and source links for each claim. Every verification includes timestamps and confidence scores.
               </p>
               <div className="rounded-xl overflow-hidden bg-gray-900 border border-gray-800">
-                <div className="px-4 py-2 border-b border-gray-800 text-sm text-gray-500">report.json</div>
+                <div className="px-4 py-2 border-b border-gray-800 text-sm text-gray-500">verification_result</div>
                 <pre className="p-4 text-sm text-gray-300 overflow-x-auto">
 {`{
   "id": "ver_abc123",
@@ -158,7 +158,7 @@ export default function HowItWorksPage() {
           </div>
         </div>
 
-        {/* CTA */}
+        {/* CTA — UNCHANGED */}
         <div className="mt-20 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to verify your first claim?</h2>
           <Link href={authLink} className="inline-block px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl">
