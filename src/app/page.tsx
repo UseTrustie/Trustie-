@@ -50,7 +50,7 @@ export default function LandingPage() {
   return (
     <div className={`min-h-screen ${bg} ${textPrimary} font-sans antialiased transition-colors duration-300`}>
       {/* Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? navBg : ''}`}>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navBg}`}>
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3">
@@ -64,7 +64,7 @@ export default function LandingPage() {
 
             <div className="hidden md:flex items-center gap-8">
               <Link href="/proof" className={`${navHover} text-sm transition-colors`}>Proof</Link>
-              <Link href="#pricing" className={`${navHover} text-sm transition-colors`}>Pricing</Link>
+              <Link href="/#pricing" className={`${navHover} text-sm transition-colors`}>Pricing</Link>
               <Link href="/help" className={`${navHover} text-sm transition-colors`}>Help</Link>
               <Link href="/blog" className={`${navHover} text-sm transition-colors`}>Blog</Link>
               <Link href="/how-it-works" className={`${navHover} text-sm transition-colors`}>How it works</Link>
@@ -108,7 +108,7 @@ export default function LandingPage() {
             <div className={`md:hidden mt-4 pb-4 border-t ${borderColor}`}>
               <div className="pt-4 space-y-2">
                 <Link href="/proof" className={`block py-2 ${textSecondary}`}>Proof</Link>
-                <Link href="#pricing" className={`block py-2 ${textSecondary}`}>Pricing</Link>
+                <Link href="/#pricing" className={`block py-2 ${textSecondary}`}>Pricing</Link>
                 <Link href="/help" className={`block py-2 ${textSecondary}`}>Help</Link>
                 <Link href="/how-it-works" className={`block py-2 ${textSecondary}`}>How it works</Link>
                 <Link href={authLink} className="block py-2 text-blue-500">{isSignedIn ? 'Dashboard' : 'Try Free'}</Link>
@@ -228,7 +228,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Feature 2 — FIX: Changed weight labels */}
+            {/* Feature 2 */}
             <div className={`rounded-2xl p-8 ${bgCard} border ${borderColor}`}>
               <h3 className={`text-2xl font-bold mb-4 ${textPrimary}`}>Source Quality Tiers</h3>
               <p className={`${textSecondary} mb-6`}>Not all sources are equal. We weight .gov, .edu, and professional networks higher than blogs and commercial sites.</p>
@@ -272,7 +272,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Feature 4 — FIX: Removed "Export JSON reports for compliance" */}
+            {/* Feature 4 */}
             <div className={`rounded-2xl p-8 ${bgCard} border ${borderColor}`}>
               <h3 className={`text-2xl font-bold mb-4 ${textPrimary}`}>Full Audit Trail</h3>
               <p className={`${textSecondary} mb-6`}>Every verification is logged with timestamps, sources checked, and confidence scores for your records.</p>
@@ -295,7 +295,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Why Trustie — FIX: Updated Privacy First description */}
+      {/* Why Trustie */}
       <section className={`py-24 px-6 ${isDark ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
@@ -321,12 +321,15 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing — FIX: Removed false features (Export reports, API access, Team features) */}
+      {/* Pricing — 4 tiers matching /pricing page */}
       <section id="pricing" className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-4">
             <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${textPrimary}`}>Pricing</h2>
-            <p className={`text-lg ${textSecondary} mb-8`}>Simple and transparent pricing</p>
+            <p className={`text-lg ${textSecondary} mb-2`}>Simple and transparent pricing</p>
+            <p className={`text-sm ${textMuted} mb-8`}>
+              Traditional background checks cost <span className="text-red-400 font-semibold">$29.99–$79.99 per check</span> and take days. Trustie starts at <span className="text-green-400 font-semibold">$0.20 per verification</span> and delivers in seconds.
+            </p>
             <div className={`inline-flex rounded-xl p-1 ${bgCardInner}`}>
               <button onClick={() => setBillingCycle('monthly')} className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${billingCycle === 'monthly' ? 'bg-blue-500 text-white' : textSecondary}`}>
                 Monthly
@@ -337,60 +340,90 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto mt-12">
             {/* Free */}
             <div className={`rounded-2xl p-8 ${bgCard} border ${borderColor}`}>
               <h3 className={`text-xl font-bold mb-1 ${textPrimary}`}>Free</h3>
-              <p className={`text-sm ${textMuted} mb-4`}>Try it out</p>
-              <div className="mb-6">
+              <p className={`text-sm ${textMuted} mb-4`}>See how Trustie works</p>
+              <div className="mb-2">
                 <span className={`text-4xl font-bold ${textPrimary}`}>$0</span>
               </div>
+              <p className={`text-sm ${textMuted} mb-6`}>No credit card required</p>
               <Link href={authLink} className={`block w-full py-3 text-center ${isDark ? 'bg-gray-800 hover:bg-gray-700 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-900'} font-medium rounded-xl mb-6 transition-colors`}>
-                Get Started Free
+                Start Free
               </Link>
               <ul className="space-y-3 text-sm">
-                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>5 verifications total</li>
-                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>All source tiers</li>
-                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Web interface</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>5 verifications (one-time)</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>AI-powered claim extraction</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Source quality indicators</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Confidence scores</li>
               </ul>
             </div>
 
-            {/* Starter — FIX: "Export reports" → "Detailed results" */}
-            <div className={`rounded-2xl p-8 ${bgCard} border-2 border-blue-500 relative`}>
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">BEST VALUE</span>
-              <h3 className={`text-xl font-bold mb-1 ${textPrimary}`}>Starter Pack</h3>
-              <p className={`text-sm ${textMuted} mb-4`}>For recruiters</p>
-              <div className="mb-6">
-                <span className={`text-4xl font-bold ${textPrimary}`}>$49</span>
-                <span className={textMuted}> one-time</span>
-              </div>
-              <Link href={authLink} className="block w-full py-3 text-center bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl mb-6 transition-colors">
-                Buy Starter Pack
-              </Link>
-              <ul className="space-y-3 text-sm">
-                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>50 verifications</li>
-                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Never expires</li>
-                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Detailed results with sources</li>
-                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Priority support</li>
-              </ul>
-            </div>
-
-            {/* Pro — FIX: Replaced "API access (coming soon)" and "Team features" */}
+            {/* Starter */}
             <div className={`rounded-2xl p-8 ${bgCard} border ${borderColor}`}>
-              <h3 className={`text-xl font-bold mb-1 ${textPrimary}`}>Pro Monthly</h3>
-              <p className={`text-sm ${textMuted} mb-4`}>For teams</p>
-              <div className="mb-6">
-                <span className={`text-4xl font-bold ${textPrimary}`}>${billingCycle === 'annual' ? '24' : '29'}</span>
+              <h3 className={`text-xl font-bold mb-1 ${textPrimary}`}>Starter</h3>
+              <p className={`text-sm ${textMuted} mb-4`}>For individual recruiters</p>
+              <div className="mb-2">
+                <span className={`text-4xl font-bold ${textPrimary}`}>${billingCycle === 'annual' ? '39' : '49'}</span>
                 <span className={textMuted}>/mo</span>
               </div>
+              <p className={`text-sm text-green-400 mb-6`}>$0.49/verification</p>
               <Link href={authLink} className={`block w-full py-3 text-center ${isDark ? 'bg-gray-800 hover:bg-gray-700 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-900'} font-medium rounded-xl mb-6 transition-colors`}>
-                Start Pro Monthly
+                Start 14-Day Free Trial
+              </Link>
+              <ul className="space-y-3 text-sm">
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>100 verifications per month</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>AI-powered claim extraction</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Source quality weighting</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Confidence scores</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Verification history</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Email support</li>
+              </ul>
+            </div>
+
+            {/* Professional — MOST POPULAR */}
+            <div className={`rounded-2xl p-8 ${bgCard} border-2 border-blue-500 relative`}>
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">MOST POPULAR</span>
+              <h3 className={`text-xl font-bold mb-1 ${textPrimary}`}>Professional</h3>
+              <p className={`text-sm ${textMuted} mb-4`}>For HR teams</p>
+              <div className="mb-2">
+                <span className={`text-4xl font-bold ${textPrimary}`}>${billingCycle === 'annual' ? '79' : '99'}</span>
+                <span className={textMuted}>/mo</span>
+              </div>
+              <p className={`text-sm text-green-400 mb-6`}>$0.20/verification</p>
+              <Link href={authLink} className="block w-full py-3 text-center bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl mb-6 transition-colors">
+                Start 14-Day Free Trial
+              </Link>
+              <ul className="space-y-3 text-sm">
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>500 verifications per month</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Everything in Starter</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Batch verification (multiple resumes)</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Detailed source audit logs</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Priority processing</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Priority email support</li>
+              </ul>
+            </div>
+
+            {/* Business */}
+            <div className={`rounded-2xl p-8 ${bgCard} border ${borderColor}`}>
+              <h3 className={`text-xl font-bold mb-1 ${textPrimary}`}>Business</h3>
+              <p className={`text-sm ${textMuted} mb-4`}>For teams that verify at scale</p>
+              <div className="mb-2">
+                <span className={`text-4xl font-bold ${textPrimary}`}>${billingCycle === 'annual' ? '199' : '249'}</span>
+                <span className={textMuted}>/mo</span>
+              </div>
+              <p className={`text-sm ${textMuted} mb-6`}>Unlimited verifications</p>
+              <Link href={authLink} className={`block w-full py-3 text-center ${isDark ? 'bg-gray-800 hover:bg-gray-700 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-900'} font-medium rounded-xl mb-6 transition-colors`}>
+                Start 14-Day Free Trial
               </Link>
               <ul className="space-y-3 text-sm">
                 <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Unlimited verifications</li>
-                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Priority processing</li>
-                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>All source tiers</li>
-                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Priority support</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Everything in Professional</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Team accounts (up to 10 users)</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>API access</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Dedicated support</li>
+                <li className={`flex items-center gap-2 ${textSecondary}`}><span className="text-green-500">✓</span>Custom integrations</li>
               </ul>
             </div>
           </div>
@@ -401,7 +434,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* FAQ — FIX: Updated "Is my data secure?" answer */}
+      {/* FAQ */}
       <section className={`py-24 px-6 ${isDark ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
         <div className="max-w-3xl mx-auto">
           <h2 className={`text-4xl font-bold text-center mb-12 ${textPrimary}`}>Frequently Asked Questions</h2>
@@ -428,7 +461,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Affiliate — FIX: Changed to "coming soon" since no program exists yet */}
+      {/* Affiliate */}
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className={`text-4xl font-bold mb-4 ${textPrimary}`}>Earn with Trustie</h2>
@@ -454,7 +487,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer — FIX: Updated year */}
+      {/* Footer */}
       <footer className={`py-16 px-6 border-t ${borderColor}`}>
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-5 gap-12 mb-12">
@@ -477,7 +510,7 @@ export default function LandingPage() {
               <h4 className={`font-semibold mb-4 ${textPrimary}`}>Pages</h4>
               <ul className="space-y-2">
                 <li><Link href="/proof" className={`text-sm ${textMuted} hover:text-blue-400`}>Proof</Link></li>
-                <li><Link href="#pricing" className={`text-sm ${textMuted} hover:text-blue-400`}>Pricing</Link></li>
+                <li><Link href="/#pricing" className={`text-sm ${textMuted} hover:text-blue-400`}>Pricing</Link></li>
                 <li><Link href="/help" className={`text-sm ${textMuted} hover:text-blue-400`}>Help</Link></li>
                 <li><Link href="/blog" className={`text-sm ${textMuted} hover:text-blue-400`}>Blog</Link></li>
                 <li><Link href="/how-it-works" className={`text-sm ${textMuted} hover:text-blue-400`}>How it works</Link></li>
@@ -487,10 +520,10 @@ export default function LandingPage() {
             <div>
               <h4 className={`font-semibold mb-4 ${textPrimary}`}>Use Cases</h4>
               <ul className="space-y-2">
-                <li><span className={`text-sm ${textMuted}`}>Resume Verification</span></li>
-                <li><span className={`text-sm ${textMuted}`}>HR Background Checks</span></li>
-                <li><span className={`text-sm ${textMuted}`}>Insurance Claims</span></li>
-                <li><span className={`text-sm ${textMuted}`}>Legal Due Diligence</span></li>
+                <li><Link href={authLink} className={`text-sm ${textMuted} hover:text-blue-400`}>Resume Verification</Link></li>
+                <li><Link href={authLink} className={`text-sm ${textMuted} hover:text-blue-400`}>HR Background Checks</Link></li>
+                <li><Link href={authLink} className={`text-sm ${textMuted} hover:text-blue-400`}>Insurance Claims</Link></li>
+                <li><Link href={authLink} className={`text-sm ${textMuted} hover:text-blue-400`}>Legal Due Diligence</Link></li>
               </ul>
             </div>
 
