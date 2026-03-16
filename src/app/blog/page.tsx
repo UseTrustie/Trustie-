@@ -10,25 +10,27 @@ export default function BlogPage() {
   const posts = [
     {
       slug: 'resume-fraud-statistics-2025',
-      title: '70% of Resumes Contain Lies: What HR Teams Need to Know',
-      excerpt: 'Studies show the majority of resumes contain some form of misrepresentation. Here\'s what to look for.',
-      date: 'Feb 20, 2025',
+      // FIX: "70%" → "Up to 64%" to match proof page
+      title: 'Up to 64% of Resumes Contain Lies: What HR Teams Need to Know',
+      excerpt: 'Multiple studies show a significant percentage of resumes contain some form of misrepresentation. Here\'s what to look for and how to protect your hiring process.',
+      // FIX: Updated date to 2026
+      date: 'Mar 10, 2026',
       readTime: '5 min read',
       category: 'Research',
     },
     {
       slug: 'source-quality-matters',
       title: 'Why Source Quality Matters More Than Quantity',
-      excerpt: 'Not all sources are equal. Learn how to evaluate the reliability of verification sources.',
-      date: 'Feb 15, 2025',
+      excerpt: 'Not all sources are equal. Learn how Trustie evaluates the reliability of verification sources using a tiered trust system.',
+      date: 'Mar 5, 2026',
       readTime: '7 min read',
       category: 'Technology',
     },
     {
       slug: 'cost-of-bad-hire',
-      title: 'The True Cost of a Bad Hire',
-      excerpt: 'Breaking down the hidden costs of hiring someone who misrepresented their qualifications.',
-      date: 'Feb 10, 2025',
+      title: 'The True Cost of a Bad Hire: $17,000 and Beyond',
+      excerpt: 'According to CareerBuilder, the average bad hire costs $17,000. Breaking down the hidden costs of hiring someone who misrepresented their qualifications.',
+      date: 'Feb 28, 2026',
       readTime: '4 min read',
       category: 'Business',
     },
