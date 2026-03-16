@@ -24,13 +24,14 @@ export default function TermsPage() {
 
       <main className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-4xl font-bold mb-4">Terms of Service</h1>
-        <p className="text-gray-500 mb-12">Last updated: March 1, 2025</p>
+        {/* FIX: 2025 → 2026 */}
+        <p className="text-gray-500 mb-12">Last updated: March 15, 2026</p>
 
         <div className="space-y-8 text-gray-300">
           <section>
             <h2 className="text-2xl font-bold mb-4 text-white">Agreement</h2>
             <p>
-              By using Trustie, you agree to these terms. If you don't agree, please don't use our service.
+              By using Trustie, you agree to these terms. If you don&apos;t agree, please don&apos;t use our service.
             </p>
           </section>
 
@@ -47,16 +48,19 @@ export default function TermsPage() {
             </ul>
           </section>
 
+          {/* FIX: Added FCRA disclaimer to limitations */}
           <section>
             <h2 className="text-2xl font-bold mb-4 text-white">Important Limitations</h2>
             <div className="rounded-xl p-6 bg-yellow-500/10 border border-yellow-500/30">
               <p className="text-yellow-400 font-medium mb-3">Please understand:</p>
               <ul className="list-disc list-inside space-y-2 text-gray-400">
                 <li>Trustie is an AI tool, not a professional background check service</li>
+                <li>Trustie is not an FCRA-compliant consumer reporting agency</li>
                 <li>Results depend on publicly available information</li>
                 <li>No AI system is 100% accurate</li>
                 <li>Trustie should assist, not replace, human judgment</li>
                 <li>We are not liable for hiring decisions based on our results</li>
+                <li>Text you submit is sent to our AI provider (Anthropic) for processing</li>
               </ul>
             </div>
           </section>
@@ -88,7 +92,7 @@ export default function TermsPage() {
             <div className="rounded-xl p-6 bg-green-500/10 border border-green-500/30">
               <p className="text-green-400 font-medium mb-2">14-Day Money-Back Guarantee</p>
               <p className="text-gray-400">
-                If you're not satisfied with Trustie, request a refund within 14 days of purchase. Email us at trustietechnologies@gmail.com with your request.
+                If you&apos;re not satisfied with Trustie, request a refund within 14 days of purchase. Email us at trustietechnologies@gmail.com with your request.
               </p>
             </div>
           </section>
