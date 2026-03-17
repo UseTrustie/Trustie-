@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Footer from '@/components/Footer';
 
 export default function RefundPage() {
   return (
@@ -78,6 +79,7 @@ export default function RefundPage() {
           </section>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
