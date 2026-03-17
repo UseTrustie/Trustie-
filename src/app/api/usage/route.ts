@@ -4,17 +4,32 @@ import { auth, clerkClient } from '@clerk/nextjs/server';
 export async function GET() {
   try {
     const { userId } = auth();
-
     if (!userId) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const user = await clerkClient.users.getUser(userId);
     const metadata = user.publicMetadata as any;
-
     const plan = metadata?.plan || 'free';
     const verificationsUsed = metadata?.verificationsUsed || 0;
-    const limit = plan === 'pro' ? Infinity : (plan === 'starter' ? 50 : 5);
+
+    let limit: number | string;
+    switch (plan) {
+      case 'business':
+        limit = Infinity;
+        break;
+      case 'professional':
+        limit = 500;
+        break;
+      case 'starter':
+        limit = 100;
+        break;
+      case 'pro':
+        limit = Infinity;
+        break;
+      default:
+        limit = 5;
+    }
 
     return NextResponse.json({
       plan,
