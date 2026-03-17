@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Footer from '@/components/Footer';
 
 export default function PrivacyPage() {
   return (
@@ -24,7 +25,6 @@ export default function PrivacyPage() {
 
       <main className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-4xl font-bold mb-4">Privacy Policy</h1>
-        {/* FIX: 2025 → 2026 */}
         <p className="text-gray-500 mb-12">Last updated: March 15, 2026</p>
 
         <div className="space-y-8 text-gray-300">
@@ -45,7 +45,6 @@ export default function PrivacyPage() {
             </ul>
           </section>
 
-          {/* FIX: Updated to be honest about AI provider processing */}
           <section>
             <h2 className="text-2xl font-bold mb-4 text-white">Text You Submit</h2>
             <div className="rounded-xl p-6 bg-green-500/10 border border-green-500/30">
@@ -72,7 +71,6 @@ export default function PrivacyPage() {
             <ul className="list-disc list-inside space-y-2 text-gray-400">
               <li><strong className="text-gray-300">Clerk:</strong> Authentication</li>
               <li><strong className="text-gray-300">Stripe:</strong> Payment processing</li>
-              {/* FIX: Added note that submitted text is sent to Anthropic */}
               <li><strong className="text-gray-300">Anthropic:</strong> AI verification (Claude) — submitted text is sent to Anthropic for processing</li>
               <li><strong className="text-gray-300">Vercel:</strong> Hosting</li>
             </ul>
@@ -94,6 +92,7 @@ export default function PrivacyPage() {
           </section>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
