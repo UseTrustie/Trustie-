@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
+import Footer from '@/components/Footer';
 
 export default function HowItWorksPage() {
   const { isSignedIn } = useUser();
@@ -41,7 +42,7 @@ export default function HowItWorksPage() {
 
         {/* Steps */}
         <div className="space-y-12">
-          {/* Step 1 — UNCHANGED */}
+          {/* Step 1 */}
           <div className="flex gap-6">
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-xl font-bold">1</div>
             <div>
@@ -56,7 +57,7 @@ export default function HowItWorksPage() {
             </div>
           </div>
 
-          {/* Step 2 — UNCHANGED */}
+          {/* Step 2 */}
           <div className="flex gap-6">
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-xl font-bold">2</div>
             <div>
@@ -75,7 +76,7 @@ export default function HowItWorksPage() {
             </div>
           </div>
 
-          {/* Step 3 — FIX: Weight labels changed to match all other pages */}
+          {/* Step 3 */}
           <div className="flex gap-6">
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-xl font-bold">3</div>
             <div>
@@ -105,7 +106,7 @@ export default function HowItWorksPage() {
             </div>
           </div>
 
-          {/* Step 4 — UNCHANGED */}
+          {/* Step 4 */}
           <div className="flex gap-6">
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-xl font-bold">4</div>
             <div>
@@ -134,7 +135,7 @@ export default function HowItWorksPage() {
             </div>
           </div>
 
-          {/* Step 5 — FIX: "Review & Export" → "Review Results", removed export claim */}
+          {/* Step 5 */}
           <div className="flex gap-6">
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-xl font-bold">5</div>
             <div>
@@ -158,7 +159,7 @@ export default function HowItWorksPage() {
           </div>
         </div>
 
-        {/* CTA — UNCHANGED */}
+        {/* CTA */}
         <div className="mt-20 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to verify your first claim?</h2>
           <Link href={authLink} className="inline-block px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl">
@@ -166,6 +167,7 @@ export default function HowItWorksPage() {
           </Link>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
