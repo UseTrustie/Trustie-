@@ -91,7 +91,7 @@ export default function AppPage() {
     }
   };
 
-  const handleCheckout = async (priceType: 'starter' | 'pro') => {
+  const handleCheckout = async (priceType: string) => {
     setIsCheckingOut(true);
     try {
       const res = await fetch('/api/checkout', {
@@ -178,17 +178,24 @@ export default function AppPage() {
             <div className="space-y-4">
               <div className="rounded-xl p-6 bg-gray-800">
                 <div className="flex justify-between mb-3">
-                  <div><h3 className="font-bold text-white">Starter Pack</h3><p className="text-sm text-gray-500">50 verifications</p></div>
-                  <div><span className="text-2xl font-bold text-white">$49</span><span className="text-gray-500"> one-time</span></div>
+                  <div><h3 className="font-bold text-white">Starter</h3><p className="text-sm text-gray-500">100 verifications/month</p></div>
+                  <div><span className="text-2xl font-bold text-white">$49</span><span className="text-gray-500">/mo</span></div>
                 </div>
-                <button onClick={() => handleCheckout('starter')} disabled={isCheckingOut} className="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors">{isCheckingOut ? 'Loading...' : 'Buy Starter'}</button>
+                <button onClick={() => handleCheckout('starter')} disabled={isCheckingOut} className="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors">{isCheckingOut ? 'Loading...' : 'Start Starter'}</button>
               </div>
               <div className="rounded-xl p-6 border-2 border-blue-500 bg-blue-500/10">
                 <div className="flex justify-between mb-3">
-                  <div><h3 className="font-bold text-white">Pro Monthly</h3><p className="text-sm text-gray-400">Unlimited</p></div>
-                  <div><span className="text-2xl font-bold text-white">$29</span><span className="text-gray-400">/mo</span></div>
+                  <div><h3 className="font-bold text-white">Professional</h3><p className="text-sm text-gray-400">500 verifications/month</p></div>
+                  <div><span className="text-2xl font-bold text-white">$99</span><span className="text-gray-400">/mo</span></div>
                 </div>
-                <button onClick={() => handleCheckout('pro')} disabled={isCheckingOut} className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">{isCheckingOut ? 'Loading...' : 'Start Pro'}</button>
+                <button onClick={() => handleCheckout('professional')} disabled={isCheckingOut} className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">{isCheckingOut ? 'Loading...' : 'Start Professional'}</button>
+              </div>
+              <div className="rounded-xl p-6 bg-gray-800">
+                <div className="flex justify-between mb-3">
+                  <div><h3 className="font-bold text-white">Business</h3><p className="text-sm text-gray-500">Unlimited verifications</p></div>
+                  <div><span className="text-2xl font-bold text-white">$249</span><span className="text-gray-500">/mo</span></div>
+                </div>
+                <button onClick={() => handleCheckout('business')} disabled={isCheckingOut} className="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors">{isCheckingOut ? 'Loading...' : 'Start Business'}</button>
               </div>
             </div>
           </div>
