@@ -10,6 +10,7 @@
 // EVERYTHING ELSE IS UNCHANGED FROM THE ORIGINAL.
 
 import Link from "next/link";
+import Footer from "@/components/Footer";
 
 export default function ProofPage() {
   return (
@@ -26,7 +27,7 @@ export default function ProofPage() {
         </Link>
         <div className="hidden md:flex items-center gap-6">
           <Link href="/proof" className="text-sm text-gray-300 hover:text-white">Proof</Link>
-          <Link href="/pricing" className="text-sm text-gray-300 hover:text-white">Pricing</Link>
+          <Link href="/#pricing" className="text-sm text-gray-300 hover:text-white">Pricing</Link>
           <Link href="/help" className="text-sm text-gray-300 hover:text-white">Help</Link>
           <Link href="/blog" className="text-sm text-gray-300 hover:text-white">Blog</Link>
           <Link href="/how-it-works" className="text-sm text-gray-300 hover:text-white">How it works</Link>
@@ -225,6 +226,8 @@ export default function ProofPage() {
           Try Trustie Free
         </Link>
       </section>
+
+      <Footer />
     </div>
   );
 }
