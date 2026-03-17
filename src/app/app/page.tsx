@@ -108,6 +108,12 @@ export default function AppPage() {
     }
   };
 
+  // Helper to display confidence correctly whether backend sends 0.85 or 85
+  const formatConfidence = (value: number) => {
+    if (value > 1) return Math.round(value);
+    return Math.round(value * 100);
+  };
+
   // Loading state
   if (!isLoaded) {
     return (
@@ -236,7 +242,7 @@ export default function AppPage() {
                 <div className="bg-gray-800 rounded-xl p-4"><div className="text-2xl font-bold text-white">{result.summary.total_claims}</div><div className="text-sm text-gray-500">Total</div></div>
                 <div className="bg-gray-800 rounded-xl p-4"><div className="text-2xl font-bold text-green-500">{result.summary.verified}</div><div className="text-sm text-gray-500">Verified</div></div>
                 <div className="bg-gray-800 rounded-xl p-4"><div className="text-2xl font-bold text-red-500">{result.summary.unverified}</div><div className="text-sm text-gray-500">Unverified</div></div>
-                <div className="bg-gray-800 rounded-xl p-4"><div className="text-2xl font-bold text-blue-500">{Math.round(result.summary.confidence * 100)}%</div><div className="text-sm text-gray-500">Confidence</div></div>
+                <div className="bg-gray-800 rounded-xl p-4"><div className="text-2xl font-bold text-blue-500">{formatConfidence(result.summary.confidence)}%</div><div className="text-sm text-gray-500">Confidence</div></div>
               </div>
             </div>
             <div className="space-y-4">
@@ -262,7 +268,7 @@ export default function AppPage() {
                           'bg-gray-500/20 text-gray-400'
                         }`}>{claim.verdict}</span>
                         <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-400">{claim.category}</span>
-                        <span className="text-xs text-gray-500">{Math.round(claim.confidence * 100)}% confidence</span>
+                        <span className="text-xs text-gray-500">{formatConfidence(claim.confidence)}% confidence</span>
                       </div>
                       {claim.sources && claim.sources.length > 0 && (
                         <div className="mt-3 space-y-1">
