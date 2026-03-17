@@ -306,7 +306,7 @@ ${text}`
       unverified: verifiedClaims.filter(c => c.verdict === 'UNVERIFIED').length,
       partial: verifiedClaims.filter(c => c.verdict === 'PARTIAL').length,
       unable_to_verify: verifiedClaims.filter(c => c.verdict === 'UNABLE_TO_VERIFY').length,
-      confidence: avgConfidence,
+      confidence: avgConfidence / 100,
     };
 
     return NextResponse.json({
