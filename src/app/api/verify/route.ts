@@ -53,6 +53,126 @@ function extractTextFromResponse(content: any[]): string {
     .join('\n');
 }
 
+// Normalize confidence to 0-1 range (Claude sometimes returns 0-100 instead of 0-1)
+function normalizeConfidence(value: number): number {
+  if (value > 1) return value / 100;
+  return value;
+}
+
+// Verify a single claim with timeout
+async function verifyClaim(
+  anthropic: Anthropic,
+  claim: any,
+  timeoutMs: number = 45000
+): Promise<any> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const verificationResponse = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1500,
+      tools: [
+        {
+          type: "web_search_20250305",
+          name: "web_search",
+          max_uses: 2,
+        } as any
+      ],
+      messages: [
+        {
+          role: 'user',
+          content: `You are a fact-verification specialist. Verify this claim by searching the web.
+
+CLAIM: "${claim.text}"
+CATEGORY: ${claim.category}
+
+Search for evidence, then respond with ONLY this JSON:
+{
+  "verdict": "VERIFIED|UNVERIFIED|PARTIAL|UNABLE_TO_VERIFY",
+  "confidence": 0.0 to 1.0,
+  "evidence": "2-3 sentence explanation",
+  "key_findings": ["finding 1", "finding 2"],
+  "red_flags": ["any concerns"]
+}
+
+GUIDELINES:
+- VERIFIED (0.7-0.95): Credible sources confirm the claim exists (institution, program, certification is real and matches).
+- PARTIAL (0.4-0.7): Some aspects confirmed but details differ (wrong dates, different title, etc).
+- UNVERIFIED (0.7-0.95): Evidence actively contradicts the claim.
+- UNABLE_TO_VERIFY (0.3-0.5): Truly no public info found. Use sparingly — most real institutions/companies/certs are searchable.
+
+If an institution offers the claimed degree, or a certification program exists, that supports the claim. Don't require finding the specific individual.`
+        }
+      ],
+    });
+
+    clearTimeout(timeout);
+
+    const webSources = extractSourcesFromResponse(verificationResponse.content);
+    const responseText = extractTextFromResponse(verificationResponse.content);
+
+    let result = {
+      verdict: 'UNABLE_TO_VERIFY',
+      confidence: 0.4,
+      evidence: 'Verification completed',
+      key_findings: [] as string[],
+      red_flags: [] as string[],
+    };
+
+    try {
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        result = { ...result, ...parsed };
+      }
+    } catch (e) {
+      result.evidence = responseText.slice(0, 500);
+    }
+
+    // Normalize confidence to 0-1 range
+    result.confidence = normalizeConfidence(result.confidence);
+
+    const allSources = webSources.map((s) => ({
+      ...s,
+      ...getSourceTier(s.url),
+    }));
+
+    // Deduplicate sources by URL
+    const uniqueSources = allSources.filter((s, i, arr) =>
+      arr.findIndex(x => x.url === s.url) === i
+    ).slice(0, 8); // Max 8 sources per claim
+
+    return {
+      id: claim.id,
+      claim: claim.text,
+      category: claim.category,
+      verdict: result.verdict,
+      confidence: Math.round(result.confidence * 100) / 100,
+      evidence: result.evidence,
+      key_findings: result.key_findings || [],
+      red_flags: result.red_flags || [],
+      sources: uniqueSources,
+    };
+  } catch (e: any) {
+    clearTimeout(timeout);
+    console.error(`Verification error for claim ${claim.id}:`, e.message);
+    return {
+      id: claim.id,
+      claim: claim.text,
+      category: claim.category,
+      verdict: 'UNABLE_TO_VERIFY',
+      confidence: 0.3,
+      evidence: e.name === 'AbortError'
+        ? 'Verification timed out. This claim may require manual review.'
+        : 'An error occurred during verification. Please try again.',
+      key_findings: [],
+      red_flags: [],
+      sources: [],
+    };
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     if (!process.env.ANTHROPIC_API_KEY) {
@@ -114,35 +234,19 @@ export async function POST(request: NextRequest) {
     try {
       const extractionResponse = await anthropic.messages.create({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 4096,
+        max_tokens: 2048,
         messages: [
           {
             role: 'user',
-            content: `You are a claim extraction engine for a ${mode === 'resume' ? 'resume/CV verification' : 'fact-checking'} tool.
-
-Extract all verifiable factual claims from this text. Focus on claims that can be checked against public information:
-
-- Education: degrees, institutions, graduation years, honors
-- Employment: companies, job titles, dates, responsibilities
-- Certifications: credential names, issuing bodies, dates
-- Achievements: publications, speaking engagements, awards, open source contributions
-- Quantitative claims: numbers, statistics, metrics
-
-Return ONLY valid JSON with no other text:
+            content: `Extract all verifiable factual claims from this ${mode === 'resume' ? 'resume/CV' : 'text'}. Return ONLY valid JSON:
 {
   "claims": [
-    {
-      "id": 1,
-      "text": "the exact claim to verify",
-      "category": "education|employment|certification|achievement|quantitative",
-      "search_queries": ["suggested search query 1", "suggested search query 2"]
-    }
+    { "id": 1, "text": "claim text", "category": "education|employment|certification|achievement|quantitative" }
   ]
 }
+Maximum 6 claims. Prioritize the most important and verifiable. Skip opinions and soft skills.
 
-Maximum 8 claims. Prioritize the most important and verifiable ones. Skip opinions, soft skills, and vague statements.
-
-TEXT TO ANALYZE:
+TEXT:
 ${text}`
           }
         ],
@@ -174,121 +278,13 @@ ${text}`
       });
     }
 
-    // STEP 2: Verify claims WITH web search
-    const verifiedClaims = [];
+    // STEP 2: Verify ALL claims in PARALLEL (not one at a time)
+    const claimsToVerify = claims.slice(0, 5);
+    const verificationPromises = claimsToVerify.map(claim =>
+      verifyClaim(anthropic, claim, 45000)
+    );
 
-    for (const claim of claims.slice(0, 5)) {
-      try {
-        const verificationResponse = await anthropic.messages.create({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 2048,
-          tools: [
-            {
-              type: "web_search_20250305",
-              name: "web_search",
-              max_uses: 3,
-            } as any
-          ],
-          messages: [
-            {
-              role: 'user',
-              content: `You are a fact-verification specialist. Your job is to verify the following claim by searching the web for evidence.
-
-CLAIM TO VERIFY: "${claim.text}"
-CATEGORY: ${claim.category}
-
-INSTRUCTIONS:
-1. Search the web to find evidence that supports or contradicts this claim.
-2. Check multiple sources when possible.
-3. For education claims: verify the institution exists, offers that program, and the graduation year is plausible.
-4. For employment claims: verify the company exists, the role title is plausible, and check LinkedIn or company pages if possible.
-5. For certifications: verify the certification program exists and is offered by the stated organization.
-6. For achievements: search for the specific publication, conference talk, or contribution.
-7. For quantitative claims: verify the numbers against official sources.
-
-After searching, provide your verdict as ONLY valid JSON with no other text:
-{
-  "verdict": "VERIFIED|UNVERIFIED|PARTIAL|UNABLE_TO_VERIFY",
-  "confidence": 0.0 to 1.0,
-  "evidence": "2-3 sentence explanation of what you found and why you reached this verdict",
-  "key_findings": ["finding 1", "finding 2"],
-  "red_flags": ["any concerns or inconsistencies found"],
-  "sources_checked": ["source name or url 1", "source name or url 2"]
-}
-
-VERDICT GUIDELINES:
-- VERIFIED (0.8-1.0 confidence): Multiple credible sources confirm the claim, or official records support it.
-- PARTIAL (0.5-0.7 confidence): Some aspects confirmed but details differ (e.g., different dates, different title).
-- UNVERIFIED (0.7-1.0 confidence): Evidence contradicts the claim (e.g., person not listed, dates wrong, credential doesn't exist).
-- UNABLE_TO_VERIFY (0.3-0.5 confidence): No public information found either way. This should be RARE — most claims about real institutions and companies will have some searchable evidence.
-
-IMPORTANT: Do NOT default to UNABLE_TO_VERIFY. If Stanford has a CS program and awards B.S. degrees, that's evidence supporting a Stanford CS claim. If AWS Solutions Architect Professional is a real certification, that supports the certification claim. Use the web to check these things.`
-            }
-          ],
-        });
-
-        // Extract sources from web search results
-        const webSources = extractSourcesFromResponse(verificationResponse.content);
-        const responseText = extractTextFromResponse(verificationResponse.content);
-
-        // Parse the JSON verdict from the response
-        let result = {
-          verdict: 'UNABLE_TO_VERIFY',
-          confidence: 0.4,
-          evidence: 'Verification in progress',
-          key_findings: [] as string[],
-          red_flags: [] as string[],
-          sources_checked: [] as string[],
-        };
-
-        try {
-          const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            const parsed = JSON.parse(jsonMatch[0]);
-            result = { ...result, ...parsed };
-          }
-        } catch (e) {
-          // If we can't parse JSON, use the text response as evidence
-          result.evidence = responseText.slice(0, 500);
-        }
-
-        // Combine web search sources with any sources mentioned in the response
-        const allSources = webSources.map((s) => ({
-          ...s,
-          ...getSourceTier(s.url),
-        }));
-
-        verifiedClaims.push({
-          id: claim.id,
-          claim: claim.text,
-          category: claim.category,
-          verdict: result.verdict,
-          confidence: Math.round(result.confidence * 100) / 100,
-          evidence: result.evidence,
-          key_findings: result.key_findings || [],
-          red_flags: result.red_flags || [],
-          sources: allSources.length > 0 ? allSources : (result.sources_checked || []).map((s: string) => ({
-            url: s.startsWith('http') ? s : '',
-            title: s,
-            snippet: '',
-            ...getSourceTier(s),
-          })),
-        });
-      } catch (e: any) {
-        console.error(`Verification error for claim ${claim.id}:`, e.message);
-        verifiedClaims.push({
-          id: claim.id,
-          claim: claim.text,
-          category: claim.category,
-          verdict: 'UNABLE_TO_VERIFY',
-          confidence: 0.3,
-          evidence: 'An error occurred during verification. Please try again.',
-          key_findings: [],
-          red_flags: [],
-          sources: [],
-        });
-      }
-    }
+    const verifiedClaims = await Promise.all(verificationPromises);
 
     // Update usage count
     try {
@@ -299,13 +295,18 @@ IMPORTANT: Do NOT default to UNABLE_TO_VERIFY. If Stanford has a CS program and 
       console.error('Failed to update usage count');
     }
 
+    const validClaims = verifiedClaims.filter(c => c.confidence > 0);
+    const avgConfidence = validClaims.length > 0
+      ? Math.round((validClaims.reduce((sum, c) => sum + c.confidence, 0) / validClaims.length) * 100)
+      : 0;
+
     const summary = {
       total_claims: verifiedClaims.length,
       verified: verifiedClaims.filter(c => c.verdict === 'VERIFIED').length,
       unverified: verifiedClaims.filter(c => c.verdict === 'UNVERIFIED').length,
       partial: verifiedClaims.filter(c => c.verdict === 'PARTIAL').length,
       unable_to_verify: verifiedClaims.filter(c => c.verdict === 'UNABLE_TO_VERIFY').length,
-      confidence: Math.round((verifiedClaims.reduce((sum, c) => sum + c.confidence, 0) / verifiedClaims.length) * 100),
+      confidence: avgConfidence,
     };
 
     return NextResponse.json({
