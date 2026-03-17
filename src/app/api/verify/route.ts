@@ -53,13 +53,11 @@ function extractTextFromResponse(content: any[]): string {
     .join('\n');
 }
 
-// Normalize confidence to 0-1 range (Claude sometimes returns 0-100 instead of 0-1)
 function normalizeConfidence(value: number): number {
   if (value > 1) return value / 100;
   return value;
 }
 
-// Verify a single claim with timeout
 async function verifyClaim(
   anthropic: Anthropic,
   claim: any,
@@ -130,7 +128,6 @@ If an institution offers the claimed degree, or a certification program exists, 
       result.evidence = responseText.slice(0, 500);
     }
 
-    // Normalize confidence to 0-1 range
     result.confidence = normalizeConfidence(result.confidence);
 
     const allSources = webSources.map((s) => ({
@@ -138,10 +135,9 @@ If an institution offers the claimed degree, or a certification program exists, 
       ...getSourceTier(s.url),
     }));
 
-    // Deduplicate sources by URL
     const uniqueSources = allSources.filter((s, i, arr) =>
       arr.findIndex(x => x.url === s.url) === i
-    ).slice(0, 8); // Max 8 sources per claim
+    ).slice(0, 8);
 
     return {
       id: claim.id,
@@ -229,7 +225,7 @@ export async function POST(request: NextRequest) {
 
     const startTime = Date.now();
 
-    // STEP 1: Extract claims (no web search needed)
+    // STEP 1: Extract claims — handles messy formatting, bullet points, special characters
     let claims: any[] = [];
     try {
       const extractionResponse = await anthropic.messages.create({
@@ -238,13 +234,22 @@ export async function POST(request: NextRequest) {
         messages: [
           {
             role: 'user',
-            content: `Extract all verifiable factual claims from this ${mode === 'resume' ? 'resume/CV' : 'text'}. Return ONLY valid JSON:
+            content: `You are extracting verifiable claims from a ${mode === 'resume' ? 'resume/CV' : 'text'}. The text may contain bullet points, special characters, and messy formatting — ignore formatting and focus on the factual claims.
+
+Extract verifiable claims such as:
+- Education: degrees, schools, graduation dates, GPA
+- Employment: companies, job titles, dates
+- Research: programs, institutions, publications, presentations
+- Certifications or awards
+- Specific quantitative claims (selected as 1 of 6, class of 25, etc.)
+
+Return ONLY valid JSON with no other text:
 {
   "claims": [
     { "id": 1, "text": "claim text", "category": "education|employment|certification|achievement|quantitative" }
   ]
 }
-Maximum 6 claims. Prioritize the most important and verifiable. Skip opinions and soft skills.
+Maximum 6 claims. Prioritize the most important and verifiable. Skip opinions, soft skills, and vague statements. If the text has messy formatting, do your best to extract the core factual claims.
 
 TEXT:
 ${text}`
@@ -278,7 +283,7 @@ ${text}`
       });
     }
 
-    // STEP 2: Verify ALL claims in PARALLEL (not one at a time)
+    // STEP 2: Verify ALL claims in PARALLEL
     const claimsToVerify = claims.slice(0, 5);
     const verificationPromises = claimsToVerify.map(claim =>
       verifyClaim(anthropic, claim, 45000)
