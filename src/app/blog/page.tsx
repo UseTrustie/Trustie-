@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
+import Footer from '@/components/Footer';
 
 export default function BlogPage() {
   const { isSignedIn } = useUser();
@@ -9,11 +10,9 @@ export default function BlogPage() {
 
   const posts = [
     {
-      slug: 'resume-fraud-statistics-2025',
-      // FIX: "70%" → "Up to 64%" to match proof page
+      slug: 'resume-fraud-statistics',
       title: 'Up to 64% of Resumes Contain Lies: What HR Teams Need to Know',
       excerpt: 'Multiple studies show a significant percentage of resumes contain some form of misrepresentation. Here\'s what to look for and how to protect your hiring process.',
-      // FIX: Updated date to 2026
       date: 'Mar 10, 2026',
       readTime: '5 min read',
       category: 'Research',
@@ -70,28 +69,33 @@ export default function BlogPage() {
 
         <div className="space-y-8">
           {posts.map((post) => (
-            <article
+            <Link
               key={post.slug}
-              className="rounded-2xl p-6 bg-gray-900 border border-gray-800 hover:border-gray-700 transition-colors"
+              href={`/blog/${post.slug}`}
+              className="block"
             >
-              <div className="flex items-center gap-3 mb-3">
-                <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400">
-                  {post.category}
+              <article
+                className="rounded-2xl p-6 bg-gray-900 border border-gray-800 hover:border-blue-500/50 transition-colors cursor-pointer"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400">
+                    {post.category}
+                  </span>
+                  <span className="text-sm text-gray-600">{post.date}</span>
+                  <span className="text-sm text-gray-600">•</span>
+                  <span className="text-sm text-gray-600">{post.readTime}</span>
+                </div>
+                <h2 className="text-xl font-bold mb-2 text-white">
+                  {post.title}
+                </h2>
+                <p className="text-gray-400 mb-4">
+                  {post.excerpt}
+                </p>
+                <span className="text-blue-500 text-sm font-medium">
+                  Read article →
                 </span>
-                <span className="text-sm text-gray-600">{post.date}</span>
-                <span className="text-sm text-gray-600">•</span>
-                <span className="text-sm text-gray-600">{post.readTime}</span>
-              </div>
-              <h2 className="text-xl font-bold mb-2 text-white">
-                {post.title}
-              </h2>
-              <p className="text-gray-400 mb-4">
-                {post.excerpt}
-              </p>
-              <p className="text-gray-600 text-sm">
-                Full article coming soon
-              </p>
-            </article>
+              </article>
+            </Link>
           ))}
         </div>
 
@@ -106,6 +110,7 @@ export default function BlogPage() {
           </Link>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
