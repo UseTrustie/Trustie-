@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Footer from '@/components/Footer';
 
 export default function TermsPage() {
   return (
@@ -24,7 +25,6 @@ export default function TermsPage() {
 
       <main className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-4xl font-bold mb-4">Terms of Service</h1>
-        {/* FIX: 2025 → 2026 */}
         <p className="text-gray-500 mb-12">Last updated: March 15, 2026</p>
 
         <div className="space-y-8 text-gray-300">
@@ -48,7 +48,6 @@ export default function TermsPage() {
             </ul>
           </section>
 
-          {/* FIX: Added FCRA disclaimer to limitations */}
           <section>
             <h2 className="text-2xl font-bold mb-4 text-white">Important Limitations</h2>
             <div className="rounded-xl p-6 bg-yellow-500/10 border border-yellow-500/30">
@@ -81,8 +80,9 @@ export default function TermsPage() {
             <h2 className="text-2xl font-bold mb-4 text-white">Payments</h2>
             <ul className="list-disc list-inside space-y-2 text-gray-400">
               <li>Free tier: 5 verifications total, no payment required</li>
-              <li>Starter Pack: $49 one-time for 50 verifications</li>
-              <li>Pro Monthly: $29/month for unlimited verifications</li>
+              <li>Starter: $49/month for 100 verifications</li>
+              <li>Professional: $99/month for 500 verifications</li>
+              <li>Business: $249/month for unlimited verifications</li>
               <li>All payments processed securely by Stripe</li>
             </ul>
           </section>
@@ -122,6 +122,7 @@ export default function TermsPage() {
           </section>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
