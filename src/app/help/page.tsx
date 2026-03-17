@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
+import Footer from '@/components/Footer';
 
 export default function HelpPage() {
   const { isSignedIn } = useUser();
@@ -74,13 +75,13 @@ export default function HelpPage() {
           </div>
         </main>
       </div>
+      <Footer />
     </div>
   );
 }
 
 function GettingStarted({ authLink }: { authLink: string }) {
   const steps = [
-    // FIX: Removed "trustieapp.com" — may not resolve
     { title: 'Create an account', description: 'Sign up for free, no credit card required.' },
     { title: 'Open the verification tool', description: 'Go to the App page to access the verification interface.' },
     { title: 'Paste your text', description: 'Copy and paste a resume, bio, or any text with claims to verify.' },
@@ -148,7 +149,6 @@ function Verification() {
           </div>
         </div>
 
-        {/* FIX: Changed weight labels to match home page */}
         <div className="rounded-xl p-6 bg-gray-900 border border-gray-800">
           <h3 className="font-semibold mb-3 text-white">Source Tiers</h3>
           <div className="space-y-3">
@@ -194,14 +194,21 @@ function Billing() {
           <div className="p-4 rounded-lg bg-gray-800">
             <div className="flex justify-between items-center">
               <span className="font-medium text-white">Starter</span>
-              <span className="text-gray-400">$49 one-time</span>
+              <span className="text-gray-400">$49/mo</span>
             </div>
-            <p className="text-sm mt-1 text-gray-500">50 verifications, never expires</p>
+            <p className="text-sm mt-1 text-gray-500">100 verifications per month</p>
           </div>
           <div className="p-4 rounded-lg bg-gray-800">
             <div className="flex justify-between items-center">
-              <span className="font-medium text-white">Pro</span>
-              <span className="text-gray-400">$29/mo</span>
+              <span className="font-medium text-white">Professional</span>
+              <span className="text-gray-400">$99/mo</span>
+            </div>
+            <p className="text-sm mt-1 text-gray-500">500 verifications per month</p>
+          </div>
+          <div className="p-4 rounded-lg bg-gray-800">
+            <div className="flex justify-between items-center">
+              <span className="font-medium text-white">Business</span>
+              <span className="text-gray-400">$249/mo</span>
             </div>
             <p className="text-sm mt-1 text-gray-500">Unlimited verifications</p>
           </div>
@@ -229,7 +236,6 @@ function FAQ() {
   const faqs = [
     { q: 'What can Trustie verify?', a: 'Employment history, education credentials, certifications, achievements, and any factual claims in text.' },
     { q: 'How accurate is it?', a: 'Accuracy depends on available public information. We show confidence scores so you know when to verify manually.' },
-    // FIX: Updated data storage answer to be honest about AI provider
     { q: 'Is my data stored?', a: 'Trustie does not store your submitted text. It is sent to our AI provider for processing and is not retained by Trustie after verification is complete.' },
     { q: 'What sources do you check?', a: 'LinkedIn, .edu/.gov sites, company websites, news archives, professional certification bodies, and more.' },
   ];
