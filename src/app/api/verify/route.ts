@@ -58,6 +58,20 @@ function normalizeConfidence(value: number): number {
   return value;
 }
 
+function cleanInputText(text: string): string {
+  return text
+    .replace(/[●•◦▪▸►◆■□▶→⭐✦✓✗✔✘☐☑⬤◉○◌⊙⊚]/g, '-')
+    .replace(/\u2022|\u2023|\u2043|\u2219|\u25AA|\u25CB|\u25CF|\u25E6|\u2013|\u2014/g, '-')
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/[ \t]{2,}/g, ' ')
+    .trim();
+}
+
 async function verifyClaim(
   anthropic: Anthropic,
   claim: any,
@@ -219,13 +233,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Text is required' }, { status: 400 });
     }
 
-    if (text.length > 10000) {
+    // Clean text - strip special characters from PDF pastes
+    const cleanText = cleanInputText(text);
+
+    if (cleanText.length > 10000) {
       return NextResponse.json({ error: 'Text too long. Maximum 10,000 characters.' }, { status: 400 });
+    }
+
+    if (cleanText.length < 10) {
+      return NextResponse.json({ error: 'Text too short. Please paste a resume or text with verifiable claims.' }, { status: 400 });
     }
 
     const startTime = Date.now();
 
-    // STEP 1: Extract claims — handles messy formatting, bullet points, special characters
+    // STEP 1: Extract claims - handles messy formatting, bullet points, special characters
     let claims: any[] = [];
     try {
       const extractionResponse = await anthropic.messages.create({
@@ -234,7 +255,7 @@ export async function POST(request: NextRequest) {
         messages: [
           {
             role: 'user',
-            content: `You are extracting verifiable claims from a ${mode === 'resume' ? 'resume/CV' : 'text'}. The text may contain bullet points, special characters, and messy formatting — ignore formatting and focus on the factual claims.
+            content: `You are extracting verifiable claims from a ${mode === 'resume' ? 'resume/CV' : 'text'}. The text may contain bullet points, special characters, and messy formatting - ignore formatting and focus on the factual claims.
 
 Extract verifiable claims such as:
 - Education: degrees, schools, graduation dates, GPA
@@ -252,7 +273,7 @@ Return ONLY valid JSON with no other text:
 Maximum 6 claims. Prioritize the most important and verifiable. Skip opinions, soft skills, and vague statements. If the text has messy formatting, do your best to extract the core factual claims.
 
 TEXT:
-${text}`
+${cleanText}`
           }
         ],
       });
