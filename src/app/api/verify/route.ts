@@ -60,15 +60,13 @@ function normalizeConfidence(value: number): number {
 
 function cleanInputText(text: string): string {
   return text
-    .replace(/[●•◦▪▸►◆■□▶→⭐✦✓✗✔✘☐☑⬤◉○◌⊙⊚]/g, '-')
-    .replace(/\u2022|\u2023|\u2043|\u2219|\u25AA|\u25CB|\u25CF|\u25E6|\u2013|\u2014/g, '-')
-    .replace(/[\u2018\u2019]/g, "'")
-    .replace(/[\u201C\u201D]/g, '"')
-    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+    .replace(/[\u200B\u200C\u200D\u200E\u200F\uFEFF\u00AD\u2060\u180E]/g, '')
+    .replace(/\u00A0/g, ' ')
+    .replace(/[^\x20-\x7E\n\xC0-\xFF]/g, ' ')
     .replace(/\r\n/g, '\n')
     .replace(/\r/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
-    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/ {2,}/g, ' ')
     .trim();
 }
 
@@ -233,7 +231,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Text is required' }, { status: 400 });
     }
 
-    // Clean text - strip special characters from PDF pastes
+    // Clean text - strip ALL non-printable and special characters from PDF pastes
     const cleanText = cleanInputText(text);
 
     if (cleanText.length > 10000) {
