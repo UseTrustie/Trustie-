@@ -55,7 +55,7 @@ if (risk.level === ‘high’) {
 return { action: ‘Do Not Proceed’, detail: unverified + ’ claim’ + (unverified > 1 ? ‘s’ : ‘’) + ’ contradicted by public records. Request documentation or reconsider this candidate.’, icon: ‘\u{1F6AB}’ };
 }
 if (risk.level === ‘medium’) {
-const flagged = unverified + (partial || 0);
+var flagged = unverified + (partial || 0);
 return { action: ‘Proceed with Caution’, detail: flagged + ’ claim’ + (flagged > 1 ? ‘s’ : ‘’) + ’ need’ + (flagged === 1 ? ‘s’ : ‘’) + ’ additional documentation. Ask the candidate to provide supporting records.’, icon: ‘\u26A0\uFE0F’ };
 }
 if (risk.level === ‘low’) {
@@ -80,7 +80,7 @@ const order: Record<string, number> = { ‘UNVERIFIED’: 0, ‘PARTIAL’: 1, �
 return […claims].sort((a, b) => (order[a.verdict] ?? 4) - (order[b.verdict] ?? 4));
 }
 
-const LOADING_FACTS = [
+var LOADING_FACTS = [
 ‘Searching university databases…’,
 ‘Cross-referencing company records…’,
 ‘Checking certification registries…’,
@@ -105,13 +105,13 @@ const [isCheckingOut, setIsCheckingOut] = useState(false);
 const [loadingFact, setLoadingFact] = useState(0);
 const [expandedClaim, setExpandedClaim] = useState<number | null>(null);
 
-useEffect(() => {
+useEffect(function() {
 if (isLoaded && !isSignedIn) router.push(’/’);
 }, [isLoaded, isSignedIn, router]);
 
-useEffect(() => {
+useEffect(function() {
 if (isSignedIn) {
-fetch(’/api/usage’).then(r => r.json()).then(data => {
+fetch(’/api/usage’).then(function(r) { return r.json(); }).then(function(data) {
 if (data.verificationsUsed !== undefined) {
 setUsage({
 used: data.verificationsUsed,
@@ -119,19 +119,19 @@ limit: data.verificationsLimit === ‘unlimited’ ? Infinity : data.verificatio
 plan: data.plan,
 });
 }
-}).catch(() => {});
+}).catch(function() {});
 }
 }, [isSignedIn]);
 
-useEffect(() => {
+useEffect(function() {
 if (!isVerifying) return;
-const interval = setInterval(() => {
-setLoadingFact(prev => (prev + 1) % LOADING_FACTS.length);
+var interval = setInterval(function() {
+setLoadingFact(function(prev) { return (prev + 1) % LOADING_FACTS.length; });
 }, 2500);
-return () => clearInterval(interval);
+return function() { clearInterval(interval); };
 }, [isVerifying]);
 
-const handleVerify = async () => {
+var handleVerify = async function() {
 if (!inputText.trim()) return setError(‘Please enter text to verify’);
 setIsVerifying(true);
 setError(null);
@@ -141,17 +141,17 @@ setExpandedClaim(null);
 
 ```
 try {
-  const response = await fetch('/api/verify', {
+  var response = await fetch('/api/verify', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text: inputText, mode }),
+    body: JSON.stringify({ text: inputText, mode: mode }),
   });
-  let data;
+  var data;
   try { data = await response.json(); } catch (e) { throw new Error('Server error. Please try again.'); }
   if (data.limitReached) { setShowUpgrade(true); return setError('Upgrade to continue verifying!'); }
   if (!response.ok) throw new Error(data.error || 'Verification failed');
   setResult(data);
-  if (data.usage) setUsage({ ...usage, used: data.usage.used });
+  if (data.usage) setUsage({ used: data.usage.used, limit: usage.limit, plan: usage.plan });
 } catch (err: any) {
   setError(err.message || 'Something went wrong. Please try again.');
 } finally {
@@ -161,11 +161,11 @@ try {
 
 };
 
-const handleCheckout = async (priceType: string) => {
+var handleCheckout = async function(priceType: string) {
 setIsCheckingOut(true);
 try {
-const res = await fetch(’/api/checkout’, { method: ‘POST’, headers: { ‘Content-Type’: ‘application/json’ }, body: JSON.stringify({ priceType }) });
-const data = await res.json();
+var res = await fetch(’/api/checkout’, { method: ‘POST’, headers: { ‘Content-Type’: ‘application/json’ }, body: JSON.stringify({ priceType: priceType }) });
+var data = await res.json();
 if (data.url) window.location.href = data.url;
 else throw new Error(data.error);
 } catch (err: any) { setError(err.message); setIsCheckingOut(false); }
@@ -190,7 +190,7 @@ return (
 );
 }
 
-const limitReached = usage.limit !== Infinity && usage.used >= usage.limit;
+var limitReached = usage.limit !== Infinity && usage.used >= usage.limit;
 
 return (
 <div className="min-h-screen bg-gray-950 text-white">
@@ -208,7 +208,7 @@ return (
 <span className="text-gray-500">/{usage.limit === Infinity ? ‘\u221E’ : usage.limit}</span>
 <span className="ml-1.5 text-xs text-gray-600">{usage.plan}</span>
 </div>
-{usage.plan === ‘free’ && <button onClick={() => setShowUpgrade(true)} className=“px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transition-colors”>Upgrade</button>}
+{usage.plan === ‘free’ && <button onClick={function() { setShowUpgrade(true); }} className=“px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transition-colors”>Upgrade</button>}
 <span className="text-sm text-gray-500 hidden sm:block">{user?.emailAddresses[0]?.emailAddress}</span>
 <SignOutButton signOutOptions={{ redirectUrl: ‘/’ }}><button className="text-sm text-gray-600 hover:text-white transition-colors">Sign Out</button></SignOutButton>
 </div>
@@ -218,9 +218,9 @@ return (
 ```
   {showUpgrade && (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowUpgrade(false)} />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={function() { setShowUpgrade(false); }} />
       <div className="relative w-full max-w-lg rounded-2xl p-8 bg-gray-900 border border-gray-800">
-        <button onClick={() => setShowUpgrade(false)} className="absolute top-4 right-4 text-gray-500 hover:text-white text-xl">{'\u2715'}</button>
+        <button onClick={function() { setShowUpgrade(false); }} className="absolute top-4 right-4 text-gray-500 hover:text-white text-xl">{'\u2715'}</button>
         <h2 className="text-2xl font-bold mb-6">Upgrade Your Plan</h2>
         <div className="space-y-4">
           <div className="rounded-xl p-5 bg-gray-800">
@@ -228,21 +228,21 @@ return (
               <div><h3 className="font-bold text-white">Starter</h3><p className="text-sm text-gray-500">100 verifications/month</p></div>
               <div className="text-right"><span className="text-2xl font-bold text-white">$49</span><span className="text-gray-500">/mo</span></div>
             </div>
-            <button onClick={() => handleCheckout('starter')} disabled={isCheckingOut} className="w-full py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm font-medium">{isCheckingOut ? 'Loading...' : 'Start Starter'}</button>
+            <button onClick={function() { handleCheckout('starter'); }} disabled={isCheckingOut} className="w-full py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm font-medium">{isCheckingOut ? 'Loading...' : 'Start Starter'}</button>
           </div>
           <div className="rounded-xl p-5 border-2 border-blue-500 bg-blue-500/5">
             <div className="flex justify-between items-center mb-3">
               <div><h3 className="font-bold text-white">Professional</h3><p className="text-sm text-blue-400">500 verifications/month</p></div>
               <div className="text-right"><span className="text-2xl font-bold text-white">$99</span><span className="text-gray-400">/mo</span></div>
             </div>
-            <button onClick={() => handleCheckout('professional')} disabled={isCheckingOut} className="w-full py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium">{isCheckingOut ? 'Loading...' : 'Start Professional'}</button>
+            <button onClick={function() { handleCheckout('professional'); }} disabled={isCheckingOut} className="w-full py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium">{isCheckingOut ? 'Loading...' : 'Start Professional'}</button>
           </div>
           <div className="rounded-xl p-5 bg-gray-800">
             <div className="flex justify-between items-center mb-3">
               <div><h3 className="font-bold text-white">Business</h3><p className="text-sm text-gray-500">Unlimited verifications</p></div>
               <div className="text-right"><span className="text-2xl font-bold text-white">$249</span><span className="text-gray-500">/mo</span></div>
             </div>
-            <button onClick={() => handleCheckout('business')} disabled={isCheckingOut} className="w-full py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm font-medium">{isCheckingOut ? 'Loading...' : 'Start Business'}</button>
+            <button onClick={function() { handleCheckout('business'); }} disabled={isCheckingOut} className="w-full py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm font-medium">{isCheckingOut ? 'Loading...' : 'Start Business'}</button>
           </div>
         </div>
       </div>
@@ -254,14 +254,14 @@ return (
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold text-white">Verify Claims</h1>
         <div className="flex rounded-lg bg-gray-800 p-1">
-          <button onClick={() => setMode('resume')} className={`px-4 py-2 text-sm rounded-md transition-colors ${mode === 'resume' ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-white'}`}>Resume</button>
-          <button onClick={() => setMode('general')} className={`px-4 py-2 text-sm rounded-md transition-colors ${mode === 'general' ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-white'}`}>General</button>
+          <button onClick={function() { setMode('resume'); }} className={'px-4 py-2 text-sm rounded-md transition-colors ' + (mode === 'resume' ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-white')}>Resume</button>
+          <button onClick={function() { setMode('general'); }} className={'px-4 py-2 text-sm rounded-md transition-colors ' + (mode === 'general' ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-white')}>General</button>
         </div>
       </div>
       <div className="rounded-2xl bg-gray-900 border border-gray-800">
         <textarea
           value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
+          onChange={function(e) { setInputText(e.target.value); }}
           placeholder={mode === 'resume' ? 'Paste a resume or CV to verify claims...' : 'Paste any text to verify factual claims...'}
           disabled={limitReached}
           className="w-full h-56 p-6 bg-transparent resize-none outline-none text-white placeholder-gray-600 text-sm leading-relaxed"
@@ -269,9 +269,9 @@ return (
         <div className="flex items-center justify-between px-6 py-3 border-t border-gray-800">
           <span className="text-xs text-gray-600">{inputText.length.toLocaleString()} characters</span>
           <button
-            onClick={limitReached ? () => setShowUpgrade(true) : handleVerify}
+            onClick={limitReached ? function() { setShowUpgrade(true); } : handleVerify}
             disabled={isVerifying || (!inputText.trim() && !limitReached)}
-            className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-all ${limitReached ? 'bg-yellow-500 text-black hover:bg-yellow-400' : 'bg-blue-500 text-white hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-500/20'} disabled:opacity-40 disabled:cursor-not-allowed`}
+            className={'px-6 py-2.5 rounded-lg font-medium text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed ' + (limitReached ? 'bg-yellow-500 text-black hover:bg-yellow-400' : 'bg-blue-500 text-white hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-500/20')}
           >
             {isVerifying ? 'Verifying...' : limitReached ? 'Upgrade to Continue' : 'Verify Claims'}
           </button>
@@ -290,20 +290,20 @@ return (
 
     {result && !isVerifying && (
       <div className="space-y-5">
-        {result.summary.total_claims > 0 && (() => {
-          const risk = getRiskLevel(result);
-          const rec = getRecommendation(result);
-          const bgColor = risk.color === 'green' ? 'bg-green-500/10 border-green-500/30' : risk.color === 'red' ? 'bg-red-500/10 border-red-500/30' : 'bg-yellow-500/10 border-yellow-500/30';
-          const textColor = risk.color === 'green' ? 'text-green-400' : risk.color === 'red' ? 'text-red-400' : 'text-yellow-400';
-          const badgeBg = risk.color === 'green' ? 'bg-green-500/20' : risk.color === 'red' ? 'bg-red-500/20' : 'bg-yellow-500/20';
+        {result.summary.total_claims > 0 && (function() {
+          var risk = getRiskLevel(result);
+          var rec = getRecommendation(result);
+          var bgColor = risk.color === 'green' ? 'bg-green-500/10 border-green-500/30' : risk.color === 'red' ? 'bg-red-500/10 border-red-500/30' : 'bg-yellow-500/10 border-yellow-500/30';
+          var textColor = risk.color === 'green' ? 'text-green-400' : risk.color === 'red' ? 'text-red-400' : 'text-yellow-400';
+          var badgeBg = risk.color === 'green' ? 'bg-green-500/20' : risk.color === 'red' ? 'bg-red-500/20' : 'bg-yellow-500/20';
           return (
-            <div className={`rounded-2xl border p-6 ${bgColor}`}>
+            <div className={'rounded-2xl border p-6 ' + bgColor}>
               <div className="flex items-start gap-4">
                 <span className="text-3xl">{rec.icon}</span>
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <h2 className="text-xl font-bold text-white">{rec.action}</h2>
-                    <span className={`text-xs px-3 py-1 rounded-full font-semibold ${badgeBg} ${textColor}`}>{risk.label}</span>
+                    <span className={'text-xs px-3 py-1 rounded-full font-semibold ' + badgeBg + ' ' + textColor}>{risk.label}</span>
                   </div>
                   <p className="text-sm text-gray-300">{rec.detail}</p>
                 </div>
@@ -335,25 +335,25 @@ return (
         </div>
 
         <div className="space-y-3">
-          {sortClaims(result.claims).map((claim) => {
-            const isExpanded = expandedClaim === claim.id;
-            const vcMap: Record<string, { bg: string; text: string; icon: string; label: string; border: string }> = {
+          {sortClaims(result.claims).map(function(claim) {
+            var isExpanded = expandedClaim === claim.id;
+            var vcMap: Record<string, { bg: string; text: string; icon: string; label: string; border: string }> = {
               'VERIFIED': { bg: 'bg-green-500/10', text: 'text-green-400', icon: '\u2713', label: 'Confirmed', border: 'border-green-500/20' },
               'UNVERIFIED': { bg: 'bg-red-500/10', text: 'text-red-400', icon: '\u2717', label: 'Flagged', border: 'border-red-500/20' },
               'PARTIAL': { bg: 'bg-yellow-500/10', text: 'text-yellow-400', icon: '\u25D0', label: 'Partial', border: 'border-yellow-500/20' },
               'UNABLE_TO_VERIFY': { bg: 'bg-gray-500/10', text: 'text-gray-400', icon: '?', label: 'Unconfirmed', border: 'border-gray-500/20' },
             };
-            const v = vcMap[claim.verdict] || vcMap['UNABLE_TO_VERIFY'];
+            var v = vcMap[claim.verdict] || vcMap['UNABLE_TO_VERIFY'];
             return (
-              <div key={claim.id} className={`rounded-xl border ${v.border} ${v.bg} overflow-hidden cursor-pointer transition-all hover:border-opacity-50`} onClick={() => setExpandedClaim(isExpanded ? null : claim.id)}>
+              <div key={claim.id} className={'rounded-xl border overflow-hidden cursor-pointer transition-all hover:border-opacity-50 ' + v.border + ' ' + v.bg} onClick={function() { setExpandedClaim(isExpanded ? null : claim.id); }}>
                 <div className="p-4">
                   <div className="flex items-start gap-3">
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-base font-bold shrink-0 ${v.bg} ${v.text}`}>{v.icon}</div>
+                    <div className={'w-9 h-9 rounded-lg flex items-center justify-center text-base font-bold shrink-0 ' + v.bg + ' ' + v.text}>{v.icon}</div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <p className="font-medium text-white text-sm leading-snug">{claim.claim}</p>
                         <div className="flex items-center gap-2 shrink-0">
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${v.bg} ${v.text}`}>{v.label}</span>
+                          <span className={'text-xs px-2 py-0.5 rounded-full font-medium ' + v.bg + ' ' + v.text}>{v.label}</span>
                           <span className="text-xs text-gray-600">{formatConfidence(claim.confidence)}%</span>
                         </div>
                       </div>
@@ -367,33 +367,35 @@ return (
                       {claim.red_flags && claim.red_flags.length > 0 && (
                         <div className="mb-3">
                           <p className="text-xs font-medium text-red-400 mb-1">Red Flags:</p>
-                          {claim.red_flags.map((flag, i) => (<p key={i} className="text-xs text-red-300/70 ml-2">- {flag}</p>))}
+                          {claim.red_flags.map(function(flag, i) { return (<p key={i} className="text-xs text-red-300/70 ml-2">- {flag}</p>); })}
                         </div>
                       )}
                       {claim.key_findings && claim.key_findings.length > 0 && (
                         <div className="mb-3">
                           <p className="text-xs font-medium text-gray-400 mb-1">Key Findings:</p>
-                          {claim.key_findings.map((f, i) => (<p key={i} className="text-xs text-gray-500 ml-2">- {f}</p>))}
+                          {claim.key_findings.map(function(f, i) { return (<p key={i} className="text-xs text-gray-500 ml-2">- {f}</p>); })}
                         </div>
                       )}
                       {claim.sources && claim.sources.length > 0 && (
                         <div>
                           <p className="text-xs font-medium text-gray-400 mb-1.5">Sources ({claim.sources.length}):</p>
                           <div className="space-y-1">
-                            {claim.sources.map((source: any, idx: number) => (
-                              <div key={idx} className="flex items-center gap-2 text-xs">
-                                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${source.tier === 1 ? 'bg-green-500' : source.tier === 2 ? 'bg-yellow-500' : 'bg-gray-600'}`} />
-                                <span className="text-gray-600 shrink-0">{source.label}:</span>
-                                <a href={source.url && source.url.startsWith('http') ? source.url : 'https://' + source.url} target="_blank" rel="noopener noreferrer" className="text-blue-400/80 hover:text-blue-400 hover:underline truncate" onClick={(e) => e.stopPropagation()}>{source.url}</a>
-                              </div>
-                            ))}
+                            {claim.sources.map(function(source: any, idx: number) {
+                              return (
+                                <div key={idx} className="flex items-center gap-2 text-xs">
+                                  <span className={'w-1.5 h-1.5 rounded-full shrink-0 ' + (source.tier === 1 ? 'bg-green-500' : source.tier === 2 ? 'bg-yellow-500' : 'bg-gray-600')} />
+                                  <span className="text-gray-600 shrink-0">{source.label}:</span>
+                                  <a href={source.url && source.url.startsWith('http') ? source.url : 'https://' + source.url} target="_blank" rel="noopener noreferrer" className="text-blue-400/80 hover:text-blue-400 hover:underline truncate" onClick={function(e) { e.stopPropagation(); }}>{source.url}</a>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       )}
                       <div className="flex items-center gap-3 mt-3">
                         <span className="text-xs px-2 py-0.5 rounded bg-gray-800 text-gray-500">{claim.category}</span>
                         <div className="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full ${claim.verdict === 'VERIFIED' ? 'bg-green-500' : claim.verdict === 'UNVERIFIED' ? 'bg-red-500' : claim.verdict === 'PARTIAL' ? 'bg-yellow-500' : 'bg-gray-500'}`} style={{ width: formatConfidence(claim.confidence) + '%' }} />
+                          <div className={'h-full rounded-full ' + (claim.verdict === 'VERIFIED' ? 'bg-green-500' : claim.verdict === 'UNVERIFIED' ? 'bg-red-500' : claim.verdict === 'PARTIAL' ? 'bg-yellow-500' : 'bg-gray-500')} style={{ width: formatConfidence(claim.confidence) + '%' }} />
                         </div>
                         <span className="text-xs text-gray-600">{formatConfidence(claim.confidence)}%</span>
                       </div>
