@@ -1,5 +1,4 @@
-'use client';
-
+‘use client’;
 
 import { useState, useEffect } from ‘react’;
 import { useUser, SignOutButton } from ‘@clerk/nextjs’;
@@ -39,12 +38,12 @@ return Math.round(value * 100);
 }
 
 function getRiskLevel(result: VerificationResult) {
-const { verified, unverified, total_claims } = result.summary;
+const { verified, unverified, partial, total_claims } = result.summary;
 if (total_claims === 0) return { level: ‘unknown’, color: ‘gray’, label: ‘No Claims Found’ };
 const unverifiedRatio = unverified / total_claims;
 const verifiedRatio = verified / total_claims;
 if (unverified >= 2 || unverifiedRatio >= 0.4) return { level: ‘high’, color: ‘red’, label: ‘High Risk’ };
-if (unverified === 1 || (result.summary.partial || 0) >= 2) return { level: ‘medium’, color: ‘yellow’, label: ‘Medium Risk’ };
+if (unverified === 1 || (partial || 0) >= 2) return { level: ‘medium’, color: ‘yellow’, label: ‘Medium Risk’ };
 if (verifiedRatio >= 0.8 && unverified === 0) return { level: ‘low’, color: ‘green’, label: ‘Low Risk’ };
 return { level: ‘medium’, color: ‘yellow’, label: ‘Medium Risk’ };
 }
@@ -53,14 +52,14 @@ function getRecommendation(result: VerificationResult) {
 const risk = getRiskLevel(result);
 const { verified, unverified, partial, total_claims } = result.summary;
 if (risk.level === ‘high’) {
-return { action: ‘Do Not Proceed’, detail: `${unverified} claim${unverified > 1 ? 's' : ''} contradicted by public records. Request documentation or reconsider this candidate.`, icon: ‘\u{1F6AB}’ };
+return { action: ‘Do Not Proceed’, detail: unverified + ’ claim’ + (unverified > 1 ? ‘s’ : ‘’) + ’ contradicted by public records. Request documentation or reconsider this candidate.’, icon: ‘\u{1F6AB}’ };
 }
 if (risk.level === ‘medium’) {
 const flagged = unverified + (partial || 0);
-return { action: ‘Proceed with Caution’, detail: `${flagged} claim${flagged > 1 ? 's' : ''} need${flagged === 1 ? 's' : ''} additional documentation. Ask the candidate to provide supporting records.`, icon: ‘\u26A0\uFE0F’ };
+return { action: ‘Proceed with Caution’, detail: flagged + ’ claim’ + (flagged > 1 ? ‘s’ : ‘’) + ’ need’ + (flagged === 1 ? ‘s’ : ‘’) + ’ additional documentation. Ask the candidate to provide supporting records.’, icon: ‘\u26A0\uFE0F’ };
 }
 if (risk.level === ‘low’) {
-return { action: ‘Proceed to Interview’, detail: `${verified} of ${total_claims} claims confirmed against public sources. Credentials appear legitimate.`, icon: ‘\u2705’ };
+return { action: ‘Proceed to Interview’, detail: verified + ’ of ’ + total_claims + ’ claims confirmed against public sources. Credentials appear legitimate.’, icon: ‘\u2705’ };
 }
 return { action: ‘Insufficient Data’, detail: ‘Not enough verifiable claims found. Try pasting the full resume.’, icon: ‘\u2139\uFE0F’ };
 }
@@ -69,11 +68,11 @@ function getPlainSummary(result: VerificationResult) {
 const { verified, unverified, partial, total_claims } = result.summary;
 const unable = (result.summary as any).unable_to_verify || 0;
 const parts: string[] = [];
-if (verified > 0) parts.push(`${verified} confirmed`);
-if (partial > 0) parts.push(`${partial} partially confirmed`);
-if (unverified > 0) parts.push(`${unverified} flagged`);
-if (unable > 0) parts.push(`${unable} could not be verified`);
-return `${total_claims} claims analyzed: ${parts.join(', ')}.`;
+if (verified > 0) parts.push(verified + ’ confirmed’);
+if (partial > 0) parts.push(partial + ’ partially confirmed’);
+if (unverified > 0) parts.push(unverified + ’ flagged’);
+if (unable > 0) parts.push(unable + ’ could not be verified’);
+return total_claims + ’ claims analyzed: ’ + parts.join(’, ’) + ‘.’;
 }
 
 function sortClaims(claims: VerifiedClaim[]) {
@@ -173,11 +172,22 @@ else throw new Error(data.error);
 };
 
 if (!isLoaded) {
-return (<div className="min-h-screen bg-gray-950 flex items-center justify-center"><div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>);
+return (
+<div className="min-h-screen bg-gray-950 flex items-center justify-center">
+<div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+</div>
+);
 }
 
 if (!isSignedIn) {
-return (<div className="min-h-screen bg-gray-950 flex items-center justify-center px-4"><div className="text-center"><h1 className="text-2xl font-bold text-white mb-4">Redirecting…</h1><Link href="/" className="px-6 py-3 bg-blue-500 text-white rounded-xl inline-block">Go to Homepage</Link></div></div>);
+return (
+<div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+<div className="text-center">
+<h1 className="text-2xl font-bold text-white mb-4">Redirecting…</h1>
+<Link href="/" className="px-6 py-3 bg-blue-500 text-white rounded-xl inline-block">Go to Homepage</Link>
+</div>
+</div>
+);
 }
 
 const limitReached = usage.limit !== Infinity && usage.used >= usage.limit;
@@ -327,13 +337,13 @@ return (
         <div className="space-y-3">
           {sortClaims(result.claims).map((claim) => {
             const isExpanded = expandedClaim === claim.id;
-            const vc: Record<string, { bg: string; text: string; icon: string; label: string; border: string }> = {
+            const vcMap: Record<string, { bg: string; text: string; icon: string; label: string; border: string }> = {
               'VERIFIED': { bg: 'bg-green-500/10', text: 'text-green-400', icon: '\u2713', label: 'Confirmed', border: 'border-green-500/20' },
               'UNVERIFIED': { bg: 'bg-red-500/10', text: 'text-red-400', icon: '\u2717', label: 'Flagged', border: 'border-red-500/20' },
               'PARTIAL': { bg: 'bg-yellow-500/10', text: 'text-yellow-400', icon: '\u25D0', label: 'Partial', border: 'border-yellow-500/20' },
               'UNABLE_TO_VERIFY': { bg: 'bg-gray-500/10', text: 'text-gray-400', icon: '?', label: 'Unconfirmed', border: 'border-gray-500/20' },
             };
-            const v = vc[claim.verdict] || vc['UNABLE_TO_VERIFY'];
+            const v = vcMap[claim.verdict] || vcMap['UNABLE_TO_VERIFY'];
             return (
               <div key={claim.id} className={`rounded-xl border ${v.border} ${v.bg} overflow-hidden cursor-pointer transition-all hover:border-opacity-50`} onClick={() => setExpandedClaim(isExpanded ? null : claim.id)}>
                 <div className="p-4">
@@ -374,7 +384,7 @@ return (
                               <div key={idx} className="flex items-center gap-2 text-xs">
                                 <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${source.tier === 1 ? 'bg-green-500' : source.tier === 2 ? 'bg-yellow-500' : 'bg-gray-600'}`} />
                                 <span className="text-gray-600 shrink-0">{source.label}:</span>
-                                <a href={source.url?.startsWith('http') ? source.url : `https://${source.url}`} target="_blank" rel="noopener noreferrer" className="text-blue-400/80 hover:text-blue-400 hover:underline truncate" onClick={(e) => e.stopPropagation()}>{source.url}</a>
+                                <a href={source.url && source.url.startsWith('http') ? source.url : 'https://' + source.url} target="_blank" rel="noopener noreferrer" className="text-blue-400/80 hover:text-blue-400 hover:underline truncate" onClick={(e) => e.stopPropagation()}>{source.url}</a>
                               </div>
                             ))}
                           </div>
@@ -383,7 +393,7 @@ return (
                       <div className="flex items-center gap-3 mt-3">
                         <span className="text-xs px-2 py-0.5 rounded bg-gray-800 text-gray-500">{claim.category}</span>
                         <div className="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full ${claim.verdict === 'VERIFIED' ? 'bg-green-500' : claim.verdict === 'UNVERIFIED' ? 'bg-red-500' : claim.verdict === 'PARTIAL' ? 'bg-yellow-500' : 'bg-gray-500'}`} style={{ width: `${formatConfidence(claim.confidence)}%` }} />
+                          <div className={`h-full rounded-full ${claim.verdict === 'VERIFIED' ? 'bg-green-500' : claim.verdict === 'UNVERIFIED' ? 'bg-red-500' : claim.verdict === 'PARTIAL' ? 'bg-yellow-500' : 'bg-gray-500'}`} style={{ width: formatConfidence(claim.confidence) + '%' }} />
                         </div>
                         <span className="text-xs text-gray-600">{formatConfidence(claim.confidence)}%</span>
                       </div>
@@ -402,10 +412,10 @@ return (
               How to read these results
             </summary>
             <div className="mt-3 space-y-2 text-xs text-gray-500">
-              <p><span className="text-green-400 font-medium">Confirmed</span> — Public sources support this claim.</p>
-              <p><span className="text-red-400 font-medium">Flagged</span> — Public sources contradict this claim.</p>
-              <p><span className="text-yellow-400 font-medium">Partial</span> — Some aspects confirmed, but details differ.</p>
-              <p><span className="text-gray-400 font-medium">Unconfirmed</span> — No public evidence found either way.</p>
+              <p><span className="text-green-400 font-medium">Confirmed</span> - Public sources support this claim.</p>
+              <p><span className="text-red-400 font-medium">Flagged</span> - Public sources contradict this claim.</p>
+              <p><span className="text-yellow-400 font-medium">Partial</span> - Some aspects confirmed, but details differ.</p>
+              <p><span className="text-gray-400 font-medium">Unconfirmed</span> - No public evidence found either way.</p>
               <p className="pt-1 text-gray-600">Confidence shows how strongly evidence supports or contradicts each claim. Trustie checks public information and cannot access private records like HR systems or transcripts.</p>
             </div>
           </details>
