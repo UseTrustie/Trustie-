@@ -52,14 +52,14 @@ function getRecommendation(result: VerificationResult) {
   const risk = getRiskLevel(result);
   const { verified, unverified, partial, total_claims } = result.summary;
   if (risk.level === 'high') {
-    return { action: 'Do Not Proceed', detail: unverified + ' claim' + (unverified > 1 ? 's' : '') + ' contradicted by public records. Request documentation or reconsider this candidate.', icon: '\u{1F6AB}' };
+    return { action: 'Do Not Consider', detail: unverified + ' claim' + (unverified > 1 ? 's' : '') + ' contradicted by public records. Request documentation or reconsider this candidate.', icon: '\u{1F6AB}' };
   }
   if (risk.level === 'medium') {
     var flagged = unverified + (partial || 0);
-    return { action: 'Proceed with Caution', detail: flagged + ' claim' + (flagged > 1 ? 's' : '') + ' need' + (flagged === 1 ? 's' : '') + ' additional documentation. Ask the candidate to provide supporting records.', icon: '\u26A0\uFE0F' };
+    return { action: 'Consider with Follow-up', detail: flagged + ' claim' + (flagged > 1 ? 's' : '') + ' need' + (flagged === 1 ? 's' : '') + ' additional documentation. Ask the candidate to provide supporting records.', icon: '\u26A0\uFE0F' };
   }
   if (risk.level === 'low') {
-    return { action: 'Proceed to Interview', detail: verified + ' of ' + total_claims + ' claims confirmed against public sources. Credentials appear legitimate.', icon: '\u2705' };
+    return { action: 'Strong Consider', detail: verified + ' of ' + total_claims + ' claims confirmed against public sources. Credentials appear legitimate.', icon: '\u2705' };
   }
   return { action: 'Insufficient Data', detail: 'Not enough verifiable claims found. Try pasting the full resume.', icon: '\u2139\uFE0F' };
 }
@@ -325,7 +325,7 @@ export default function AppPage() {
                 </div>
                 <div className="bg-gray-800/60 rounded-xl p-3 text-center">
                   <div className="text-2xl font-bold text-blue-400">{formatConfidence(result.summary.confidence)}%</div>
-                  <div className="text-xs text-gray-500 mt-1">Confidence</div>
+                  <div className="text-xs text-gray-500 mt-1">Score</div>
                 </div>
               </div>
             </div>
