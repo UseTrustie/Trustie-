@@ -8,16 +8,14 @@ import Anthropic from '@anthropic-ai/sdk';
 
 const MODEL = 'claude-sonnet-4-20250514';
 
-// Max input size. Claude's context window is ~200k tokens; this cap (~50k tokens)
-// comfortably handles even a 38-page resume. This is OUR limit, not the model's.
+// Claude's context window is ~200k tokens; this (~50k tokens) handles a 38-page
+// resume. This is OUR cap, not the model's. (Old code rejected anything over 10k.)
 const MAX_INPUT_CHARS = 200_000;
 const MIN_INPUT_CHARS = 10;
 
-// How many extracted claims we send to the (slower, paid) web-verification layer.
 const MAX_CLAIMS_TO_VERIFY = 4;
 
-// If the internal analysis is this confident the resume is fake, skip web search
-// entirely — no point spending search tokens confirming an obvious fake. (Margin saver.)
+// Skip the (paid) web layer when the resume is an obvious fake — saves money.
 const SKIP_WEB_IF_REJECT_CONFIDENCE = 0.8;
 
 // ============================================================================
@@ -43,18 +41,9 @@ const SOURCE_TIERS: Record<string, { tier: number; weight: number; label: string
 function getSourceTier(url: string) {
   const urlLower = url.toLowerCase();
   for (const [domain, info] of Object.entries(SOURCE_TIERS)) {
-    if (domain !== 'default' && urlLower.includes(domain)) {
-      return info;
-    }
+    if (domain !== 'default' && urlLower.includes(domain)) return info;
   }
   return SOURCE_TIERS['default'];
-}
-
-// Map our internal tier (1/2/3) to the frontend's TrustQuality ('high'|'medium'|'low').
-function tierToQuality(tier: number): 'high' | 'medium' | 'low' {
-  if (tier === 1) return 'high';
-  if (tier === 2) return 'medium';
-  return 'low';
 }
 
 function getDomain(url: string): string {
@@ -66,16 +55,16 @@ function getDomain(url: string): string {
 }
 
 // ============================================================================
-// SHARED HELPERS
+// HELPERS
 // ============================================================================
 
-function extractSourcesFromResponse(content: any[]): { url: string; title: string; snippet: string }[] {
-  const sources: { url: string; title: string; snippet: string }[] = [];
+function extractSourcesFromResponse(content: any[]): { url: string; title: string }[] {
+  const sources: { url: string; title: string }[] = [];
   for (const block of content) {
     if (block.type === 'web_search_tool_result' && block.content) {
       for (const result of block.content) {
         if (result.type === 'web_search_result' && result.url) {
-          sources.push({ url: result.url, title: result.title || '', snippet: '' });
+          sources.push({ url: result.url, title: result.title || '' });
         }
       }
     }
@@ -109,7 +98,6 @@ function cleanInputText(text: string): string {
     .trim();
 }
 
-// Pull the first valid JSON object out of a model response.
 function parseJsonObject(text: string): any | null {
   const match = text.match(/\{[\s\S]*\}/);
   if (!match) return null;
@@ -121,9 +109,7 @@ function parseJsonObject(text: string): any | null {
 }
 
 // ============================================================================
-// STEP 1 — INTERNAL ANALYSIS (the brain)
-// No web search. Examines the WHOLE resume for fraud + quality signals.
-// This is what was missing: it catches fakes that name-drop real companies.
+// STEP 1 — INTERNAL ANALYSIS (the brain). No web search. Reads the WHOLE resume.
 // ============================================================================
 
 interface InternalAnalysis {
@@ -146,25 +132,23 @@ async function analyzeResume(anthropic: Anthropic, resumeText: string): Promise<
 
 Analyze the resume below for both AUTHENTICITY and QUALITY across these dimensions:
 
-1. INTERNAL CONSISTENCY — Do the claims agree with each other? Add up dated roles and compare to the stated years of experience. Check whether tenure claims match the timeline. Flag contradictions (e.g., header says "8+ years" but summary says "7 years"; dated jobs only sum to ~5 years).
+1. INTERNAL CONSISTENCY — Do the claims agree with each other? Add up dated roles and compare to the stated years of experience. Check whether tenure claims match the timeline. Flag contradictions (e.g., header says "8+ years" but summary says "7 years"; dated jobs only sum to ~5 years). These are HIGH severity.
 
-2. IDENTITY COHERENCE — Does the candidate's name match their email, GitHub/LinkedIn handles, and any URLs? A name like "Sean Keller" with a GitHub handle "KobenjiSan" is a real red flag. Mismatched digital identity is a common fraud signal.
+2. IDENTITY COHERENCE — Does the candidate's name match their email, GitHub/LinkedIn handles, and any URLs? A name like "Sean Keller" with a GitHub handle "KobenjiSan" is a real red flag. Mismatched digital identity is HIGH severity.
 
-3. AI-GENERATION / TEMPLATING TELLS — Keyword-stuffed skill lists (claiming expert-level mastery of 30+ unrelated technologies), duplicated keywords, generic templated project descriptions with no named products or verifiable metrics, repetitive padded bullets that restate the same thing many ways.
+3. AI-GENERATION / TEMPLATING TELLS — Keyword-stuffed skill lists (claiming expert-level mastery of 30+ unrelated technologies), duplicated keywords, generic templated project descriptions with no named products or verifiable metrics, repetitive padded bullets. Usually MEDIUM severity.
 
-4. SPECIFICITY & VERIFIABILITY — Does the resume name real, checkable things (specific products, named clients, concrete metrics) or is it vague boilerplate? Inflated unverifiable claims ("saved millions") are weak signals.
+4. SPECIFICITY & VERIFIABILITY — Vague boilerplate, inflated unverifiable claims ("saved millions"). Usually LOW–MEDIUM severity.
 
-5. GENUINE STRENGTHS — Identify what is actually impressive and credible. Do NOT only hunt for problems; surface real green flags too.
+5. GENUINE STRENGTHS — Identify what is actually impressive and credible. Surface real green flags too; do NOT only hunt for problems.
 
-IMPORTANT CALIBRATION:
-- Do NOT declare a specific fact "impossible" based on your own knowledge (e.g., software version numbers, recent certs) — your training may be out of date. Put anything that needs external checking into "claims_to_verify" instead.
-- A long, keyword-heavy resume is NOT automatically fraud. Many legitimate offshore/contractor resumes are dense and padded. Use INVESTIGATE for "concerning but not conclusive," and reserve REJECT for clear, hard signals (e.g., identity mismatch + experience math that doesn't add up + templated filler).
-- Be honest. If it's clean and strong, say PURSUE.
+CALIBRATION:
+- Do NOT declare a specific fact "impossible" based on your own knowledge (software versions, recent certs) — your training may be out of date. Put anything needing an external check into "claims_to_verify".
+- A long, keyword-heavy resume is NOT automatically fraud. Use INVESTIGATE for "concerning but not conclusive." Reserve REJECT for clear hard signals (e.g., identity mismatch + experience math that doesn't add up).
+- Use severity honestly: "high" only for hard fraud signals, "medium" for AI/templating tells, "low" for soft concerns. Be sparing with "high".
+- If it's clean and strong, say PURSUE with green flags and few/no red flags.
 
-VERDICTS:
-- PURSUE: Coherent, specific, credible. Worth the recruiter's time.
-- INVESTIGATE: Mixed signals or soft concerns. Recruiter should look closer / verify before investing time.
-- REJECT: Multiple hard fraud signals. Likely not a real, qualified candidate.
+VERDICTS: PURSUE (worth the recruiter's time) | INVESTIGATE (verify before investing) | REJECT (likely not real/qualified).
 
 Respond with ONLY this JSON, no other text:
 {
@@ -176,7 +160,7 @@ Respond with ONLY this JSON, no other text:
   "claims_to_verify": [{ "text": "the most important factual claim worth checking on the web", "category": "education" | "employment" | "certification" | "achievement" }]
 }
 
-Pick at most 4 claims_to_verify — the ones where external confirmation matters most.
+At most 4 claims_to_verify — the ones where external confirmation matters most.
 
 RESUME:
 ${resumeText}`,
@@ -187,7 +171,6 @@ ${resumeText}`,
   const text = response.content[0]?.type === 'text' ? response.content[0].text : '';
   const parsed = parseJsonObject(text);
 
-  // Safe defaults if the model returns something unparseable.
   return {
     verdict: parsed?.verdict === 'PURSUE' || parsed?.verdict === 'REJECT' ? parsed.verdict : 'INVESTIGATE',
     confidence: normalizeConfidence(parsed?.confidence ?? 0.5),
@@ -199,8 +182,7 @@ ${resumeText}`,
 }
 
 // ============================================================================
-// STEP 2 — WEB VERIFICATION (secondary layer, kept from your original engine)
-// Confirms that key claimed institutions/companies/credentials actually exist.
+// STEP 2 — WEB VERIFICATION (secondary layer)
 // ============================================================================
 
 async function verifyClaim(anthropic: Anthropic, claim: any, timeoutMs: number = 45000): Promise<any> {
@@ -230,12 +212,12 @@ Search for evidence, then respond with ONLY this JSON:
 }
 
 GUIDELINES:
-- VERIFIED (0.7-0.95): Credible sources confirm the claimed institution/company/credential is real and matches.
-- PARTIAL (0.4-0.7): Some aspects confirmed but details differ (wrong dates, different title, etc).
-- UNVERIFIED (0.7-0.95): Evidence actively contradicts the claim.
-- UNABLE_TO_VERIFY (0.3-0.5): Truly no public info found. Use sparingly.
+- VERIFIED: Credible sources confirm the claimed institution/company/credential is real and matches.
+- PARTIAL: Some aspects confirmed but details differ.
+- UNVERIFIED: Evidence actively contradicts the claim.
+- UNABLE_TO_VERIFY: No public info found. Use sparingly.
 
-If an institution offers the claimed degree, or a certification program exists, that supports the claim existing. Don't require finding the specific individual.`,
+If an institution offers the claimed degree or a certification program exists, that supports the claim existing. Don't require finding the specific individual.`,
         },
       ],
     });
@@ -254,26 +236,17 @@ If an institution offers the claimed degree, or a certification program exists, 
     };
 
     const parsed = parseJsonObject(responseText);
-    if (parsed) {
-      result = { ...result, ...parsed };
-    } else {
-      result.evidence = responseText.slice(0, 500);
-    }
+    if (parsed) result = { ...result, ...parsed };
+    else result.evidence = responseText.slice(0, 500);
 
     result.confidence = normalizeConfidence(result.confidence);
 
-    const uniqueSources = webSources
+    const sources = webSources
       .filter((s, i, arr) => arr.findIndex((x) => x.url === s.url) === i)
       .slice(0, 5)
       .map((s) => {
-        const tier = getSourceTier(s.url);
-        return {
-          url: s.url,
-          title: s.title || getDomain(s.url),
-          snippet: s.snippet || '',
-          domain: getDomain(s.url),
-          quality: tierToQuality(tier.tier),
-        };
+        const t = getSourceTier(s.url);
+        return { url: s.url, title: s.title || getDomain(s.url), tier: t.tier, label: t.label };
       });
 
     return {
@@ -282,11 +255,13 @@ If an institution offers the claimed degree, or a certification program exists, 
       verdict: result.verdict,
       confidence: Math.round(result.confidence * 100) / 100,
       evidence: result.evidence,
-      sources: uniqueSources,
+      key_findings: result.key_findings || [],
+      red_flags: result.red_flags || [],
+      sources,
     };
   } catch (e: any) {
     clearTimeout(timeout);
-    console.error(`Verification error for claim:`, e?.message);
+    console.error('Verification error:', e?.message);
     return {
       claim: claim.text,
       category: claim.category,
@@ -295,21 +270,37 @@ If an institution offers the claimed degree, or a certification program exists, 
       evidence: e?.name === 'AbortError'
         ? 'Verification timed out. This claim may require manual review.'
         : 'Could not complete web verification for this claim.',
+      key_findings: [],
+      red_flags: [],
       sources: [],
     };
   }
 }
 
 // ============================================================================
-// MERGE — turn analysis + web results into the shape the frontend expects.
-// Frontend contract (src/types): claims[].status = verified|false|unconfirmed|opinion,
-// summary = { total, verified, false, unconfirmed, opinions }, message.
+// MAPPING — produce the EXACT shape src/app/app/page.tsx reads.
+// summary: { total_claims, verified, unverified, partial, unable_to_verify, confidence }
+// claim:   { id, claim, category, verdict, confidence, evidence, key_findings, red_flags, sources[{url,tier,label}] }
+// Severity drives verdict so the page's risk engine triages correctly:
+//   high   -> UNVERIFIED ("Flagged", red)   => drives High Risk / Do Not Consider
+//   medium -> PARTIAL    ("Partial", yellow) => drives Medium Risk / Consider w/ Follow-up
+//   low    -> PARTIAL    (yellow)
+//   green  -> VERIFIED   ("Confirmed", green) => clean resumes => Low Risk / Strong Consider
 // ============================================================================
 
-function webVerdictToStatus(verdict: string): 'verified' | 'false' | 'unconfirmed' {
-  if (verdict === 'VERIFIED') return 'verified';
-  if (verdict === 'UNVERIFIED') return 'false';
-  return 'unconfirmed'; // PARTIAL or UNABLE_TO_VERIFY
+function redFlagToVerdict(severity: string): { verdict: string; confidence: number } {
+  const s = (severity || '').toLowerCase();
+  if (s === 'high') return { verdict: 'UNVERIFIED', confidence: 0.9 };
+  if (s === 'low') return { verdict: 'PARTIAL', confidence: 0.45 };
+  return { verdict: 'PARTIAL', confidence: 0.6 };
+}
+
+// Overall "Score" stat = a trust score (high = looks legit), independent of the
+// page's count-based risk badge.
+function trustScore(verdict: string): number {
+  if (verdict === 'PURSUE') return 0.9;
+  if (verdict === 'REJECT') return 0.15;
+  return 0.5;
 }
 
 // ============================================================================
@@ -327,7 +318,7 @@ export async function POST(request: NextRequest) {
 
     const { userId } = auth();
     if (!userId) {
-      return NextResponse.json({ error: 'Please sign in to verify resumes' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to analyze resumes' }, { status: 401 });
     }
 
     let user;
@@ -354,8 +345,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
     }
 
-    // Accept BOTH `content` (what the UI sends) and `text` (legacy) so the request stops failing.
-    const rawInput: string = body?.content ?? body?.text ?? '';
+    // The live page sends { text, mode }; accept `content` too for safety.
+    const rawInput: string = body?.text ?? body?.content ?? '';
 
     if (!rawInput || typeof rawInput !== 'string') {
       return NextResponse.json({ error: 'Please paste a resume to analyze.' }, { status: 400 });
@@ -375,7 +366,7 @@ export async function POST(request: NextRequest) {
 
     const startTime = Date.now();
 
-    // ---- STEP 1: Internal analysis (cheap, runs on every resume, no web search) ----
+    // ---- STEP 1: Internal analysis (cheap, every resume) ----
     let analysis: InternalAnalysis;
     try {
       analysis = await analyzeResume(anthropic, cleanText);
@@ -384,66 +375,71 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'AI service temporarily unavailable. Please try again.' }, { status: 503 });
     }
 
-    // ---- STEP 2: Web verification of key claims (skip on confident REJECT to save cost) ----
+    // ---- STEP 2: Web verification (skip on confident REJECT to save cost) ----
     let webResults: any[] = [];
     const skipWeb = analysis.verdict === 'REJECT' && analysis.confidence >= SKIP_WEB_IF_REJECT_CONFIDENCE;
-
     if (!skipWeb && analysis.claims_to_verify.length > 0) {
       const toVerify = analysis.claims_to_verify.slice(0, MAX_CLAIMS_TO_VERIFY);
       webResults = await Promise.all(toVerify.map((c) => verifyClaim(anthropic, c, 45000)));
     }
 
-    // ---- Build the claims list in the frontend's shape ----
+    // ---- Build claims in the live page's shape ----
     const claims: any[] = [];
+    let id = 1;
 
-    // Red flags -> shown red
     for (const f of analysis.red_flags) {
+      const { verdict, confidence } = redFlagToVerdict(f.severity);
       claims.push({
+        id: id++,
         claim: f.title || 'Red flag',
-        type: 'fact',
-        status: 'false',
-        explanation: f.severity ? `[${String(f.severity).toUpperCase()}] ${f.detail}` : f.detail,
+        category: 'authenticity',
+        verdict,
+        confidence,
+        evidence: f.detail || '',
+        key_findings: [],
+        red_flags: f.detail ? [f.detail] : [],
         sources: [],
       });
     }
 
-    // Web verification results -> mapped status, carry their sources
     for (const w of webResults) {
       claims.push({
+        id: id++,
         claim: w.claim,
-        type: 'fact',
-        status: webVerdictToStatus(w.verdict),
-        explanation: w.evidence,
+        category: w.category || 'verification',
+        verdict: w.verdict,
+        confidence: w.confidence,
+        evidence: w.evidence,
+        key_findings: w.key_findings || [],
+        red_flags: w.red_flags || [],
         sources: w.sources || [],
       });
     }
 
-    // Green flags -> shown green (as supporting context)
     for (const g of analysis.green_flags) {
       claims.push({
+        id: id++,
         claim: g.title || 'Strength',
-        type: 'opinion',
-        status: 'verified',
-        explanation: g.detail,
+        category: 'strength',
+        verdict: 'VERIFIED',
+        confidence: 0.85,
+        evidence: g.detail || '',
+        key_findings: [],
+        red_flags: [],
         sources: [],
       });
     }
 
-    // ---- Summary counts (frontend contract) ----
     const summary = {
-      total: claims.length,
-      verified: claims.filter((c) => c.status === 'verified').length,
-      false: claims.filter((c) => c.status === 'false').length,
-      unconfirmed: claims.filter((c) => c.status === 'unconfirmed').length,
-      opinions: claims.filter((c) => c.status === 'opinion').length,
+      total_claims: claims.length,
+      verified: claims.filter((c) => c.verdict === 'VERIFIED').length,
+      unverified: claims.filter((c) => c.verdict === 'UNVERIFIED').length,
+      partial: claims.filter((c) => c.verdict === 'PARTIAL').length,
+      unable_to_verify: claims.filter((c) => c.verdict === 'UNABLE_TO_VERIFY').length,
+      confidence: trustScore(analysis.verdict),
     };
 
-    // ---- Top-line recommendation shown under the verdict banner ----
-    const verdictLabel =
-      analysis.verdict === 'PURSUE' ? 'PURSUE' : analysis.verdict === 'REJECT' ? 'LIKELY FAKE — REJECT' : 'INVESTIGATE';
-    const message = `Recommendation: ${verdictLabel} (${Math.round(analysis.confidence * 100)}% confidence). ${analysis.recommendation}`;
-
-    // Update usage count
+    // Update usage
     try {
       await clerkClient.users.updateUser(userId, {
         publicMetadata: { ...metadata, verificationsUsed: verificationsUsed + 1 },
@@ -454,17 +450,15 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      claims,
       summary,
-      message,
+      claims,
+      // Extra fields (ignored by the page, handy for debugging/future UI):
       verdict: analysis.verdict,
-      confidence: analysis.confidence,
+      recommendation: analysis.recommendation,
       audit: {
         id: `ver_${Date.now()}`,
         timestamp: new Date().toISOString(),
         processing_time_ms: Date.now() - startTime,
-        model: MODEL,
-        web_search_used: !skipWeb && webResults.length > 0,
       },
       usage: { used: verificationsUsed + 1, limit: limit === Infinity ? 'unlimited' : limit },
     });
