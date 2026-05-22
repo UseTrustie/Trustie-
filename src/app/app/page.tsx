@@ -37,12 +37,21 @@ function formatConfidence(value: number) {
   return Math.round(value * 100);
 }
 
+// Below this overall score, recommend against proceeding -- like a failing
+// grade. Catches inflated / AI-spam resumes whose facts technically check out
+// but don't clear the quality bar. Change this one number to tune strictness.
+const SCORE_FLOOR = 65;
+
 function getRiskLevel(result: VerificationResult) {
-  const { verified, unverified, partial, total_claims } = result.summary;
+  const { verified, unverified, partial, total_claims, confidence } = result.summary;
   if (total_claims === 0) return { level: 'unknown', color: 'gray', label: 'No Claims Found' };
   const unverifiedRatio = unverified / total_claims;
   const verifiedRatio = verified / total_claims;
+  const scorePct = confidence > 1 ? confidence : confidence * 100;
+  // Hard fraud signals -> High Risk.
   if (unverified >= 2 || unverifiedRatio >= 0.4) return { level: 'high', color: 'red', label: 'High Risk' };
+  // Overall score below the bar -> High Risk, even with no single hard contradiction.
+  if (scorePct < SCORE_FLOOR) return { level: 'high', color: 'red', label: 'High Risk' };
   if (unverified === 1 || (partial || 0) >= 2) return { level: 'medium', color: 'yellow', label: 'Medium Risk' };
   if (verifiedRatio >= 0.8 && unverified === 0) return { level: 'low', color: 'green', label: 'Low Risk' };
   return { level: 'medium', color: 'yellow', label: 'Medium Risk' };
@@ -50,9 +59,13 @@ function getRiskLevel(result: VerificationResult) {
 
 function getRecommendation(result: VerificationResult) {
   const risk = getRiskLevel(result);
-  const { verified, unverified, partial, total_claims } = result.summary;
+  const { verified, unverified, partial, total_claims, confidence } = result.summary;
   if (risk.level === 'high') {
-    return { action: 'Do Not Consider', detail: unverified + ' claim' + (unverified > 1 ? 's' : '') + ' contradicted by public records. Request documentation or reconsider this candidate.', icon: '\u{1F6AB}' };
+    if (unverified >= 1) {
+      return { action: 'Do Not Consider', detail: unverified + ' claim' + (unverified > 1 ? 's' : '') + ' contradicted by public records. Request documentation or reconsider this candidate.', icon: '\u{1F6AB}' };
+    }
+    var lowScore = confidence > 1 ? Math.round(confidence) : Math.round(confidence * 100);
+    return { action: 'Do Not Consider', detail: 'Overall confidence is only ' + lowScore + '%. Claims are vague, inflated, or could not be verified - not worth prioritizing without strong supporting proof.', icon: '\u{1F6AB}' };
   }
   if (risk.level === 'medium') {
     var flagged = unverified + (partial || 0);
