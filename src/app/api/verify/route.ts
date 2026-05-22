@@ -17,7 +17,7 @@ export const maxDuration = 60;
 const MAX_INPUT_CHARS = 200_000;
 const MIN_INPUT_CHARS = 10;
 
-const MAX_CLAIMS_TO_VERIFY = 4;
+const MAX_CLAIMS_TO_VERIFY = 2;
 
 // Skip the (paid) web layer when the resume is an obvious fake — saves money.
 const SKIP_WEB_IF_REJECT_CONFIDENCE = 0.8;
@@ -113,7 +113,7 @@ function parseJsonObject(text: string): any | null {
 }
 
 // Retry a flaky async op (e.g. a model call) on transient failures, with backoff.
-async function withRetry<T>(fn: () => Promise<T>, attempts = 3, baseDelayMs = 1500): Promise<T> {
+async function withRetry<T>(fn: () => Promise<T>, attempts = 2, baseDelayMs = 1000): Promise<T> {
   let lastErr: any;
   for (let i = 0; i < attempts; i++) {
     try {
@@ -334,7 +334,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Server configuration error. Please contact support.' }, { status: 500 });
     }
 
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, maxRetries: 4 });
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, maxRetries: 3 });
 
     const { userId } = auth();
     if (!userId) {
@@ -395,12 +395,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'The analysis service is busy right now. Please click Verify again in a moment.' }, { status: 503 });
     }
 
-    // ---- STEP 2: Web verification (skip on confident REJECT to save cost) ----
+    // ---- STEP 2: Web verification — BEST-EFFORT and HARD-BOUNDED. ----
+    // The internal analysis above is the core result and ALWAYS returns. Web
+    // confirmation is a bonus: if it's slow or the API is busy, we skip it and
+    // return the analysis anyway, instead of failing the whole request.
     let webResults: any[] = [];
     const skipWeb = analysis.verdict === 'REJECT' && analysis.confidence >= SKIP_WEB_IF_REJECT_CONFIDENCE;
     if (!skipWeb && analysis.claims_to_verify.length > 0) {
       const toVerify = analysis.claims_to_verify.slice(0, MAX_CLAIMS_TO_VERIFY);
-      webResults = await Promise.all(toVerify.map((c) => verifyClaim(anthropic, c, 45000)));
+      try {
+        const webWork = Promise.all(toVerify.map((c) => verifyClaim(anthropic, c, 18000)));
+        // Whole-phase budget: whichever finishes first wins. If the searches
+        // aren't done in time, we move on with an empty set (analysis only).
+        const budget = new Promise<any[]>((resolve) => setTimeout(() => resolve([]), 28000));
+        webResults = await Promise.race([webWork, budget]);
+      } catch {
+        webResults = []; // a web failure must never crash the request
+      }
     }
 
     // ---- Build claims in the live page's shape ----
