@@ -16,6 +16,9 @@ export const maxDuration = 60;
 // resume. This is OUR cap, not the model's. (Old code rejected anything over 10k.)
 const MAX_INPUT_CHARS = 200_000;
 const MIN_INPUT_CHARS = 10;
+// We ACCEPT up to MAX_INPUT_CHARS, but only ANALYZE the first slice. A real
+// resume is far under this; capping here keeps cost + speed flat on huge pastes.
+const MAX_ANALYZE_CHARS = 30_000;
 
 const MAX_CLAIMS_TO_VERIFY = 2;
 
@@ -139,8 +142,12 @@ interface InternalAnalysis {
   claims_to_verify: { text: string; category: string }[];
 }
 
-async function analyzeResume(anthropic: Anthropic, resumeText: string): Promise<InternalAnalysis> {
+async function analyzeResume(anthropic: Anthropic, fullText: string): Promise<InternalAnalysis> {
   const today = new Date().toISOString().slice(0, 10);
+  // Processing cap: a real resume is well under this. We accept much larger
+  // pastes (see MAX_INPUT_CHARS) but only analyze the first slice, so API cost
+  // and latency stay flat regardless of how much someone pastes.
+  const resumeText = fullText.slice(0, MAX_ANALYZE_CHARS);
   const response = await anthropic.messages.create({
     model: MODEL,
     max_tokens: 1400,
