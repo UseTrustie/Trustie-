@@ -168,12 +168,16 @@ Analyze the resume below for both AUTHENTICITY and QUALITY across these dimensio
 
 5. GENUINE STRENGTHS — Identify what is actually impressive and credible. Surface real green flags too; do NOT only hunt for problems.
 
-CALIBRATION (read carefully):
-- UNKNOWN EMPLOYER IS NOT A RED FLAG. Many legitimate candidates work at small, private, startup, or foreign companies with little or no web presence. Do NOT flag an employer just because it's unfamiliar or hard to verify. Only flag employment when there's an actual internal contradiction (dates that don't work, a role that conflicts with the timeline). Whether a company "exists" is checked separately and neutrally — never penalize the candidate for it here.
-- Do NOT declare a fact "impossible" from your own knowledge (software versions, recent certs) — your training may be out of date. Put anything needing an external check into "claims_to_verify".
-- AI-SPAM PATTERN: if the resume's substance is dominated by AI-generated/templated filler, keyword stuffing, and vague inflated claims ("saved millions") WITH little specific, concrete, verifiable detail, treat it as a low-effort / likely-AI application a recruiter should skip — set verdict REJECT and mark the AI-generation red flag "high" severity. (A long resume that is dense BUT specific and coherent is fine — length is not the problem; emptiness dressed up as detail is.)
-- Severity: "high" = hard fraud signals (identity mismatch, experience math that doesn't add up) OR a dominant AI-spam pattern. "medium" = some AI/templating tells mixed with real content. "low" = minor soft concerns. Be sparing with "high".
-- If it's clean, specific, and coherent, say PURSUE with green flags and few/no red flags — EVEN IF you couldn't verify every employer.
+CALIBRATION (read carefully -- you serve recruiters fighting resume fraud):
+- PHILOSOPHY: a wasted interview on a fabricated or padded resume is expensive, so lean SKEPTICAL. PURSUE is reserved for resumes that are genuine, specific, AND whose KEY claims hold up. Anything questionable is INVESTIGATE, not PURSUE.
+- KEY claims = the current/primary employer, the degree (institution + title + level), identity consistency (name vs email vs handles), and whether the experience math adds up.
+- PURSUE: genuine and specific; key employers and credentials verify or are at least plausible and consistent; identity is consistent; no material contradiction. A clean candidate with one obscure/old job or an unfindable side project still gets PURSUE -- do NOT punish that.
+- INVESTIGATE (verify before the recruiter invests time): the CURRENT or primary employer cannot be verified; OR a credential is misrepresented (the institution does not award the claimed degree/level, e.g. claims "M.S." where the school grants "MMath"); OR the resume feels inflated/padded (buzzword stuffing, vague boasts like "saved millions" with no specifics, disproportionate tool name-dropping); OR there is a real internal contradiction.
+- REJECT: identity mismatch, experience math that does not add up, a credential proven false, or a dominant AI-spam / templated-filler pattern.
+- FORGIVABLE / SOFT -- do NOT downgrade to INVESTIGATE on these alone: a small, old, minor, private, or foreign PAST employer that is merely hard to verify; a side artifact (a repo, a talk, an award) you simply could not find. Note them, but do not punish a real candidate for an obscure past job or an unfindable side project.
+- Do NOT declare a fact "impossible" from your own knowledge (software versions, recent certs) -- put those in "claims_to_verify".
+- DATES: today is ${today}. A date is "in the future" ONLY if its year is greater than the current year, OR the year is equal AND its month is greater than the current month. Never flag a past or current date as future (with today 2026-05, an end date of 2026-01 is in the PAST).
+- Severity: "high" = hard fraud (identity mismatch, experience math fails, dominant AI-spam). "medium" = unverifiable current/primary employer, credential mismatch, internal contradiction. "low" = minor soft concerns.
 
 VERDICTS: PURSUE (worth the recruiter's time) | INVESTIGATE (verify before investing) | REJECT (likely not real/qualified).
 
