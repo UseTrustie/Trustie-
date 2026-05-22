@@ -143,7 +143,7 @@ async function analyzeResume(anthropic: Anthropic, resumeText: string): Promise<
   const today = new Date().toISOString().slice(0, 10);
   const response = await anthropic.messages.create({
     model: MODEL,
-    max_tokens: 2500,
+    max_tokens: 1400,
     messages: [
       {
         role: 'user',
@@ -181,6 +181,7 @@ Respond with ONLY this JSON, no other text:
 }
 
 At most 4 claims_to_verify — the ones where external confirmation matters most.
+List at most 4 red_flags and at most 4 green_flags — only the most significant. Keep each "detail" to one concise sentence. Be brief; do not pad.
 
 RESUME:
 ${resumeText}`,
@@ -404,10 +405,10 @@ export async function POST(request: NextRequest) {
     if (!skipWeb && analysis.claims_to_verify.length > 0) {
       const toVerify = analysis.claims_to_verify.slice(0, MAX_CLAIMS_TO_VERIFY);
       try {
-        const webWork = Promise.all(toVerify.map((c) => verifyClaim(anthropic, c, 18000)));
+        const webWork = Promise.all(toVerify.map((c) => verifyClaim(anthropic, c, 14000)));
         // Whole-phase budget: whichever finishes first wins. If the searches
         // aren't done in time, we move on with an empty set (analysis only).
-        const budget = new Promise<any[]>((resolve) => setTimeout(() => resolve([]), 28000));
+        const budget = new Promise<any[]>((resolve) => setTimeout(() => resolve([]), 20000));
         webResults = await Promise.race([webWork, budget]);
       } catch {
         webResults = []; // a web failure must never crash the request
