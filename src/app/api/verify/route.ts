@@ -8,6 +8,10 @@ import Anthropic from '@anthropic-ai/sdk';
 
 const MODEL = 'claude-sonnet-4-20250514';
 
+// Give the function room for the analysis call + parallel web searches on long
+// resumes. (Vercel caps this by plan; extra is harmless.)
+export const maxDuration = 60;
+
 // Claude's context window is ~200k tokens; this (~50k tokens) handles a 38-page
 // resume. This is OUR cap, not the model's. (Old code rejected anything over 10k.)
 const MAX_INPUT_CHARS = 200_000;
@@ -106,6 +110,20 @@ function parseJsonObject(text: string): any | null {
   } catch {
     return null;
   }
+}
+
+// Retry a flaky async op (e.g. a model call) on transient failures, with backoff.
+async function withRetry<T>(fn: () => Promise<T>, attempts = 3, baseDelayMs = 1500): Promise<T> {
+  let lastErr: any;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      lastErr = e;
+      if (i < attempts - 1) await new Promise((r) => setTimeout(r, baseDelayMs * (i + 1)));
+    }
+  }
+  throw lastErr;
 }
 
 // ============================================================================
@@ -314,7 +332,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Server configuration error. Please contact support.' }, { status: 500 });
     }
 
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, maxRetries: 4 });
 
     const { userId } = auth();
     if (!userId) {
@@ -369,10 +387,10 @@ export async function POST(request: NextRequest) {
     // ---- STEP 1: Internal analysis (cheap, every resume) ----
     let analysis: InternalAnalysis;
     try {
-      analysis = await analyzeResume(anthropic, cleanText);
+      analysis = await withRetry(() => analyzeResume(anthropic, cleanText));
     } catch (aiError: any) {
       console.error('Internal analysis error:', aiError?.message);
-      return NextResponse.json({ error: 'AI service temporarily unavailable. Please try again.' }, { status: 503 });
+      return NextResponse.json({ error: 'The analysis service is busy right now. Please click Verify again in a moment.' }, { status: 503 });
     }
 
     // ---- STEP 2: Web verification (skip on confident REJECT to save cost) ----
