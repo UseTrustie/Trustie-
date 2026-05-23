@@ -128,7 +128,7 @@ export default function LandingPage() {
               <span className="text-blue-500">Trust Every Hire.</span>
             </h1>
             <p className={`text-xl ${textSecondary} mb-10 max-w-2xl mx-auto`}>
-              AI-powered fact verification that cross-checks claims across multiple sources. Stop fraud. Build trust.
+              AI-powered resume and credential verification that checks every claim against public records in seconds. Spot the fakes before you hire, not after.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href={authLink} className="w-full sm:w-auto px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors">
@@ -150,7 +150,7 @@ export default function LandingPage() {
                   <div className="w-3 h-3 rounded-full bg-green-500" />
                 </div>
                 <div className="flex-1 text-center">
-                  <span className={`text-sm ${textMuted}`}>trustieapp.com/app</span>
+                  <span className={`text-sm ${textMuted}`}>usetrustie.com/app</span>
                 </div>
               </div>
               <div className="p-8">
