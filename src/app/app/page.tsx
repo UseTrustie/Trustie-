@@ -37,21 +37,12 @@ function formatConfidence(value: number) {
   return Math.round(value * 100);
 }
 
-// Below this overall score, recommend against proceeding -- like a failing
-// grade. Catches inflated / AI-spam resumes whose facts technically check out
-// but don't clear the quality bar. Change this one number to tune strictness.
-const SCORE_FLOOR = 65;
-
 function getRiskLevel(result: VerificationResult) {
-  const { verified, unverified, partial, total_claims, confidence } = result.summary;
+  const { verified, unverified, partial, total_claims } = result.summary;
   if (total_claims === 0) return { level: 'unknown', color: 'gray', label: 'No Claims Found' };
   const unverifiedRatio = unverified / total_claims;
   const verifiedRatio = verified / total_claims;
-  const scorePct = confidence > 1 ? confidence : confidence * 100;
-  // Hard fraud signals -> High Risk.
   if (unverified >= 2 || unverifiedRatio >= 0.4) return { level: 'high', color: 'red', label: 'High Risk' };
-  // Overall score below the bar -> High Risk, even with no single hard contradiction.
-  if (scorePct < SCORE_FLOOR) return { level: 'high', color: 'red', label: 'High Risk' };
   if (unverified === 1 || (partial || 0) >= 2) return { level: 'medium', color: 'yellow', label: 'Medium Risk' };
   if (verifiedRatio >= 0.8 && unverified === 0) return { level: 'low', color: 'green', label: 'Low Risk' };
   return { level: 'medium', color: 'yellow', label: 'Medium Risk' };
@@ -59,13 +50,9 @@ function getRiskLevel(result: VerificationResult) {
 
 function getRecommendation(result: VerificationResult) {
   const risk = getRiskLevel(result);
-  const { verified, unverified, partial, total_claims, confidence } = result.summary;
+  const { verified, unverified, partial, total_claims } = result.summary;
   if (risk.level === 'high') {
-    if (unverified >= 1) {
-      return { action: 'Do Not Consider', detail: unverified + ' claim' + (unverified > 1 ? 's' : '') + ' contradicted by public records. Request documentation or reconsider this candidate.', icon: '\u{1F6AB}' };
-    }
-    var lowScore = confidence > 1 ? Math.round(confidence) : Math.round(confidence * 100);
-    return { action: 'Do Not Consider', detail: 'Overall confidence is only ' + lowScore + '%. Claims are vague, inflated, or could not be verified - not worth prioritizing without strong supporting proof.', icon: '\u{1F6AB}' };
+    return { action: 'Do Not Consider', detail: unverified + ' claim' + (unverified > 1 ? 's' : '') + ' contradicted by public records. Request documentation or reconsider this candidate.', icon: '\u{1F6AB}' };
   }
   if (risk.level === 'medium') {
     var flagged = unverified + (partial || 0);
@@ -117,6 +104,8 @@ export default function AppPage() {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [loadingFact, setLoadingFact] = useState(0);
   const [expandedClaim, setExpandedClaim] = useState<number | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackText, setFeedbackText] = useState('');
 
   useEffect(function() {
     if (isLoaded && !isSignedIn) router.push('/');
@@ -179,6 +168,26 @@ export default function AppPage() {
       if (data.url) window.location.href = data.url;
       else throw new Error(data.error);
     } catch (err: any) { setError(err.message); setIsCheckingOut(false); }
+  };
+
+  var handleSendFeedback = function() {
+    var trimmed = feedbackText.trim();
+    if (!trimmed) return;
+    var lines = [
+      trimmed,
+      '',
+      '---',
+      'From: ' + (user && user.emailAddresses[0] ? user.emailAddresses[0].emailAddress : 'unknown'),
+      'Plan: ' + usage.plan,
+    ];
+    if (result && result.audit && result.audit.id) {
+      lines.push('Re: verification ' + result.audit.id);
+    }
+    var subject = encodeURIComponent('Trustie feedback');
+    var body = encodeURIComponent(lines.join('\n'));
+    window.location.href = 'mailto:trustietechnologies@gmail.com?subject=' + subject + '&body=' + body;
+    setFeedbackText('');
+    setShowFeedback(false);
   };
 
   if (!isLoaded) {
@@ -439,6 +448,39 @@ export default function AppPage() {
           </div>
         )}
       </main>
+
+      <button
+        onClick={function() { setShowFeedback(true); }}
+        className="fixed bottom-5 right-5 z-40 flex items-center gap-2 px-4 py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white text-sm rounded-full shadow-lg shadow-black/30 transition-colors"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+        Feedback
+      </button>
+
+      {showFeedback && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={function() { setShowFeedback(false); }} />
+          <div className="relative w-full max-w-lg rounded-2xl p-8 bg-gray-900 border border-gray-800">
+            <button onClick={function() { setShowFeedback(false); }} className="absolute top-4 right-4 text-gray-500 hover:text-white text-xl">{'\u2715'}</button>
+            <h2 className="text-2xl font-bold mb-2">Help improve Trustie</h2>
+            <p className="text-sm text-gray-400 mb-5">Spotted a wrong result, missing something, or have an idea? Tell us - it comes straight to us.</p>
+            <textarea
+              value={feedbackText}
+              onChange={function(e) { setFeedbackText(e.target.value); }}
+              placeholder="What worked, what didn't, what felt off about a result..."
+              className="w-full h-36 p-4 rounded-xl bg-gray-800 border border-gray-700 resize-none outline-none text-white placeholder-gray-600 text-sm leading-relaxed focus:border-blue-500 transition-colors"
+            />
+            <button
+              onClick={handleSendFeedback}
+              disabled={!feedbackText.trim()}
+              className="mt-4 w-full py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Send feedback
+            </button>
+            <p className="text-xs text-gray-600 mt-3 text-center">Opens your email pre-filled - just hit send.</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
